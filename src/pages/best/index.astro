@@ -1,0 +1,36 @@
+---
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { SITE } from '@data/site';
+
+const seo = buildSEO({
+  title: 'Best OwnitApps Tools Hub',
+  description: 'Commercial SEO hub for best offline-first, privacy-first, and no-subscription digital tools.',
+  canonical: `${SITE.url}${'/best'}`,
+});
+---
+
+<PublicLayout seo={seo} schema={null}>
+  <section class="container py-16">
+    <div class="max-w-3xl">
+      <span class="badge badge-gold mb-4">Best Tools</span>
+      <h1 class="mb-4">Best Tools</h1>
+      <p class="text-lg leading-relaxed text-[var(--text-secondary)] mb-8">Commercial-intent pages for users comparing the best private, offline-first tools by use case.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4 mt-8">
+      <a href="/apps" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Apps</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Browse all tools.</p>
+      </a>
+      <a href="/resources" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Resources</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Read guides.</p>
+      </a>
+      <a href="/compare" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Compare</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Compare options.</p>
+      </a>
+    </div>
+  </section>
+</PublicLayout>

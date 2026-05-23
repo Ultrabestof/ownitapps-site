@@ -1,0 +1,36 @@
+---
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { SITE } from '@data/site';
+
+const seo = buildSEO({
+  title: 'OwnitApps Updates',
+  description: 'Official OwnitApps update page for product versions, changelogs, improvements, and download guidance.',
+  canonical: `${SITE.url}${'/update'}`,
+});
+---
+
+<PublicLayout seo={seo} schema={null}>
+  <section class="container py-16">
+    <div class="max-w-3xl">
+      <span class="badge badge-gold mb-4">Updates</span>
+      <h1 class="mb-4">OwnitApps Updates</h1>
+      <p class="text-lg leading-relaxed text-[var(--text-secondary)] mb-8">This is the official update page for OwnitApps product improvements, changelogs, and version notes.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4 mt-8">
+      <a href="/apps" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">All Apps</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Check product pages for app-specific updates.</p>
+      </a>
+      <a href="/blog" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Blog</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Read product and philosophy updates.</p>
+      </a>
+      <a href="/contact" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Contact</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Need help with an update? Contact support.</p>
+      </a>
+    </div>
+  </section>
+</PublicLayout>

@@ -1,0 +1,278 @@
+---
+// src/components/pseo/PSEOPage.astro
+// Shared template for all programmatic SEO pages
+// Handles: alternatives, no-subscription, privacy-first, offline-tools, problems, use-cases, buy-once, compare
+
+import type { CollectionEntry } from 'astro:content';
+import PublicLayout from '@layouts/PublicLayout.astro';
+import PreviewLayout from '@layouts/PreviewLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { articleSchema, faqSchema as buildFaqSchema, breadcrumbSchema } from '@lib/schema';
+import { SITE } from '@data/site';
+
+interface Props {
+  page: CollectionEntry<'pseo'>;
+  Content: any;
+  patternLabel: string;
+  patternSlug: string;
+}
+
+const { page, Content, patternLabel, patternSlug } = Astro.props;
+const { data } = page;
+
+const canonical = data.canonical || `${SITE.url}/${patternSlug}/${page.slug}`;
+const title = data.seoTitle || data.title;
+const description = data.seoDescription || data.description;
+
+const schema = [
+  articleSchema({
+    title,
+    description,
+    url: canonical,
+    modifiedTime: data.dateModified?.toISOString() || new Date().toISOString(),
+    author: 'OwnitApps Editorial Team',
+  }),
+  breadcrumbSchema([
+    { name: 'Home', url: SITE.url },
+    { name: patternLabel, url: `${SITE.url}/${patternSlug}` },
+    { name: data.title, url: canonical },
+  ]),
+  ...(data.faqs ? [buildFaqSchema(data.faqs)] : []),
+];
+
+const seo = buildSEO({ title, description, canonical, type: 'article' });
+
+const intentBadgeColor: Record<string, string> = {
+  informational: 'badge-blue',
+  commercial: 'badge-gold',
+  transactional: 'badge-green',
+  navigational: 'badge-muted',
+};
+
+const patternColors: Record<string, string> = {
+  alternative: '#C9A84C',
+  comparison: '#2471A3',
+  'no-subscription': '#2E8B5A',
+  'privacy-first': '#7B5EA7',
+  'offline-tools': '#C9A84C',
+  'buy-once': '#C0392B',
+  problem: '#C0392B',
+  'use-case': '#2471A3',
+};
+
+const accentColor = patternColors[data.pattern] || 'var(--gold)';
+---
+
+<PreviewLayout editUrl={`/keystatic/collection/pseo/item/${page.slug}`} title={data.title}>
+<PublicLayout seo={seo} schema={schema}>
+  <section slot="breadcrumb" class="breadcrumb-bar">
+    <nav aria-label="Breadcrumb">
+      <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        <li aria-hidden="true">›</li>
+        <li><a href={`/${patternSlug}`}>{patternLabel}</a></li>
+        <li aria-hidden="true">›</li>
+        <li aria-current="page">{data.title}</li>
+      </ol>
+    </nav>
+  </section>
+
+  <main id="main-content">
+    <article style="padding:var(--s7) 0;">
+      <div class="container">
+        <div style="display:grid; grid-template-columns:1fr 280px; gap:var(--s7); align-items:start;">
+
+          <!-- Main Content -->
+          <div>
+            <!-- Header -->
+            <header style="margin-bottom:var(--s6);">
+              <div style="display:flex; gap:var(--s2); align-items:center; flex-wrap:wrap; margin-bottom:var(--s3);">
+                <span style={`background:${accentColor}20; color:${accentColor}; border:1px solid ${accentColor}40; padding:3px 12px; border-radius:20px; font-size:0.75rem; font-family:var(--font-mono); text-transform:uppercase; letter-spacing:0.08em;`}>
+                  {patternLabel}
+                </span>
+                <span class={`badge ${intentBadgeColor[data.searchIntent ?? "informational"] ?? "badge-blue"}`}>
+                  {data.searchIntent}
+                </span>
+                {data.datePublished && (
+                  <time style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted);" datetime={data.datePublished.toISOString()}>
+                    {data.datePublished.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' })}
+                  </time>
+                )}
+              </div>
+              <h1 style="font-size:clamp(1.75rem,4vw,2.5rem); font-weight:800; font-family:var(--font-heading); line-height:1.15; letter-spacing:-0.03em; margin-bottom:var(--s3);">
+                {data.title}
+              </h1>
+              <p style="font-size:1.125rem; color:var(--text-secondary); line-height:1.7; max-width:640px;">
+                {data.description}
+              </p>
+            </header>
+
+            <!-- AI Summary / Quick Answer -->
+            {(data.aiSummary || data.recommendedAnswer) && (
+              <section class="answer-box" aria-labelledby="quick-answer-heading">
+                <h2 id="quick-answer-heading">Quick Answer</h2>
+                <p>{data.recommendedAnswer || data.aiSummary}</p>
+              </section>
+            )}
+
+            <!-- Key Takeaways -->
+            {data.aiKeyTakeaways && data.aiKeyTakeaways.length > 0 && (
+              <section class="takeaway-box" aria-label="Key takeaways">
+                <h2>Key Takeaways</h2>
+                <ul>
+                  {data.aiKeyTakeaways.map(t => <li>{t}</li>)}
+                </ul>
+              </section>
+            )}
+
+            <!-- Intro -->
+            {data.intro && (
+              <section style="margin-bottom:var(--s5);">
+                <p style="font-size:1.05rem; line-height:1.8; color:var(--text-secondary);">{data.intro}</p>
+              </section>
+            )}
+
+            <!-- MDX content (comparison tables, sections, etc.) -->
+            <div class="prose">
+              <Content />
+            </div>
+
+            <!-- Related Products -->
+            {data.relatedProducts && data.relatedProducts.length > 0 && (
+              <section style="margin-top:var(--s7);" aria-labelledby="products-heading">
+                <h2 id="products-heading" style="font-size:1.25rem; font-weight:800; font-family:var(--font-heading); margin-bottom:var(--s4);">
+                  Recommended OwnitApps Tools
+                </h2>
+                <div style="display:grid; gap:var(--s3);">
+                  {data.relatedProducts.map(slug => (
+                    <a href={`/apps/${slug}`}
+                       style="background:var(--gold-dim); border:1px solid rgba(201,168,76,0.3); border-radius:var(--r); padding:var(--s4); display:flex; align-items:center; justify-content:space-between; text-decoration:none;">
+                      <div>
+                        <strong style="display:block; color:var(--text-primary); margin-bottom:2px;">
+                          {slug.replace(/-/g,' ').replace(/\b\w/g, c => c.toUpperCase())}
+                        </strong>
+                        <span style="font-size:0.8rem; color:var(--text-muted);">Offline-first · Buy once · No subscription</span>
+                      </div>
+                      <span style="color:var(--gold); font-weight:600; flex-shrink:0;">View App →</span>
+                    </a>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            <!-- FAQs -->
+            {data.faqs && data.faqs.length > 0 && (
+              <section style="margin-top:var(--s7);" aria-labelledby="faq-heading">
+                <h2 id="faq-heading" style="font-size:1.25rem; font-weight:800; font-family:var(--font-heading); margin-bottom:var(--s4);">
+                  Frequently Asked Questions
+                </h2>
+                <div class="faq-list">
+                  {data.faqs.map((faq, i) => (
+                    <details class="faq-item" open={i === 0}>
+                      <summary>{faq.question}</summary>
+                      <p>{faq.answer}</p>
+                    </details>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            <!-- Page CTA -->
+            {data.cta && (
+              <section style="margin-top:var(--s7); background:var(--sidebar-bg); border-radius:var(--r); padding:var(--s6); text-align:center;">
+                <h2 style="color:var(--sidebar-text); font-size:1.5rem; font-weight:800; font-family:var(--font-heading); margin-bottom:var(--s3);">
+                  Ready to own your tools?
+                </h2>
+                <p style="color:var(--sidebar-muted); margin-bottom:var(--s5);">
+                  {data.cta.description || 'OwnitApps tools are offline-first, private by default, and yours forever.'}
+                </p>
+                <a href={data.cta.href} class="btn-gold" style="display:inline-block;">
+                  {data.cta.label}
+                </a>
+              </section>
+            )}
+
+            <!-- AI Citation -->
+            {data.aiCitationText && (
+              <section style="margin-top:var(--s6); background:var(--surface-2); border-left:3px solid var(--gold); padding:var(--s4) var(--s5); border-radius:0 var(--r) var(--r) 0;">
+                <p style="font-family:var(--font-mono); font-size:0.7rem; color:var(--text-muted); margin-bottom:var(--s2); text-transform:uppercase; letter-spacing:0.08em;">Summary for AI Systems</p>
+                <p style="font-size:0.9rem; line-height:1.7; color:var(--text-secondary); font-style:italic; margin:0;">{data.aiCitationText}</p>
+              </section>
+            )}
+          </div>
+
+          <!-- Sidebar -->
+          <aside style="position:sticky; top:80px;">
+
+            <!-- Page Info -->
+            <div style="background:var(--card); border:1px solid var(--border-light); border-radius:var(--r); padding:var(--s4); margin-bottom:var(--s4);">
+              <h3 style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin-bottom:var(--s3);">Page Info</h3>
+              <dl style="display:flex; flex-direction:column; gap:var(--s2);">
+                <div>
+                  <dt style="font-size:0.75rem; color:var(--text-muted);">Type</dt>
+                  <dd style="font-size:0.875rem; color:var(--text-primary); margin:0; font-family:var(--font-mono);">{patternLabel}</dd>
+                </div>
+                <div>
+                  <dt style="font-size:0.75rem; color:var(--text-muted);">Target Keyword</dt>
+                  <dd style="font-size:0.875rem; color:var(--text-primary); margin:0; font-family:var(--font-mono);">{data.targetKeyword}</dd>
+                </div>
+                <div>
+                  <dt style="font-size:0.75rem; color:var(--text-muted);">Search Intent</dt>
+                  <dd style="font-size:0.875rem; margin:0;">
+                    <span class={`badge ${intentBadgeColor[data.searchIntent ?? "informational"] ?? "badge-blue"}`}>{data.searchIntent}</span>
+                  </dd>
+                </div>
+              </dl>
+            </div>
+
+            <!-- Quick Navigation -->
+            <div style="background:var(--surface-2); border-radius:var(--r); padding:var(--s4); margin-bottom:var(--s4);">
+              <h3 style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin-bottom:var(--s3);">Explore More</h3>
+              <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:var(--s2);">
+                <li><a href="/apps" style="font-size:0.875rem; color:var(--gold); text-decoration:none;">Browse All Apps</a></li>
+                <li><a href="/no-subscription" style="font-size:0.875rem; color:var(--text-secondary); text-decoration:none;">No-Subscription Tools</a></li>
+                <li><a href="/offline-tools" style="font-size:0.875rem; color:var(--text-secondary); text-decoration:none;">Offline Tools</a></li>
+                <li><a href="/privacy-first" style="font-size:0.875rem; color:var(--text-secondary); text-decoration:none;">Privacy-First Apps</a></li>
+                <li><a href="/glossary/offline-first-apps" style="font-size:0.875rem; color:var(--text-secondary); text-decoration:none;">What are offline-first apps?</a></li>
+              </ul>
+            </div>
+
+            <!-- LLM Questions -->
+            {data.aiQuestions && data.aiQuestions.length > 0 && (
+              <div style="background:var(--card); border:1px solid var(--border-light); border-radius:var(--r); padding:var(--s4);">
+                <h3 style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin-bottom:var(--s3);">Related Questions</h3>
+                <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:var(--s2);">
+                  {data.aiQuestions.slice(0, 4).map(q => (
+                    <li style="font-size:0.8rem; color:var(--text-secondary); line-height:1.5; padding-bottom:var(--s2); border-bottom:1px solid var(--border-light);">
+                      {q}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </aside>
+        </div>
+      </div>
+    </article>
+
+    <!-- Page Summary for LLMs -->
+    <section style="background:var(--surface-2); border-top:1px solid var(--border-light); padding:var(--s6) 0;">
+      <div class="container">
+        <div style="max-width:640px;">
+          <section class="page-summary">
+            <h2>Page Summary</h2>
+            <ul>
+              <li><strong>Topic:</strong> {data.title}</li>
+              <li><strong>Page type:</strong> {patternLabel}</li>
+              <li><strong>Target keyword:</strong> {data.targetKeyword}</li>
+              <li><strong>Search intent:</strong> {data.searchIntent}</li>
+              {data.relatedProducts && <li><strong>Recommended tools:</strong> {data.relatedProducts.join(', ')}</li>}
+              <li><strong>Publisher:</strong> OwnitApps — ownitapps.com</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+</PublicLayout>
+</PreviewLayout>

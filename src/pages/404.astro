@@ -1,0 +1,60 @@
+---
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+
+const seo = buildSEO({
+  title: '404 — Page Not Found | OwnitApps',
+  description: 'This page does not exist. Browse OwnitApps offline-first tools or head back home.',
+  noindex: true,
+});
+---
+
+<PublicLayout seo={seo} schema={null}>
+  <div class="min-h-[70vh] flex items-center justify-center px-6 py-24">
+    <div class="max-w-xl w-full text-center">
+
+      <!-- Error code -->
+      <div class="font-mono text-8xl font-bold text-[var(--text-primary)]/5 mb-4 select-none leading-none">
+        404
+      </div>
+
+      <!-- Icon + message -->
+      <div class="text-4xl mb-6">🗂️</div>
+      <h1 class="text-2xl font-bold font-heading text-[var(--text-primary)] mb-3">
+        This page doesn't exist
+      </h1>
+      <p class="text-[var(--text-muted)] mb-10 leading-relaxed">
+        It may have moved, been deleted, or you may have followed a broken link.
+        Either way, the page isn't here — but your data is still safe on your device.
+      </p>
+
+      <!-- Quick links -->
+      <div class="grid sm:grid-cols-2 gap-3 mb-10 text-left">
+        {[
+          { href: '/', label: 'Home', desc: 'Back to the beginning', icon: '🏠' },
+          { href: '/apps', label: 'Browse Apps', desc: 'All OwnitApps tools', icon: '📦' },
+          { href: '/blog', label: 'Blog', desc: 'Offline-first articles', icon: '📝' },
+          { href: '/glossary', label: 'Glossary', desc: 'Key terms explained', icon: '📖' },
+        ].map(({ href, label, desc, icon }) => (
+          <a
+            href={href}
+            class="flex items-center gap-3 p-4 rounded-xl border border-[var(--border-light)] bg-[var(--card)]
+                   hover:border-[var(--gold)]/40 hover:bg-[var(--surface-2)] transition-all group"
+          >
+            <span class="text-2xl flex-shrink-0">{icon}</span>
+            <div>
+              <div class="text-[var(--text-primary)] font-medium text-sm group-hover:text-[var(--gold)] transition-colors">
+                {label}
+              </div>
+              <div class="text-[var(--text-muted)] text-xs">{desc}</div>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      <!-- CTA -->
+      <a href="/" class="btn-gold">Go Home</a>
+
+    </div>
+  </div>
+</PublicLayout>

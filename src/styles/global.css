@@ -1,0 +1,578 @@
+/* ============================================================
+   OwnitApps Global Styles
+   ============================================================ */
+@import './tokens.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Web Font Declarations ──────────────────────────────── */
+/* No remote font loading. System fallbacks are used by default. */
+
+/* ── Base Reset ─────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text-primary);
+    background-color: var(--main-bg);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--main-bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+  }
+
+  /* ── Headings ── */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--text-primary);
+    margin-top: 0;
+  }
+
+  h1 { font-size: clamp(2rem, 5vw, 3.5rem); }
+  h2 { font-size: clamp(1.5rem, 3.5vw, 2.25rem); letter-spacing: -0.025em; }
+  h3 { font-size: clamp(1.2rem, 2.5vw, 1.5rem); letter-spacing: -0.02em; }
+  h4 { font-size: 1.125rem; letter-spacing: -0.015em; }
+
+  /* ── Links ── */
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* ── Images ── */
+  img, svg, video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* ── Focus ── */
+  :focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* ── Selection ── */
+  ::selection {
+    background: var(--gold-dim);
+    color: var(--text-primary);
+  }
+
+  /* ── Code / Mono ── */
+  code, kbd, samp, pre {
+    font-family: var(--font-mono);
+  }
+
+  code:not(pre code) {
+    background: var(--surface-2);
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    font-size: 0.875em;
+  }
+
+  pre {
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    padding: 1.25rem 1.5rem;
+    border-radius: var(--r);
+    overflow-x: auto;
+    line-height: 1.6;
+  }
+
+  /* ── Tables ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+  }
+
+  th {
+    background: var(--surface-2);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    border-bottom: 2px solid var(--border-medium);
+    font-size: 0.8125rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: middle;
+  }
+
+  tr:hover td {
+    background: rgba(201, 168, 76, 0.04);
+  }
+
+  /* ── HR ── */
+  hr {
+    border: none;
+    border-top: 1px solid var(--border-light);
+    margin: 2rem 0;
+  }
+
+  /* ── Lists ── */
+  ul, ol {
+    padding-left: 1.5em;
+  }
+
+  li {
+    margin-bottom: 0.35em;
+  }
+}
+
+/* ── Layout Components ─────────────────────────────────── */
+@layer components {
+
+  /* ── App Shell ── */
+  .app-shell {
+    display: flex;
+    min-height: 100vh;
+    background: var(--main-bg);
+  }
+
+  .sidebar {
+    width: var(--sidebar-width);
+    flex: 0 0 var(--sidebar-width);
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    border-right: 1px solid var(--sidebar-border);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: var(--z-sidebar);
+  }
+
+  .main {
+    flex: 1;
+    min-width: 0;
+    background: var(--main-bg);
+    padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .mobile-nav {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--card);
+    border-radius: var(--r);
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .card:hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  /* ── Gold Buttons ── */
+  .btn-gold {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--gold);
+    color: #1a1208;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.9375rem;
+    letter-spacing: -0.01em;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--rs);
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+    text-decoration: none;
+    white-space: nowrap;
+    min-height: 48px;
+  }
+
+  .btn-gold:hover {
+    background: var(--gold-hover);
+    box-shadow: var(--shadow-gold);
+    transform: translateY(-1px);
+  }
+
+  .btn-gold:active {
+    transform: translateY(0);
+  }
+
+  /* ── Ghost Button ── */
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    color: var(--text-primary);
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    letter-spacing: -0.01em;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--rs);
+    border: 1.5px solid var(--border-medium);
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+    text-decoration: none;
+    white-space: nowrap;
+    min-height: 48px;
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--gold);
+    background: var(--gold-dim);
+    color: var(--text-primary);
+  }
+
+  /* ── Answer Box ── */
+  .answer-box {
+    background: linear-gradient(135deg, var(--surface-2) 0%, #fff 100%);
+    border-left: 4px solid var(--gold);
+    border-radius: var(--rs);
+    padding: var(--s5) var(--s6);
+    margin-bottom: var(--s6);
+  }
+
+  .answer-box h2 {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: var(--s3);
+    font-weight: 700;
+  }
+
+  .answer-box p {
+    color: var(--text-primary);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  /* ── Key Takeaway Box ── */
+  .takeaway-box {
+    background: var(--gold-dim);
+    border: 1px solid rgba(201, 168, 76, 0.3);
+    border-radius: var(--r);
+    padding: var(--s5);
+    margin-bottom: var(--s6);
+  }
+
+  .takeaway-box strong {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: var(--s2);
+  }
+
+  /* ── Page Summary ── */
+  .page-summary {
+    background: var(--surface-2);
+    border: 1px solid var(--border-light);
+    border-radius: var(--r);
+    padding: var(--s5) var(--s6);
+    margin-bottom: var(--s7);
+  }
+
+  .page-summary h2 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: var(--s4);
+    font-weight: 700;
+  }
+
+  .page-summary ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--s2);
+  }
+
+  .page-summary li {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    display: flex;
+    gap: var(--s3);
+    margin: 0;
+  }
+
+  .page-summary li strong {
+    color: var(--text-primary);
+    min-width: 130px;
+    flex-shrink: 0;
+    font-weight: 600;
+  }
+
+  /* ── Badge ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 10px;
+    border-radius: var(--rpill);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .badge-gold {
+    background: var(--gold-dim);
+    color: var(--gold);
+    border: 1px solid rgba(201, 168, 76, 0.25);
+  }
+
+  .badge-green {
+    background: rgba(46, 139, 90, 0.1);
+    color: var(--green);
+    border: 1px solid rgba(46, 139, 90, 0.2);
+  }
+
+  .badge-red {
+    background: rgba(192, 57, 43, 0.1);
+    color: var(--red);
+    border: 1px solid rgba(192, 57, 43, 0.2);
+  }
+
+  .badge-muted {
+    background: var(--surface-2);
+    color: var(--text-muted);
+    border: 1px solid var(--border-light);
+  }
+
+  /* ── Section Labels ── */
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: block;
+    margin-bottom: var(--s3);
+  }
+
+  /* ── Comparison Table ── */
+  .comparison-table {
+    width: 100%;
+    border-radius: var(--r);
+    overflow: hidden;
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-card);
+  }
+
+  .comparison-table th:first-child {
+    border-radius: var(--r) 0 0 0;
+  }
+
+  .comparison-table th:last-child {
+    border-radius: 0 var(--r) 0 0;
+  }
+
+  /* ── Breadcrumbs ── */
+  .breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
+    flex-wrap: wrap;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: var(--s5);
+  }
+
+  .breadcrumbs a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .breadcrumbs a:hover {
+    color: var(--gold);
+  }
+
+  .breadcrumbs span.sep {
+    color: var(--border-medium);
+    user-select: none;
+  }
+
+  .breadcrumbs span.current {
+    color: var(--text-secondary);
+  }
+
+  /* ── FAQ Accordion ── */
+  .faq-item {
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .faq-item:last-child {
+    border-bottom: none;
+  }
+
+  .faq-question {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--s4) 0;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--s4);
+    min-height: 44px;
+    transition: color 0.15s;
+  }
+
+  .faq-question:hover {
+    color: var(--gold);
+  }
+
+  .faq-answer {
+    padding: 0 0 var(--s4);
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    display: none;
+  }
+
+  .faq-item.open .faq-answer {
+    display: block;
+  }
+
+  /* ── Container ── */
+  .container {
+    width: 100%;
+    max-width: var(--content-max);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--s6);
+    padding-right: var(--s6);
+  }
+
+  @media (max-width: 640px) {
+    .container {
+      padding-left: var(--s5);
+      padding-right: var(--s5);
+    }
+  }
+
+  /* ── Grid Utilities ── */
+  .grid-auto-fill {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+    gap: var(--s5);
+  }
+
+  .grid-auto-fill-sm {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
+    gap: var(--s4);
+  }
+
+  /* ── Philosophy Pills ── */
+  .philosophy-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s2);
+    background: var(--card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--rpill);
+    padding: var(--s2) var(--s4);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    box-shadow: var(--shadow-card);
+    white-space: nowrap;
+  }
+
+  /* ── Scroll Animations ── */
+  .animate-in {
+    animation: fadeUp 0.5s ease-out both;
+  }
+
+  .animate-in-delay-1 { animation-delay: 0.1s; }
+  .animate-in-delay-2 { animation-delay: 0.2s; }
+  .animate-in-delay-3 { animation-delay: 0.3s; }
+  .animate-in-delay-4 { animation-delay: 0.4s; }
+  .animate-in-delay-5 { animation-delay: 0.5s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* ── Accessibility ── */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* ── Print ── */
+  @media print {
+    .sidebar, .mobile-nav, .btn-gold, .btn-ghost {
+      display: none !important;
+    }
+
+    body {
+      background: white;
+      color: black;
+    }
+  }
+}
+
+
+  /* Tailwind compatibility utilities for fractional opacity values used in templates. */
+  .bg-white\/2 { background-color: rgba(255, 255, 255, 0.02); }
+  .bg-white\/3 { background-color: rgba(255, 255, 255, 0.03); }
+  .bg-white\/4 { background-color: rgba(255, 255, 255, 0.04); }
+  .border-white\/8 { border-color: rgba(255, 255, 255, 0.08); }

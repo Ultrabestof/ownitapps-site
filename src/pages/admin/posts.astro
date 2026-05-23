@@ -1,0 +1,144 @@
+---
+// src/pages/admin/posts.astro
+import { getCollection } from 'astro:content';
+import AdminLayout from '@layouts/AdminLayout.astro';
+import { SEO_LIMITS } from '@lib/seo';
+
+const allPosts = await getCollection('blog');
+const posts = [...allPosts].sort((a, b) => b.data.datePublished.getTime() - a.data.datePublished.getTime());
+
+function seoStatus(post: typeof posts[0]) {
+  const issues: string[] = [];
+  if (post.data.title.length > SEO_LIMITS.titleMax) issues.push('Title too long');
+  if (post.data.description.length > SEO_LIMITS.descriptionMax) issues.push('Desc too long');
+  if (!post.data.featuredImage) issues.push('No image');
+  if (!post.data.aiSummary) issues.push('No aiSummary');
+  if (!post.data.aiCitationText) issues.push('No aiCitation');
+  if (!post.data.faqs || post.data.faqs.length === 0) issues.push('No FAQs');
+  return issues;
+}
+
+const categories = [...new Set(posts.map(p => p.data.category))].sort();
+const publishedCount = posts.filter(p => !p.data.draft).length;
+const draftCount = posts.filter(p => p.data.draft).length;
+const withIssues = posts.filter(p => seoStatus(p).length > 0).length;
+---
+
+<AdminLayout title="Content Manager — Blog Posts">
+  <div style="display:flex; flex-direction:column; gap:var(--s5);">
+
+    <!-- Header -->
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--s3);">
+      <div>
+        <h1 style="font-size:1.5rem; font-weight:800; font-family:var(--font-heading); margin:0 0 var(--s1);">Blog Posts</h1>
+        <p style="color:var(--sidebar-muted); font-size:0.875rem; margin:0;">{posts.length} total · {publishedCount} published · {draftCount} drafts · {withIssues} with SEO issues</p>
+      </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:var(--s3);">
+      {[
+        { label: 'Published', value: publishedCount, color: 'var(--green)' },
+        { label: 'Drafts', value: draftCount, color: 'var(--sidebar-muted)' },
+        { label: 'SEO Issues', value: withIssues, color: withIssues > 0 ? 'var(--amber)' : 'var(--green)' },
+        { label: 'Missing Images', value: posts.filter(p => !p.data.featuredImage).length, color: 'var(--red)' },
+        { label: 'Missing FAQs', value: posts.filter(p => !p.data.faqs || p.data.faqs.length === 0).length, color: 'var(--amber)' },
+        { label: 'Missing AI Fields', value: posts.filter(p => !p.data.aiSummary).length, color: 'var(--amber)' },
+      ].map(stat => (
+        <div style="background:rgba(255,255,255,0.04); border:1px solid var(--sidebar-border); border-radius:var(--r); padding:var(--s3) var(--s4);">
+          <div style="font-size:0.7rem; color:var(--sidebar-muted); margin-bottom:var(--s1);">{stat.label}</div>
+          <div style={`font-size:1.5rem; font-weight:800; font-family:var(--font-mono); color:${stat.color};`}>{stat.value}</div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Posts Table -->
+    <div style="background:rgba(255,255,255,0.04); border:1px solid var(--sidebar-border); border-radius:var(--r); overflow:hidden;">
+      <div style="padding:var(--s3) var(--s5); border-bottom:1px solid var(--sidebar-border); display:flex; align-items:center; justify-content:space-between;">
+        <h2 style="font-size:0.8rem; font-weight:700; color:var(--sidebar-muted); margin:0; text-transform:uppercase; letter-spacing:0.08em;">All Posts</h2>
+        <div style="display:flex; gap:var(--s2);">
+          <span style="font-size:0.75rem; color:var(--sidebar-muted);">
+            {categories.join(' · ')}
+          </span>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.78rem;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--sidebar-border);">
+              <th style="text-align:left; padding:var(--s3) var(--s5); color:var(--sidebar-muted); font-weight:600;">Title</th>
+              <th style="text-align:left; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Cat</th>
+              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Status</th>
+              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Title</th>
+              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Desc</th>
+              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Img</th>
+              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">FAQs</th>
+              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">AI</th>
+              <th style="text-align:left; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {posts.map(post => {
+              const _issues = seoStatus(post);
+              const _titleLen = post.data.title.length;
+              const _descLen = post.data.description.length;
+              const _titleOk = _titleLen < 61;
+              const _descOk = _descLen < 161;
+              const _hasImg = !!post.data.featuredImage;
+              const _hasFaqs = !!(post.data.faqs && post.data.faqs.length > 0);
+              const _hasAI = !!(post.data.aiSummary && post.data.aiCitationText);
+
+              return (
+                <tr style={`border-bottom:1px solid rgba(58,58,58,0.5); ${_issues.length > 0 ? 'background:rgba(192,57,43,0.04);' : ''}`}>
+                  <td style="padding:var(--s3) var(--s5); max-width:240px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    <a href={`/blog/${post.slug}`} target="_blank"
+                       style="color:var(--sidebar-text); text-decoration:none; font-weight:500;">
+                      {post.data.title}
+                    </a>
+                    {_issues.length > 0 && (
+                      <div style="margin-top:2px; display:flex; gap:4px; flex-wrap:wrap;">
+                        {_issues.slice(0, 3).map(issue => (
+                          <span style="background:rgba(201,168,76,0.15); color:var(--amber); font-size:0.65rem; padding:1px 6px; border-radius:8px;">{issue}</span>
+                        ))}
+                      </div>
+                    )}
+                  </td>
+                  <td style="padding:var(--s3) var(--s4);">
+                    <span style="font-size:0.7rem; color:var(--gold);">{post.data.category}</span>
+                  </td>
+                  <td style="padding:var(--s3) var(--s4); text-align:center;">
+                    <span style={`font-size:0.7rem; padding:2px 6px; border-radius:8px; ${post.data.draft ? 'background:rgba(154,143,130,0.2); color:var(--sidebar-muted)' : 'background:rgba(46,139,90,0.15); color:#6fcf97'}`}>
+                      {post.data.draft ? 'Draft' : 'Live'}
+                    </span>
+                  </td>
+                  <td style="padding:var(--s3) var(--s4); text-align:center;">
+                    <span style={`font-family:var(--font-mono); font-size:0.75rem; color:${_titleOk ? '#6fcf97' : 'var(--red)'};`}>{_titleLen}</span>
+                  </td>
+                  <td style="padding:var(--s3) var(--s4); text-align:center;">
+                    <span style={`font-family:var(--font-mono); font-size:0.75rem; color:${_descOk ? '#6fcf97' : 'var(--red)'};`}>{_descLen}</span>
+                  </td>
+                  <td style="padding:var(--s3) var(--s4); text-align:center;">{_hasImg ? '✅' : '❌'}</td>
+                  <td style="padding:var(--s3) var(--s4); text-align:center;">{_hasFaqs ? `✅ ${post.data.faqs!.length}` : '❌'}</td>
+                  <td style="padding:var(--s3) var(--s4); text-align:center;">{_hasAI ? '✅' : '⚠️'}</td>
+                  <td style="padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-family:var(--font-mono); font-size:0.72rem; white-space:nowrap;">
+                    {post.data.datePublished.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'2-digit' })}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div style="display:flex; gap:var(--s5); flex-wrap:wrap; font-size:0.75rem; color:var(--sidebar-muted);">
+      <span>✅ = OK</span>
+      <span>❌ = Missing / Failed</span>
+      <span>⚠️ = Needs attention</span>
+      <span>Title column = character count (max 60)</span>
+      <span>Desc column = character count (max 160)</span>
+      <span>AI = aiSummary + aiCitationText present</span>
+    </div>
+  </div>
+</AdminLayout>

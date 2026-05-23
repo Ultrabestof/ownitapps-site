@@ -1,0 +1,88 @@
+/* ============================================================
+   OwnitApps Design Tokens v1.0
+   Locked brand palette — do not modify without brand review
+   ============================================================ */
+
+:root {
+  /* ── Sidebar ── */
+  --sidebar-bg: #2B2B2B;
+  --sidebar-text: #E8DDD0;
+  --sidebar-muted: #9A8F82;
+  --sidebar-border: #3A3A3A;
+
+  /* ── Surfaces ── */
+  --main-bg: #F5F0E8;
+  --card: #FFFFFF;
+  --surface-2: #F0EBE0;
+  --surface-3: #E8E0D0;
+
+  /* ── Borders ── */
+  --border-light: rgba(0, 0, 0, 0.07);
+  --border-medium: rgba(0, 0, 0, 0.12);
+
+  /* ── Brand Colors ── */
+  --gold: #C9A84C;
+  --gold-hover: #B8932E;
+  --gold-dim: rgba(201, 168, 76, 0.15);
+  --gold-400: #C9A84C; /* compatibility alias: use --gold in new code */
+
+  /* ── Status Colors ── */
+  --green: #2E8B5A;
+  --red: #C0392B;
+  --blue: #2471A3;
+  --amber: #C9A84C;
+
+  /* ── Text ── */
+  --text-primary: #2B2B2B;
+  --text-secondary: #6B6258;
+  --text-muted: #9A8F82;
+
+  /* ── Radius ── */
+  --r: 10px;
+  --rs: 6px;
+  --rpill: 20px;
+
+  /* ── Spacing ── */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+
+  /* ── Typography ── */
+  --font-heading: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, monospace;
+
+  /* ── Shadows ── */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.07), 0 4px 16px rgba(0, 0, 0, 0.05);
+  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.1), 0 12px 40px rgba(0, 0, 0, 0.08);
+  --shadow-gold: 0 4px 20px rgba(201, 168, 76, 0.25);
+  --shadow-dropdown: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --shadow-modal: 0 24px 80px rgba(0, 0, 0, 0.2);
+
+  /* ── Z-index ── */
+  --z-sidebar: 100;
+  --z-mobile-nav: 200;
+  --z-dropdown: 300;
+  --z-modal: 500;
+  --z-toast: 700;
+  --z-save-indicator: 800;
+
+  /* ── Layout ── */
+  --sidebar-width: 220px;
+  --header-height: 64px;
+  --content-max: 72rem;
+  --prose-max: 68ch;
+}
+
+/* ── Color Meaning Lock ──
+   Gold   = primary action / active state / premium accent
+   Green  = positive / success
+   Red    = danger / destructive / negative
+   Blue   = info / edit
+   Amber  = warning / saving
+   Muted  = secondary / disabled / quiet information
+   ────────────────────────────────────────────────── */

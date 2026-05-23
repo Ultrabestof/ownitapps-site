@@ -1,0 +1,40 @@
+---
+// Static preview redirect pages for pSEO entries.
+// Keystatic server previews are disabled in the static production build, but these pages keep preview URLs build-safe.
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const pages = await getCollection('pseo');
+  return pages.map((page) => ({ params: { slug: page.slug }, props: { page } }));
+}
+
+interface Props { page: CollectionEntry<'pseo'>; }
+const { page } = Astro.props;
+const patternPrefix: Record<string, string> = {
+  'no-subscription': '/no-subscription',
+  alternative: '/alternatives',
+  comparison: '/compare',
+  compare: '/compare',
+  'privacy-first': '/privacy-first',
+  'offline-tools': '/offline-tools',
+  problem: '/problems',
+  solution: '/solutions',
+  'use-case': '/use-cases',
+  'buy-once': '/buy-once',
+  'local-first': '/local-first',
+  best: '/best',
+};
+const prefix = patternPrefix[page.data.pattern] ?? '/' + page.data.pattern;
+const targetUrl = `${prefix}/${page.slug}`;
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content={`0;url=${targetUrl}`} />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Redirecting…</title>
+  </head>
+  <body>
+    <p>Redirecting to <a href={targetUrl}>{targetUrl}</a>.</p>
+  </body>
+</html>

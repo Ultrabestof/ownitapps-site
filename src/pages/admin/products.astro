@@ -1,0 +1,160 @@
+---
+// src/pages/admin/products.astro
+import { getCollection } from 'astro:content';
+import AdminLayout from '@layouts/AdminLayout.astro';
+
+const allProducts = await getCollection('products');
+const products = [...allProducts].sort((a, b) => a.data.name.localeCompare(b.data.name));
+
+function productIssues(p: typeof products[0]) {
+  const issues: string[] = [];
+  if (!p.data.faqs || p.data.faqs.length === 0) issues.push('No FAQs');
+  if (!p.data.screenshots || p.data.screenshots.length === 0) issues.push('No screenshots');
+  if (!p.data.aiSummary) issues.push('No aiSummary');
+  if (!p.data.aiCitationText) issues.push('No aiCitation');
+  if (!p.data.buyUrl && p.data.status === 'available') issues.push('No buy URL');
+  if (!p.data.seoTitle) issues.push('No seoTitle');
+  if (!p.data.seoDescription) issues.push('No seoDesc');
+  if (p.data.features.length < 5) issues.push('Few features');
+  return issues;
+}
+
+const statusColors: Record<string, string> = {
+  available: 'rgba(46,139,90,0.2); color:#6fcf97',
+  'coming-soon': 'rgba(154,143,130,0.15); color:var(--sidebar-muted)',
+  beta: 'rgba(36,113,163,0.2); color:#74b9ff',
+  deprecated: 'rgba(192,57,43,0.2); color:#ff7675',
+};
+---
+
+<AdminLayout title="Product Manager">
+  <div style="display:flex; flex-direction:column; gap:var(--s5);">
+
+    <!-- Header -->
+    <div>
+      <h1 style="font-size:1.5rem; font-weight:800; font-family:var(--font-heading); margin:0 0 var(--s1);">Product Manager</h1>
+      <p style="color:var(--sidebar-muted); font-size:0.875rem; margin:0;">
+        {products.length} products · {products.filter(p => p.data.status === 'available').length} available · {products.filter(p => p.data.status === 'coming-soon').length} coming soon
+      </p>
+    </div>
+
+    <!-- Summary Cards -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:var(--s3);">
+      {[
+        { label: 'Available', value: products.filter(p => p.data.status === 'available').length, color: 'var(--green)' },
+        { label: 'Coming Soon', value: products.filter(p => p.data.status === 'coming-soon').length, color: 'var(--sidebar-muted)' },
+        { label: 'Missing FAQs', value: products.filter(p => !p.data.faqs || p.data.faqs.length === 0).length, color: 'var(--amber)' },
+        { label: 'Missing AI Fields', value: products.filter(p => !p.data.aiSummary).length, color: 'var(--amber)' },
+        { label: 'Missing Screenshots', value: products.filter(p => !p.data.screenshots || p.data.screenshots.length === 0).length, color: 'var(--red)' },
+        { label: 'No Buy URL', value: products.filter(p => p.data.status === 'available' && !p.data.buyUrl).length, color: 'var(--red)' },
+      ].map(stat => (
+        <div style="background:rgba(255,255,255,0.04); border:1px solid var(--sidebar-border); border-radius:var(--r); padding:var(--s3) var(--s4);">
+          <div style="font-size:0.7rem; color:var(--sidebar-muted); margin-bottom:var(--s1);">{stat.label}</div>
+          <div style={`font-size:1.5rem; font-weight:800; font-family:var(--font-mono); color:${stat.color};`}>{stat.value}</div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Products Table -->
+    <div style="background:rgba(255,255,255,0.04); border:1px solid var(--sidebar-border); border-radius:var(--r); overflow:hidden;">
+      <div style="padding:var(--s3) var(--s5); border-bottom:1px solid var(--sidebar-border);">
+        <h2 style="font-size:0.8rem; font-weight:700; color:var(--sidebar-muted); margin:0; text-transform:uppercase; letter-spacing:0.08em;">All Products</h2>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.78rem;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--sidebar-border);">
+              <th style="text-align:left; padding:var(--s3) var(--s5); color:var(--sidebar-muted); font-weight:600;">Name</th>
+              <th style="text-align:left; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Category</th>
+              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Status</th>
+              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Price</th>
+              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Version</th>
+              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">FAQs</th>
+              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Schema</th>
+              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">AI</th>
+              <th style="text-align:left; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Issues</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map(product => {
+              const issues = productIssues(product);
+              const hasFaqs = !!(product.data.faqs && product.data.faqs.length > 0);
+              const hasAI = !!(product.data.aiSummary && product.data.aiCitationText);
+              const hasSchema = !!(product.data.seoTitle && product.data.seoDescription);
+              const statusStyle = statusColors[product.data.status] || 'rgba(154,143,130,0.15); color:var(--sidebar-muted)';
+
+              return (
+                <tr style={`border-bottom:1px solid rgba(58,58,58,0.5); ${issues.length > 3 ? 'background:rgba(192,57,43,0.04);' : ''}`}>
+                  <td style="padding:var(--s3) var(--s5); max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    <a href={`/apps/${product.slug}`} target="_blank"
+                       style="color:var(--sidebar-text); text-decoration:none; font-weight:600;">{product.data.name}</a>
+                  </td>
+                  <td style="padding:var(--s3) var(--s4);">
+                    <span style="font-size:0.7rem; color:var(--gold);">{product.data.category}</span>
+                  </td>
+                  <td style="padding:var(--s3) var(--s4); text-align:center;">
+                    <span style={`font-size:0.7rem; padding:2px 8px; border-radius:10px; background:${statusStyle};`}>
+                      {product.data.status}
+                    </span>
+                  </td>
+                  <td style="padding:var(--s3) var(--s4); text-align:center; font-family:var(--font-mono); font-size:0.8rem; color:var(--gold);">
+                    {product.data.price ? `$${product.data.price}` : '—'}
+                  </td>
+                  <td style="padding:var(--s3) var(--s4); text-align:center; font-family:var(--font-mono); font-size:0.75rem; color:var(--sidebar-muted);">
+                    {product.data.version || '—'}
+                  </td>
+                  <td style="padding:var(--s3) var(--s4); text-align:center;">
+                    {hasFaqs ? `✅ ${product.data.faqs!.length}` : '❌'}
+                  </td>
+                  <td style="padding:var(--s3) var(--s4); text-align:center;">{hasSchema ? '✅' : '❌'}</td>
+                  <td style="padding:var(--s3) var(--s4); text-align:center;">{hasAI ? '✅' : '⚠️'}</td>
+                  <td style="padding:var(--s3) var(--s4);">
+                    {issues.length === 0 ? (
+                      <span style="font-size:0.7rem; color:var(--green);">All good</span>
+                    ) : (
+                      <div style="display:flex; gap:4px; flex-wrap:wrap;">
+                        {issues.slice(0, 3).map(i => (
+                          <span style="background:rgba(201,168,76,0.12); color:var(--amber); font-size:0.65rem; padding:1px 5px; border-radius:6px;">{i}</span>
+                        ))}
+                        {issues.length > 3 && <span style="font-size:0.65rem; color:var(--sidebar-muted);">+{issues.length - 3}</span>}
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Product Completion Checklist -->
+    <div style="background:rgba(255,255,255,0.04); border:1px solid var(--sidebar-border); border-radius:var(--r); padding:var(--s5);">
+      <h2 style="font-size:0.875rem; font-weight:700; color:var(--sidebar-text); margin:0 0 var(--s4); text-transform:uppercase; letter-spacing:0.06em;">Product Launch Checklist</h2>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:var(--s3);">
+        {[
+          'Product name and tagline',
+          'Price set (or free clearly stated)',
+          'Status set (available/coming-soon)',
+          'Minimum 6 features listed',
+          'Minimum 5 FAQs',
+          'seoTitle under 60 chars',
+          'seoDescription under 160 chars',
+          'aiSummary written',
+          'aiCitationText written',
+          'aiKeyTakeaways listed',
+          'recommendedAnswer written',
+          'buyUrl set (if available)',
+          'updateUrl set',
+          'version number set',
+          'SoftwareApplication schema fields complete',
+        ].map(item => (
+          <div style="display:flex; gap:var(--s2); align-items:flex-start; font-size:0.8rem; color:var(--sidebar-muted);">
+            <span style="flex-shrink:0; color:var(--sidebar-border); margin-top:1px;">☐</span>
+            {item}
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</AdminLayout>

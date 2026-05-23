@@ -1,0 +1,15 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import PSEOPage from '@components/pseo/PSEOPage.astro';
+
+export async function getStaticPaths() {
+  const pages = await getCollection('pseo');
+  return pages
+    .filter(p => p.data.pattern === 'buy-once' && !p.data.draft)
+    .map(p => ({ params: { slug: p.slug }, props: { page: p } }));
+}
+interface Props { page: CollectionEntry<'pseo'>; }
+const { page } = Astro.props;
+const { Content } = await page.render();
+---
+<PSEOPage page={page} Content={Content} patternLabel="Buy-Once Tools" patternSlug="buy-once" />

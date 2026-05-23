@@ -1,0 +1,94 @@
+---
+// src/layouts/BaseLayout.astro
+// Root HTML shell — wraps every page
+// Handles: fonts, global CSS, SEO meta, schema injection, body classes
+
+import '../styles/global.css';
+import SEO from '../components/seo/SEO.astro';
+import type { SEOProps } from '../lib/seo';
+import { SITE } from '../data/site';
+
+interface Props {
+  seo: SEOProps;
+  path?: string;
+  class?: string;
+  bodyClass?: string;
+  schema?: object | object[] | null;
+}
+
+const { seo, path = Astro.url.pathname, bodyClass, schema } = Astro.props;
+
+---
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <!-- SEO Component -->
+  <SEO {seo} {path} schema={typeof schema === "string" ? null : (schema ?? null)} />
+
+  <!-- Brand / Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" href="/favicon-32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="/favicon-16.png" sizes="16x16" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#C9A84C" />
+  <meta name="msapplication-TileColor" content="#2B2B2B" />
+
+  <!-- Fonts: no remote font loading. Uses OwnitApps system fallbacks from tokens.css. -->
+
+  <!-- Feed -->
+  <link rel="alternate" type="application/rss+xml" title={`${SITE.name} Blog`} href="/rss.xml" />
+
+  <!-- Slot for page-specific head content -->
+  <slot name="head" />
+</head>
+<body class:list={['antialiased', bodyClass]}>
+  <slot />
+
+  <!-- Minimal FAQ accordion script — progressive enhancement only -->
+  <!-- Core FAQ content is always visible in HTML for crawlers -->
+  <script>
+    // FAQ accordion — no-JS fallback: all answers visible
+    document.addEventListener('DOMContentLoaded', () => {
+      const items = document.querySelectorAll<HTMLElement>('.faq-item');
+      items.forEach(item => {
+        const btn = item.querySelector<HTMLButtonElement>('.faq-question');
+        const answer = item.querySelector<HTMLElement>('.faq-answer');
+        if (!btn || !answer) return;
+
+        // Start with first open, rest closed (JS enhancement)
+        if (item !== items[0]) {
+          answer.style.display = 'none';
+        }
+
+        btn.setAttribute('aria-expanded', item === items[0] ? 'true' : 'false');
+        answer.id = `faq-answer-${Math.random().toString(36).slice(2)}`;
+        btn.setAttribute('aria-controls', answer.id);
+
+        btn.addEventListener('click', () => {
+          const isOpen = item.classList.contains('open');
+          // Close all
+          items.forEach(i => {
+            i.classList.remove('open');
+            const a = i.querySelector<HTMLElement>('.faq-answer');
+            const b = i.querySelector<HTMLButtonElement>('.faq-question');
+            if (a) a.style.display = 'none';
+            if (b) b.setAttribute('aria-expanded', 'false');
+          });
+          // Toggle current
+          if (!isOpen) {
+            item.classList.add('open');
+            answer.style.display = 'block';
+            btn.setAttribute('aria-expanded', 'true');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+---
+// src/layouts/PreviewLayout.astro
+// Wraps any page in a floating preview toolbar when ?preview=true is in the URL
+// Used by Keystatic's previewUrl feature
+
+interface Props {
+  title?: string;
+  editUrl?: string;
+}
+
+const { title = 'Preview', editUrl = '/keystatic' } = Astro.props;
+const isPreview = Astro.url.searchParams.get('preview') === 'true';
+---
+
+{isPreview && (
+  <div id="preview-toolbar" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    height: 44px;
+    background: #2B2B2B;
+    color: #E8DDD0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    border-bottom: 2px solid #C9A84C;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  ">
+    <!-- Left: status -->
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="
+        width:8px;height:8px;border-radius:50%;
+        background:#C9A84C;
+        box-shadow:0 0 0 3px rgba(201,168,76,0.25);
+        animation: pulse 2s infinite;
+      "></div>
+      <span style="color:#C9A84C;letter-spacing:.1em;text-transform:uppercase;">Preview Mode</span>
+      <span style="color:#9A8F82;">·</span>
+      <span style="color:#9A8F82;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{title}</span>
+    </div>
+
+    <!-- Right: actions -->
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span id="preview-save-status" style="color:#9A8F82;font-size:10px;"></span>
+      <a
+        href={editUrl}
+        target="_blank"
+        style="
+          background:transparent;
+          color:#E8DDD0;
+          border:1px solid #3A3A3A;
+          padding:4px 12px;
+          border-radius:6px;
+          text-decoration:none;
+          font-size:11px;
+          letter-spacing:.06em;
+          transition:.15s;
+        "
+        onmouseover="this.style.borderColor='#C9A84C';this.style.color='#C9A84C'"
+        onmouseout="this.style.borderColor='#3A3A3A';this.style.color='#E8DDD0'"
+      >
+        ← Back to Editor
+      </a>
+      <button
+        onclick="document.getElementById('preview-toolbar').style.display='none';document.body.style.paddingTop='0'"
+        style="
+          background:transparent;
+          color:#9A8F82;
+          border:none;
+          cursor:pointer;
+          padding:4px 8px;
+          font-size:16px;
+          line-height:1;
+        "
+        title="Hide toolbar"
+      >×</button>
+    </div>
+  </div>
+
+  <!-- Push page content below toolbar -->
+  <style>
+    body { padding-top: 44px !important; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+  </style>
+
+  <!-- Auto-refresh when content files change (dev server polling) -->
+  <script>
+    // Poll for file changes every 800ms — works with Astro's dev server HMR
+    let lastModified = null;
+
+    async function checkForUpdates() {
+      try {
+        const res = await fetch(window.location.href, { method: 'HEAD', cache: 'no-store' });
+        const modified = res.headers.get('last-modified') || res.headers.get('etag');
+        if (lastModified && modified && modified !== lastModified) {
+          document.getElementById('preview-save-status').textContent = 'Refreshing…';
+          window.location.reload();
+        }
+        if (modified) lastModified = modified;
+      } catch {}
+    }
+
+    // Initial check after short delay to let dev server settle
+    setTimeout(() => {
+      lastModified = 'init';
+      setInterval(checkForUpdates, 800);
+    }, 500);
+  </script>
+)}
+
+<slot />

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 64" role="img" aria-label="OwnitApps logo">
+  <rect x="0" y="8" width="48" height="48" rx="10" fill="#C9A84C"/>
+  <path d="M24 18c7.7 0 14 6.3 14 14s-6.3 14-14 14-14-6.3-14-14 6.3-14 14-14Zm0 7a7 7 0 1 0 0 14 7 7 0 0 0 0-14Z" fill="#2B2B2B"/>
+  <text x="62" y="39" font-family="Inter,Segoe UI,system-ui,sans-serif" font-size="24" font-weight="800" fill="#2B2B2B">Ownit<tspan fill="#C9A84C">Apps</tspan></text>
+</svg>

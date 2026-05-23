@@ -1,0 +1,36 @@
+---
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { SITE } from '@data/site';
+
+const seo = buildSEO({
+  title: 'OwnitApps Solutions Hub',
+  description: 'Problem-solution hub for subscription fatigue, cloud lock-in, data ownership, and app bloat.',
+  canonical: `${SITE.url}${'/solutions'}`,
+});
+---
+
+<PublicLayout seo={seo} schema={null}>
+  <section class="container py-16">
+    <div class="max-w-3xl">
+      <span class="badge badge-gold mb-4">Solutions</span>
+      <h1 class="mb-4">Solutions</h1>
+      <p class="text-lg leading-relaxed text-[var(--text-secondary)] mb-8">Solution pages for people looking to escape subscriptions, forced accounts, and unnecessary cloud lock-in.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4 mt-8">
+      <a href="/problems/subscription-fatigue" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Problems</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">See problem pages.</p>
+      </a>
+      <a href="/start-here" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Start Here</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Start with ownership.</p>
+      </a>
+      <a href="/apps" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Apps</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Browse tools.</p>
+      </a>
+    </div>
+  </section>
+</PublicLayout>

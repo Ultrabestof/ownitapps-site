@@ -1,0 +1,80 @@
+---
+import { getCollection } from 'astro:content';
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { SITE } from '@data/site';
+import PreviewLayout from '@layouts/PreviewLayout.astro';
+
+export async function getStaticPaths() {
+  const pages = await getCollection('legal');
+  return pages.map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }));
+}
+
+const { page } = Astro.props;
+const { data } = page;
+const { Content } = await page.render();
+
+const seo = buildSEO({
+  title: `${data.title} — OwnitApps`,
+  description: `OwnitApps ${data.title}. Last updated ${data.dateModified ? new Date(data.dateModified).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}.`,
+  canonical: `${SITE.url}/legal/${page.slug}`,
+  noindex: true,
+});
+---
+
+<PreviewLayout editUrl={`/keystatic/collection/legal/item/${page.slug}`} title={data.title}>
+<PublicLayout seo={seo} schema={null}>
+  <div class="max-w-3xl mx-auto px-6 py-16">
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb mb-10" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="/">Home</a></li>
+        <li aria-current="page">{data.title}</li>
+      </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="mb-10 pb-8 border-b border-[var(--border-light)]">
+      <span class="badge badge-amber mb-4">Legal</span>
+      <h1 class="text-3xl font-bold font-heading text-[var(--text-primary)] mb-3">{data.title}</h1>
+      <p class="text-sm text-[var(--text-muted)] font-mono">
+        Last updated:{' '}
+        {data.dateModified ? new Date(data.dateModified).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        }) : 'N/A'}
+        {data.dateEffective && (
+          <span class="ml-4">
+            Effective:{' '}
+            {new Date(data.dateEffective).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </span>
+        )}
+      </p>
+    </div>
+
+    <!-- Content -->
+    <div class="prose prose-ownitapps prose-lg max-w-none">
+      <Content />
+    </div>
+
+    <!-- Legal nav -->
+    <div class="mt-16 pt-8 border-t border-[var(--border-light)]">
+      <p class="text-sm text-[var(--text-muted)] mb-4">Other legal documents:</p>
+      <div class="flex flex-wrap gap-4">
+        <a href="/legal/privacy-policy" class="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">Privacy Policy</a>
+        <a href="/legal/terms" class="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">Terms of Service</a>
+        <a href="/legal/refund-policy" class="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">Refund Policy</a>
+      </div>
+    </div>
+  </div>
+</PublicLayout>
+</PreviewLayout>

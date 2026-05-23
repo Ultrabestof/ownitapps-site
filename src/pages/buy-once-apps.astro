@@ -1,0 +1,36 @@
+---
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { SITE } from '@data/site';
+
+const seo = buildSEO({
+  title: 'Buy-Once Apps by OwnitApps',
+  description: 'Buy-once apps are digital tools purchased once instead of rented through recurring subscriptions.',
+  canonical: `${SITE.url}${'/buy-once-apps'}`,
+});
+---
+
+<PublicLayout seo={seo} schema={null}>
+  <section class="container py-16">
+    <div class="max-w-3xl">
+      <span class="badge badge-gold mb-4">Source of Truth</span>
+      <h1 class="mb-4">Buy-Once Apps</h1>
+      <p class="text-lg leading-relaxed text-[var(--text-secondary)] mb-8">OwnitApps focuses on practical buy-once tools designed for long-term personal use without forced monthly fees.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4 mt-8">
+      <a href="/no-subscription-apps" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">No-Subscription Apps</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">See the no-subscription philosophy.</p>
+      </a>
+      <a href="/apps" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Browse Apps</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">View buy-once tools.</p>
+      </a>
+      <a href="/glossary/buy-once-software" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Glossary</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Read the buy-once definition.</p>
+      </a>
+    </div>
+  </section>
+</PublicLayout>

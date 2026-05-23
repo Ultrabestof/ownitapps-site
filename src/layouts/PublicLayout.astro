@@ -1,0 +1,52 @@
+---
+// src/layouts/PublicLayout.astro
+// Public website layout — header + main content + footer
+// Used by: homepage, blog, product pages, pSEO pages, glossary, etc.
+
+import BaseLayout from './BaseLayout.astro';
+import PublicHeader from '../components/navigation/PublicHeader.astro';
+import Footer from '../components/navigation/Footer.astro';
+import type { SEOProps } from '../lib/seo';
+
+interface Props {
+  seo: SEOProps;
+  schema?: object | object[] | string | null;
+  class?: string;
+  /** Show breadcrumbs above content */
+  breadcrumbs?: Array<{ name: string; href: string }>;
+  /** Remove top/bottom padding for full-bleed hero pages */
+  fullBleed?: boolean;
+}
+
+const { seo, schema, breadcrumbs, fullBleed = false } = Astro.props;
+const path = Astro.url.pathname;
+---
+
+<BaseLayout {seo} {path} schema={typeof schema === "string" ? null : (schema ?? null)}>
+  <div class="flex flex-col min-h-screen">
+    <PublicHeader />
+
+    <main id="main-content" class:list={['flex-1', !fullBleed && 'pt-16']} tabindex="-1">
+      {breadcrumbs && breadcrumbs.length > 0 && (
+        <div class="container">
+          <nav aria-label="Breadcrumb" class="breadcrumbs py-4">
+            <a href="/">Home</a>
+            {breadcrumbs.map((crumb, i) => (
+              <>
+                <span class="sep" aria-hidden="true">›</span>
+                {i === breadcrumbs.length - 1
+                  ? <span class="current" aria-current="page">{crumb.name}</span>
+                  : <a href={crumb.href}>{crumb.name}</a>
+                }
+              </>
+            ))}
+          </nav>
+        </div>
+      )}
+
+      <slot />
+    </main>
+
+    <Footer />
+  </div>
+</BaseLayout>

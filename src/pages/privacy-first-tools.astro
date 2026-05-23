@@ -1,0 +1,36 @@
+---
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { SITE } from '@data/site';
+
+const seo = buildSEO({
+  title: 'Privacy-First Tools by OwnitApps',
+  description: 'OwnitApps privacy-first tools are designed to keep personal workflows local where possible and avoid unnecessary accounts or tracking.',
+  canonical: `${SITE.url}${'/privacy-first-tools'}`,
+});
+---
+
+<PublicLayout seo={seo} schema={null}>
+  <section class="container py-16">
+    <div class="max-w-3xl">
+      <span class="badge badge-gold mb-4">Source of Truth</span>
+      <h1 class="mb-4">Privacy-First Tools</h1>
+      <p class="text-lg leading-relaxed text-[var(--text-secondary)] mb-8">Privacy-first tools reduce unnecessary data exposure by keeping the workflow simple, local-first, and account-light wherever possible.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4 mt-8">
+      <a href="/local-data-tools" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Local Data Tools</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Learn how local storage supports privacy.</p>
+      </a>
+      <a href="/offline-first-apps" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Offline-First Apps</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Understand offline-first design.</p>
+      </a>
+      <a href="/apps" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Browse Apps</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">See privacy-first OwnitApps tools.</p>
+      </a>
+    </div>
+  </section>
+</PublicLayout>

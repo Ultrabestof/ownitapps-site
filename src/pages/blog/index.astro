@@ -1,0 +1,212 @@
+---
+// src/pages/blog/index.astro
+import { getCollection } from 'astro:content';
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { collectionPageSchema, breadcrumbSchema } from '@lib/schema';
+import { SITE } from '@data/site';
+
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const posts = allPosts.sort((a, b) => b.data.datePublished.getTime() - a.data.datePublished.getTime());
+
+// Group by category
+const byCategory = posts.reduce<Record<string, typeof posts>>((acc, post) => {
+  const cat = post.data.category;
+  if (!acc[cat]) acc[cat] = [];
+  acc[cat].push(post);
+  return acc;
+}, {});
+
+const categories = Object.keys(byCategory).sort();
+
+const seo = buildSEO({
+  title: 'Blog — Offline-First Tools, Privacy & No-Subscription Living',
+  description: 'Guides, comparisons, and insights on offline-first apps, no-subscription software, privacy-first tools, and local-data ownership from the OwnitApps team.',
+  canonical: `${SITE.url}/blog`,
+  type: 'website',
+});
+
+const schema = [
+  collectionPageSchema({
+    title: 'OwnitApps Blog',
+    description: 'Guides and insights on offline-first apps, no-subscription software, and privacy-first digital tools.',
+    url: `${SITE.url}/blog`,
+    items: posts.slice(0, 10).map(p => ({ name: p.data.title, url: `${SITE.url}/blog/${p.slug}` })),
+  }),
+  breadcrumbSchema([
+    { name: 'Home', url: SITE.url },
+    { name: 'Blog', url: `${SITE.url}/blog` },
+  ]),
+];
+
+function formatDate(d: Date) {
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+const featuredPost = posts[0];
+const recentPosts = posts.slice(1, 7);
+---
+
+<PublicLayout seo={seo} schema={schema}>
+  <section slot="breadcrumb" class="breadcrumb-bar">
+    <nav aria-label="Breadcrumb">
+      <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        <li aria-hidden="true">›</li>
+        <li aria-current="page">Blog</li>
+      </ol>
+    </nav>
+  </section>
+
+  <main id="main-content">
+
+    <!-- Header -->
+    <section style="background:var(--sidebar-bg); color:var(--sidebar-text); padding:var(--s7) 0;">
+      <div class="container">
+        <h1 style="font-size:clamp(2rem,5vw,3rem); color:var(--sidebar-text); margin-bottom:var(--s3);">
+          The OwnitApps Blog
+        </h1>
+        <p style="color:var(--sidebar-muted); font-size:1.125rem; max-width:600px; margin-bottom:var(--s5);">
+          Practical guides on offline-first software, no-subscription tools, data privacy, and reclaiming control of your digital life.
+        </p>
+        <!-- Category filter links -->
+        <nav aria-label="Blog categories" style="display:flex; gap:var(--s2); flex-wrap:wrap;">
+          <a href="/blog" style="background:var(--gold); color:#fff; padding:var(--s1) var(--s4); border-radius:20px; font-size:0.8rem; text-decoration:none; font-weight:600;">All</a>
+          {categories.map(cat => (
+            <a href={`/blog/category/${cat.toLowerCase().replace(/\s+/g,'-')}`}
+               style="background:rgba(154,143,130,0.2); color:var(--sidebar-muted); padding:var(--s1) var(--s4); border-radius:20px; font-size:0.8rem; text-decoration:none; border:1px solid rgba(154,143,130,0.3);">
+              {cat}
+            </a>
+          ))}
+        </nav>
+      </div>
+    </section>
+
+    <!-- Featured Post -->
+    {featuredPost && (
+      <section style="padding:var(--s7) 0 0;" aria-labelledby="featured-heading">
+        <div class="container">
+          <p style="font-family:var(--font-mono); font-size:0.75rem; color:var(--gold); letter-spacing:0.1em; margin-bottom:var(--s4); text-transform:uppercase;">Featured Article</p>
+          <article class="card" style="display:grid; grid-template-columns:1fr 1fr; gap:var(--s6); align-items:center; padding:var(--s6);">
+            <div>
+              <div style="display:flex; gap:var(--s2); margin-bottom:var(--s3);">
+                <span class="badge badge-gold">{featuredPost.data.category}</span>
+                <span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted);">{formatDate(featuredPost.data.datePublished)}</span>
+              </div>
+              <h2 id="featured-heading" style="font-size:1.75rem; font-weight:800; font-family:var(--font-heading); line-height:1.2; margin-bottom:var(--s3);">
+                <a href={`/blog/${featuredPost.slug}`} style="color:var(--text-primary); text-decoration:none;">
+                  {featuredPost.data.title}
+                </a>
+              </h2>
+              <p style="color:var(--text-secondary); line-height:1.7; margin-bottom:var(--s4);">
+                {featuredPost.data.description}
+              </p>
+              <div style="display:flex; align-items:center; gap:var(--s4);">
+                <a href={`/blog/${featuredPost.slug}`} class="btn-gold">Read Article →</a>
+                <span style="font-size:0.8rem; color:var(--text-muted);">By {featuredPost.data.author}</span>
+              </div>
+            </div>
+            <div style="background:var(--gold-dim); border-radius:var(--r); height:200px; display:flex; align-items:center; justify-content:center;">
+              <div style="text-align:center; color:var(--gold);">
+                <div style="font-size:3rem; margin-bottom:var(--s2);">📖</div>
+                <div style="font-family:var(--font-mono); font-size:0.75rem; opacity:0.7;">Featured Article</div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    )}
+
+    <!-- Recent Posts Grid -->
+    {recentPosts.length > 0 && (
+      <section style="padding:var(--s6) 0 var(--s7);" aria-labelledby="recent-heading">
+        <div class="container">
+          <h2 id="recent-heading" style="font-size:1.25rem; font-weight:800; font-family:var(--font-heading); margin-bottom:var(--s5);">
+            Recent Articles
+          </h2>
+          <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:var(--s5);">
+            {recentPosts.map(post => (
+              <article class="card" style="display:flex; flex-direction:column;">
+                <div style="display:flex; gap:var(--s2); margin-bottom:var(--s3); flex-wrap:wrap;">
+                  <span class="badge badge-muted">{post.data.category}</span>
+                  <time style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted);" datetime={post.data.datePublished.toISOString()}>
+                    {formatDate(post.data.datePublished)}
+                  </time>
+                </div>
+                <h3 style="font-size:1rem; font-weight:800; font-family:var(--font-heading); line-height:1.3; margin-bottom:var(--s2); flex:1;">
+                  <a href={`/blog/${post.slug}`} style="color:var(--text-primary); text-decoration:none;">
+                    {post.data.title}
+                  </a>
+                </h3>
+                <p style="color:var(--text-secondary); font-size:0.875rem; line-height:1.6; margin-bottom:var(--s4);">
+                  {post.data.excerpt || post.data.description.slice(0, 120)}…
+                </p>
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                  <span style="font-size:0.75rem; color:var(--text-muted);">{post.data.author}</span>
+                  <a href={`/blog/${post.slug}`} class="btn-ghost" style="font-size:0.8rem; padding:var(--s1) var(--s3);">Read →</a>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- All Posts by Category -->
+    {categories.length > 0 && (
+      <section style="background:var(--surface-2); border-top:1px solid var(--border-light); padding:var(--s7) 0;">
+        <div class="container">
+          <h2 style="font-size:1.25rem; font-weight:800; margin-bottom:var(--s6);">Browse by Topic</h2>
+          {categories.map(cat => {
+            const catPosts = byCategory[cat];
+            if (!catPosts || catPosts.length === 0) return null;
+            return (
+              <div style="margin-bottom:var(--s7);">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--s4);">
+                  <h3 style="font-size:1rem; font-weight:700; color:var(--gold); text-transform:uppercase; letter-spacing:0.05em; font-family:var(--font-mono);">
+                    {cat}
+                  </h3>
+                  <a href={`/blog/category/${cat.toLowerCase().replace(/\s+/g,'-')}`} style="font-size:0.8rem; color:var(--text-muted); text-decoration:none;">
+                    All {catPosts.length} →
+                  </a>
+                </div>
+                <div style="display:grid; gap:var(--s3);">
+                  {catPosts.slice(0, 4).map(post => (
+                    <article style="background:var(--card); border:1px solid var(--border-light); border-radius:var(--r); padding:var(--s4); display:flex; align-items:center; justify-content:space-between; gap:var(--s4);">
+                      <div style="flex:1; min-width:0;">
+                        <h4 style="font-size:0.9rem; font-weight:600; margin:0 0 var(--s1); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                          <a href={`/blog/${post.slug}`} style="color:var(--text-primary); text-decoration:none;">{post.data.title}</a>
+                        </h4>
+                        <span style="font-family:var(--font-mono); font-size:0.72rem; color:var(--text-muted);">{formatDate(post.data.datePublished)}</span>
+                      </div>
+                      <a href={`/blog/${post.slug}`} style="flex-shrink:0; color:var(--gold); font-size:0.8rem; text-decoration:none; white-space:nowrap;">Read →</a>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    )}
+
+    <!-- LLM Summary -->
+    <section style="padding:var(--s7) 0;">
+      <div class="container">
+        <div style="max-width:760px; margin:0 auto;">
+          <section class="page-summary">
+            <h2>About This Blog</h2>
+            <ul>
+              <li><strong>Publisher:</strong> OwnitApps — ownitapps.com</li>
+              <li><strong>Focus:</strong> Offline-first apps, no-subscription tools, data privacy, and personal data ownership</li>
+              <li><strong>Content types:</strong> Guides, comparisons, explainers, product updates, opinion</li>
+              <li><strong>Author:</strong> OwnitApps Editorial Team</li>
+              <li><strong>Update frequency:</strong> Regular — follow updates at ownitapps.com/update</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</PublicLayout>

@@ -1,0 +1,140 @@
+---
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { SITE } from '@data/site';
+
+const seo = buildSEO({
+  title: 'Contact OwnitApps — Support, Refunds & Feedback',
+  description:
+    'Get in touch with OwnitApps for product support, refund requests, or general feedback. We respond to all emails within 2 business days.',
+  canonical: `${SITE.url}/contact`,
+});
+
+const topics = [
+  {
+    icon: '🛠️',
+    label: 'Product Support',
+    email: 'support@ownitapps.com',
+    subject: 'Support Request — [Tool Name]',
+    desc: "Tool not opening? Feature not working? We'll help you get it running.",
+  },
+  {
+    icon: '↩️',
+    label: 'Refund Request',
+    email: 'support@ownitapps.com',
+    subject: 'Refund Request — [Order Number] — [Tool Name]',
+    desc: 'See our refund policy for eligibility. Include your order number and the issue.',
+  },
+  {
+    icon: '💡',
+    label: 'Feature Suggestion',
+    email: 'hello@ownitapps.com',
+    subject: 'Feature Idea — [Tool Name]',
+    desc: 'Have an idea that fits the offline-first, buy-once model? We read everything.',
+  },
+  {
+    icon: '📰',
+    label: 'Press & Media',
+    email: 'hello@ownitapps.com',
+    subject: 'Press Inquiry',
+    desc: 'Writing about OwnitApps or offline-first software? Happy to talk.',
+  },
+];
+---
+
+<PublicLayout seo={seo} schema={null}>
+  <div class="max-w-4xl mx-auto px-6 py-16">
+
+    <!-- Header -->
+    <div class="mb-14 max-w-2xl">
+      <span class="badge badge-gold mb-4">Contact</span>
+      <h1 class="text-4xl font-bold font-heading text-[var(--text-primary)] mb-4">Get in touch</h1>
+      <p class="text-[var(--text-muted)] text-lg leading-relaxed">
+        We respond to all emails within 2 business days. Choose the right address below
+        to help us route your message quickly.
+      </p>
+    </div>
+
+    <!-- Contact topics grid -->
+    <div class="grid sm:grid-cols-2 gap-4 mb-16">
+      {topics.map(({ icon, label, email, subject, desc }) => {
+        const mailto = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
+        return (
+          <a
+            href={mailto}
+            class="group p-6 rounded-xl border border-[var(--border-light)] bg-[var(--card)]
+                   hover:border-[var(--gold)]/40 hover:bg-[var(--surface-2)] transition-all"
+          >
+            <div class="text-3xl mb-3">{icon}</div>
+            <h2 class="text-[var(--text-primary)] font-semibold mb-2 group-hover:text-[var(--gold)] transition-colors">
+              {label}
+            </h2>
+            <p class="text-[var(--text-muted)] text-sm mb-4 leading-relaxed">{desc}</p>
+            <div class="font-mono text-xs text-[var(--gold)] opacity-70 group-hover:opacity-100 transition-opacity">
+              {email} →
+            </div>
+          </a>
+        );
+      })}
+    </div>
+
+    <!-- Divider -->
+    <div class="border-t border-[var(--border-light)] mb-16"></div>
+
+    <!-- Waitlist section -->
+    <div class="max-w-2xl">
+      <h2 class="text-2xl font-bold font-heading text-[var(--text-primary)] mb-3">
+        Stay updated on new tools
+      </h2>
+      <p class="text-[var(--text-muted)] mb-6 leading-relaxed">
+        OwnitApps is actively building Budget by Paycheck OS, Debt Escape OS, Home Admin Binder OS,
+        and Medical Binder OS. Join the waitlist to hear when each one launches — no spam,
+        no marketing sequences, just a single launch email per tool.
+      </p>
+
+      <!-- Static waitlist notice (no form — Gumroad handles this) -->
+      <div class="p-5 rounded-xl border border-[var(--gold)]/20 bg-[var(--gold)]/5">
+        <p class="text-sm text-[var(--text-muted)]">
+          To join the waitlist for a specific tool, visit its product page and use the
+          "Notify me at launch" option. We use Gumroad pre-orders for waitlist management —
+          no email required unless you choose to be notified.
+        </p>
+        <div class="flex flex-wrap gap-3 mt-4">
+          {[
+            { href: '/apps/budget-by-paycheck-os', label: 'Budget by Paycheck OS' },
+            { href: '/apps/debt-escape-os', label: 'Debt Escape OS' },
+            { href: '/apps/home-admin-binder-os', label: 'Home Admin Binder OS' },
+            { href: '/apps/medical-binder-os', label: 'Medical Binder OS' },
+          ].map(({ href, label }) => (
+            <a
+              href={href}
+              class="text-xs px-3 py-1.5 rounded-full border border-[var(--gold)]/30
+                     text-[var(--gold)] hover:bg-[var(--gold)]/10 transition-colors"
+            >
+              {label} →
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="border-t border-[var(--border-light)] my-16"></div>
+
+    <!-- Response time + philosophy -->
+    <div class="grid sm:grid-cols-3 gap-6 text-center">
+      {[
+        { stat: '2 days', label: 'Max response time', desc: 'For all support emails' },
+        { stat: '7 days', label: 'Refund window', desc: 'If the tool doesn\'t work as described' },
+        { stat: '0', label: 'Spam ever', desc: 'We have one newsletter: launch emails' },
+      ].map(({ stat, label, desc }) => (
+        <div class="p-5 rounded-xl border border-[var(--border-light)] bg-[var(--card)]">
+          <div class="text-3xl font-bold font-heading text-[var(--gold)] mb-1">{stat}</div>
+          <div class="text-[var(--text-primary)] font-medium text-sm mb-1">{label}</div>
+          <div class="text-[var(--text-muted)] text-xs">{desc}</div>
+        </div>
+      ))}
+    </div>
+
+  </div>
+</PublicLayout>

@@ -1,0 +1,192 @@
+---
+// src/pages/admin/pseo.astro
+import { getCollection } from 'astro:content';
+import AdminLayout from '@layouts/AdminLayout.astro';
+
+const allPseo = await getCollection('pseo');
+const pages = [...allPseo].sort((a, b) => a.data.pattern.localeCompare(b.data.pattern));
+
+function pseoIssues(p: typeof pages[0]) {
+  const issues: string[] = [];
+  if (!p.data.targetKeyword) issues.push('No target keyword');
+  if (!p.data.aiSummary) issues.push('No aiSummary');
+  if (!p.data.aiCitationText) issues.push('No aiCitation');
+  if (!p.data.faqs || p.data.faqs.length === 0) issues.push('No FAQs');
+  if (!p.data.relatedProducts || p.data.relatedProducts.length === 0) issues.push('No related products');
+  if (!p.data.seoTitle) issues.push('No seoTitle');
+  if (!p.data.intro) issues.push('No intro');
+  return issues;
+}
+
+// Group by pattern
+const byPattern = pages.reduce<Record<string, typeof pages>>((acc, p) => {
+  if (!acc[p.data.pattern]) acc[p.data.pattern] = [];
+  if (acc[p.data.pattern]) acc[p.data.pattern]!.push(p);
+  return acc;
+}, {});
+
+const patternLabels: Record<string, string> = {
+  alternative: 'Alternatives',
+  comparison: 'Comparisons',
+  'use-case': 'Use Cases',
+  problem: 'Problems',
+  solution: 'Solutions',
+  'no-subscription': 'No-Subscription',
+  'privacy-first': 'Privacy-First',
+  'offline-tools': 'Offline Tools',
+  'buy-once': 'Buy-Once',
+  'local-first': 'Local-First',
+  best: 'Best [Topic]',
+};
+
+const patternRoutes: Record<string, string> = {
+  alternative: '/alternatives',
+  comparison: '/compare',
+  'use-case': '/use-cases',
+  problem: '/problems',
+  'no-subscription': '/no-subscription',
+  'privacy-first': '/privacy-first',
+  'offline-tools': '/offline-tools',
+  'buy-once': '/buy-once',
+  'local-first': '/local-first',
+};
+
+const totalIssues = pages.filter(p => pseoIssues(p).length > 0).length;
+const publishedCount = pages.filter(p => !p.data.draft).length;
+function getIntentStyle(intent: string): string {
+  const map: { [key: string]: string } = {
+    informational: 'color:var(--blue)',
+    commercial: 'color:var(--gold)',
+    transactional: 'color:var(--green)',
+    navigational: 'color:var(--sidebar-muted)',
+  };
+  return map[intent] ?? '';
+}
+
+---
+
+<AdminLayout title="pSEO Manager">
+  <div style="display:flex; flex-direction:column; gap:var(--s5);">
+
+    <!-- Header -->
+    <div>
+      <h1 style="font-size:1.5rem; font-weight:800; font-family:var(--font-heading); margin:0 0 var(--s1);">pSEO Manager</h1>
+      <p style="color:var(--sidebar-muted); font-size:0.875rem; margin:0;">
+        {pages.length} programmatic SEO pages · {publishedCount} published · {totalIssues} with issues · {Object.keys(byPattern).length} patterns active
+      </p>
+    </div>
+
+    <!-- Pattern Summary -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:var(--s3);">
+      {Object.entries(byPattern).map(([pattern, patternPages]) => {
+        const withIssues = patternPages.filter(p => pseoIssues(p).length > 0).length;
+        return (
+          <div style="background:rgba(255,255,255,0.04); border:1px solid var(--sidebar-border); border-radius:var(--r); padding:var(--s4);">
+            <div style="font-size:0.7rem; color:var(--gold); text-transform:uppercase; letter-spacing:0.08em; font-family:var(--font-mono); margin-bottom:var(--s2);">{patternLabels[pattern] || pattern}</div>
+            <div style="font-size:1.75rem; font-weight:800; font-family:var(--font-mono); color:var(--sidebar-text); margin-bottom:var(--s1);">{patternPages.length}</div>
+            {withIssues > 0 && (
+              <div style="font-size:0.7rem; color:var(--amber);">⚠ {withIssues} with issues</div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+
+    <!-- pSEO Table -->
+    <div style="background:rgba(255,255,255,0.04); border:1px solid var(--sidebar-border); border-radius:var(--r); overflow:hidden;">
+      <div style="padding:var(--s3) var(--s5); border-bottom:1px solid var(--sidebar-border);">
+        <h2 style="font-size:0.8rem; font-weight:700; color:var(--sidebar-muted); margin:0; text-transform:uppercase; letter-spacing:0.08em;">All pSEO Pages</h2>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.78rem;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--sidebar-border);">
+              <th style="text-align:left; padding:var(--s3) var(--s5); color:var(--sidebar-muted); font-weight:600;">Title</th>
+              <th style="text-align:left; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Pattern</th>
+              <th style="text-align:left; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Keyword</th>
+              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Intent</th>
+              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">FAQs</th>
+              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">AI</th>
+              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Products</th>
+              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Status</th>
+              <th style="text-align:left; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Issues</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pages.map(page => {
+              const _issues = pseoIssues(page);
+              const _hasFaqs = !!(page.data.faqs && page.data.faqs.length > 0);
+              const _hasAI = !!(page.data.aiSummary && page.data.aiCitationText);
+              const _hasProducts = !!(page.data.relatedProducts && page.data.relatedProducts.length > 0);
+              const _route = patternRoutes[page.data.pattern] || `/${page.data.pattern}`;
+              const _intentStyle = getIntentStyle(page.data.searchIntent ?? '');
+              return (
+                <tr style={`border-bottom:1px solid rgba(58,58,58,0.5); ${_issues.length > 3 ? 'background:rgba(192,57,43,0.04);' : ''}`}>
+                  <td style="padding:var(--s3) var(--s5); max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    <a href={`${_route}/${page.slug}`} target="_blank"
+                       style="color:var(--sidebar-text); text-decoration:none; font-weight:500;">{page.data.title}</a>
+                  </td>
+                  <td style="padding:var(--s3) var(--s4);">
+                    <span style="font-size:0.7rem; color:var(--gold); font-family:var(--font-mono);">{page.data.pattern}</span>
+                  </td>
+                  <td style="padding:var(--s3) var(--s4); max-width:150px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    <span style="font-size:0.75rem; color:var(--sidebar-muted);">{page.data.targetKeyword}</span>
+                  </td>
+                  <td style="padding:var(--s3) var(--s4); text-align:center;">
+                    <span style={`font-size:0.7rem; ${_intentStyle}`}>{page.data.searchIntent?.slice(0,4)}</span>
+                  </td>
+                  <td style="padding:var(--s3) var(--s4); text-align:center;">
+                    {_hasFaqs ? `✅ ${page.data.faqs!.length}` : '❌'}
+                  </td>
+                  <td style="padding:var(--s3) var(--s4); text-align:center;">{_hasAI ? '✅' : '⚠️'}</td>
+                  <td style="padding:var(--s3) var(--s4); text-align:center;">{_hasProducts ? `✅ ${page.data.relatedProducts!.length}` : '❌'}</td>
+                  <td style="padding:var(--s3) var(--s4); text-align:center;">
+                    <span style={`font-size:0.7rem; padding:2px 6px; border-radius:8px; ${page.data.draft ? 'background:rgba(154,143,130,0.2); color:var(--sidebar-muted)' : 'background:rgba(46,139,90,0.15); color:#6fcf97'}`}>
+                      {page.data.draft ? 'Draft' : 'Live'}
+                    </span>
+                  </td>
+                  <td style="padding:var(--s3) var(--s4);">
+                    {_issues.length === 0 ? (
+                      <span style="font-size:0.7rem; color:var(--green);">All good</span>
+                    ) : (
+                      <div style="display:flex; gap:4px; flex-wrap:wrap;">
+                        {_issues.slice(0, 2).map((iss: string) => (
+                          <span style="background:rgba(201,168,76,0.12); color:var(--amber); font-size:0.65rem; padding:1px 5px; border-radius:6px;">{iss}</span>
+                        ))}
+                        {_issues.length > 2 && <span style="font-size:0.65rem; color:var(--sidebar-muted);">+{_issues.length - 2}</span>}
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- pSEO Gap Finder -->
+    <div style="background:rgba(255,255,255,0.04); border:1px solid var(--sidebar-border); border-radius:var(--r); padding:var(--s5);">
+      <h2 style="font-size:0.875rem; font-weight:700; color:var(--sidebar-text); margin:0 0 var(--s4); text-transform:uppercase; letter-spacing:0.06em;">Pattern Coverage Gap Analysis</h2>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:var(--s3);">
+        {Object.entries(patternLabels).map(([pattern, label]) => {
+          const count = (byPattern[pattern] || []).length;
+          const target = 5;
+          const pct = Math.min((count / target) * 100, 100);
+          return (
+            <div style="display:flex; flex-direction:column; gap:var(--s2);">
+              <div style="display:flex; justify-content:space-between; font-size:0.75rem;">
+                <span style="color:var(--sidebar-text);">{label}</span>
+                <span style={`font-family:var(--font-mono); color:${count >= target ? 'var(--green)' : 'var(--amber)'};`}>{count}/{target}</span>
+              </div>
+              <div style="background:var(--sidebar-border); border-radius:4px; height:6px; overflow:hidden;">
+                <div style={`height:100%; border-radius:4px; background:${count >= target ? 'var(--green)' : 'var(--amber)'}; width:${pct}%;`}></div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+
+  </div>
+</AdminLayout>

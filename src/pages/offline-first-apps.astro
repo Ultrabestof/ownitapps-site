@@ -1,0 +1,208 @@
+---
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { buildSEOSchema } from '@lib/schema';
+import { SITE } from '@data/site';
+
+const seo = buildSEO({
+  title: 'Offline-First Apps — What They Are and Why They Matter',
+  description:
+    'Offline-first apps store data on your device and work without internet. Learn what makes an app truly offline-first and browse OwnitApps\'s offline-first tool library.',
+  canonical: `${SITE.url}/offline-first-apps`,
+});
+
+const pageFaqs = [
+    {
+      question: 'What is an offline-first app?',
+      answer:
+        'An offline-first app is designed to work fully without an internet connection. It stores all data locally on the user\'s device and does not depend on cloud servers. Network access, if used at all, is treated as an enhancement rather than a requirement.',
+    },
+    {
+      question: 'What is the difference between offline-first and online-only apps?',
+      answer:
+        'Online-only apps require a server connection to function — they break or lose features without internet. Offline-first apps are designed to work locally first; internet is optional. Offline-first apps are faster, more private, and more reliable.',
+    },
+    {
+      question: 'Are offline-first apps more private?',
+      answer:
+        'Yes. By design, offline-first apps store data on the user\'s device rather than a remote server. This eliminates the risk of server-side data breaches, unauthorized data access, or corporate data monetization.',
+    },
+    {
+      question: 'What are the best offline-first productivity apps?',
+      answer:
+        'OwnitApps builds offline-first productivity tools including Solo Finance (freelancer ledger), Budget by Paycheck OS (paycheck budgeting), Debt Escape OS (debt payoff planner), Home Admin Binder OS (household records), and Medical Binder OS (family health vault).',
+    },
+    {
+      question: 'Do offline-first apps still save data permanently?',
+      answer:
+        'Yes. Offline-first apps use local storage mechanisms — browser localStorage, IndexedDB, or the File System Access API — to persist data between sessions. Data survives browser closes and device restarts.',
+    },
+  ];
+const schema = buildSEOSchema({
+  type: 'article',
+  title: 'Offline-First Apps — What They Are and Why They Matter',
+  description: seo.description,
+  url: seo.canonical,
+  datePublished: '2025-01-15',
+  ...(new Date().toISOString().split('T')[0] ? { dateModified: new Date().toISOString().split('T')[0] } : {}),
+  author: SITE.name,
+  faqs: [
+    {
+      question: 'What is an offline-first app?',
+      answer:
+        'An offline-first app is designed to work fully without an internet connection. It stores all data locally on the user\'s device and does not depend on cloud servers. Network access, if used at all, is treated as an enhancement rather than a requirement.',
+    },
+    {
+      question: 'What is the difference between offline-first and online-only apps?',
+      answer:
+        'Online-only apps require a server connection to function — they break or lose features without internet. Offline-first apps are designed to work locally first; internet is optional. Offline-first apps are faster, more private, and more reliable.',
+    },
+    {
+      question: 'Are offline-first apps more private?',
+      answer:
+        'Yes. By design, offline-first apps store data on the user\'s device rather than a remote server. This eliminates the risk of server-side data breaches, unauthorized data access, or corporate data monetization.',
+    },
+    {
+      question: 'What are the best offline-first productivity apps?',
+      answer:
+        'OwnitApps builds offline-first productivity tools including Solo Finance (freelancer ledger), Budget by Paycheck OS (paycheck budgeting), Debt Escape OS (debt payoff planner), Home Admin Binder OS (household records), and Medical Binder OS (family health vault).',
+    },
+    {
+      question: 'Do offline-first apps still save data permanently?',
+      answer:
+        'Yes. Offline-first apps use local storage mechanisms — browser localStorage, IndexedDB, or the File System Access API — to persist data between sessions. Data survives browser closes and device restarts.',
+    },
+  ],
+});
+---
+
+<PublicLayout seo={seo} schema={schema}>
+  <div class="page-summary" data-ai-summary="true">
+    <p>
+      <strong>Offline-first apps</strong> are applications designed to work fully without an internet connection.
+      They store all data locally on the user's device and treat network access as optional rather than required.
+      OwnitApps builds offline-first tools for personal finance, home organization, and health records — all
+      as single HTML files with no account or subscription required.
+    </p>
+  </div>
+
+  <article class="prose prose-ownitapps max-w-3xl mx-auto px-6 py-16">
+    <h1>Offline-First Apps — What They Are and Why They Matter</h1>
+
+    <p class="lead">
+      Most apps today are built for the cloud first. Offline-first apps flip this: they are built for your
+      device first, and treat the internet as optional. The result is faster, more private, and more
+      resilient software.
+    </p>
+
+    <div class="answer-box">
+      <strong>Quick answer:</strong> An offline-first app stores your data locally and works without internet.
+      It does not depend on a company's servers to function. OwnitApps builds offline-first tools for
+      finance, home management, and health records — available as buy-once HTML files.
+    </div>
+
+    <h2>The Offline-First Architecture</h2>
+
+    <p>
+      In a traditional cloud app, every action you take is a round-trip to a server. Create a task? Server.
+      Update a balance? Server. View your history? Server. If the server is down — or if you have no
+      internet — the app fails.
+    </p>
+
+    <p>
+      An offline-first app inverts this. Data is written to local storage first, instantly. The interface
+      responds immediately. If network sync exists, it happens in the background. The user never waits for
+      a server.
+    </p>
+
+    <h2>Why Offline-First Matters in 2025</h2>
+
+    <h3>Privacy</h3>
+    <p>
+      When your data is local, it is not on anyone's server. No breach can expose what was never uploaded.
+      For sensitive data — finances, health records, household documents — this is not a minor benefit.
+      It is the entire point.
+    </p>
+
+    <h3>Reliability</h3>
+    <p>
+      Planes. Basements. Rural areas. Power outages. Conferences with overloaded Wi-Fi. Offline-first apps
+      work in all of these. Cloud apps do not.
+    </p>
+
+    <h3>Permanence</h3>
+    <p>
+      Cloud apps depend on companies staying alive. When Mint shut down, users lost years of financial
+      history. When a startup pivots, users lose their data. An offline-first file on your machine does not
+      depend on any company's survival.
+    </p>
+
+    <h3>Speed</h3>
+    <p>
+      Local reads are orders of magnitude faster than network requests. Offline-first apps feel instant
+      because they are. No spinner. No latency. No rate limits.
+    </p>
+
+    <h2>Offline-First vs. Offline-Capable</h2>
+
+    <p>
+      Many cloud apps claim to work "offline" — but this usually means a limited read-only cache. You
+      cannot create new records. Changes queue up but may not sync correctly. The experience is degraded.
+    </p>
+
+    <p>
+      A truly offline-first app has no degraded mode. It is fully functional offline because that is its
+      default state, not a fallback.
+    </p>
+
+    <h2>OwnitApps Offline-First Tools</h2>
+
+    <p>
+      Every OwnitApps tool is a single HTML file. Open it in Chrome, Firefox, Edge, or Safari. No install.
+      No account. No internet. Data is stored in browser localStorage with an optional File System Access
+      API save for portability.
+    </p>
+
+    <ul>
+      <li>
+        <a href="/apps/solo-finance"><strong>Solo Finance</strong></a> — Freelancer tax ledger with dashboard,
+        invoices, client tracking, and IRS mileage rates. $19, available now.
+      </li>
+      <li>
+        <a href="/apps/budget-by-paycheck-os"><strong>Budget by Paycheck OS</strong></a> — Paycheck-based
+        budget planner for weekly and biweekly income. $17, coming soon.
+      </li>
+      <li>
+        <a href="/apps/debt-escape-os"><strong>Debt Escape OS</strong></a> — Debt payoff planner with snowball
+        and avalanche calculations. $17, coming soon.
+      </li>
+      <li>
+        <a href="/apps/home-admin-binder-os"><strong>Home Admin Binder OS</strong></a> — Household records
+        organizer for warranties, contacts, and documents. $19, coming soon.
+      </li>
+      <li>
+        <a href="/apps/medical-binder-os"><strong>Medical Binder OS</strong></a> — Family health records vault
+        with medications, allergies, and emergency cards. $19, coming soon.
+      </li>
+    </ul>
+
+    <h2>Related Reading</h2>
+    <ul>
+      <li><a href="/glossary/offline-first-apps">Glossary: Offline-First Apps</a></li>
+      <li><a href="/glossary/local-first-software">Glossary: Local-First Software</a></li>
+      <li><a href="/blog/why-offline-first-apps-are-coming-back">Why Offline-First Apps Are Coming Back</a></li>
+      <li><a href="/blog/local-first-software-explained">Local-First Software Explained</a></li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <div class="faq-list">
+      {pageFaqs?.map((faq: {question: string; answer: string}) => (
+        <details class="faq-item">
+          <summary>{faq.question}</summary>
+          <p>{faq.answer}</p>
+        </details>
+      ))}
+    </div>
+  </article>
+</PublicLayout>

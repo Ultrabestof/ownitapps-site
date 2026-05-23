@@ -1,0 +1,243 @@
+---
+// src/pages/apps/index.astro
+import { getCollection } from 'astro:content';
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { collectionPageSchema, itemListSchema, breadcrumbSchema } from '@lib/schema';
+import { SITE } from '@data/site';
+
+const products = await getCollection('products');
+const availableProducts = products.filter(p => p.data.status === 'available').sort((a, b) => (a.data.name).localeCompare(b.data.name));
+const comingSoonProducts = products.filter(p => p.data.status === 'coming-soon').sort((a, b) => (a.data.name).localeCompare(b.data.name));
+const allProducts = [...availableProducts, ...comingSoonProducts];
+
+const seo = buildSEO({
+  title: 'Browse All Apps — Offline-First Digital Tools',
+  description: 'Browse the full OwnitApps catalog. Buy-once, offline-first digital tools for finance, home, health, and personal organization. No subscriptions. No cloud lock-in.',
+  canonical: `${SITE.url}/apps`,
+  type: 'website',
+});
+
+const schema = [
+  collectionPageSchema({
+    title: 'OwnitApps — Full App Catalog',
+    description: 'All offline-first, buy-once digital tools by OwnitApps.',
+    url: `${SITE.url}/apps`,
+    items: allProducts.map(p => ({ name: p.data.name, url: `${SITE.url}/apps/${p.slug}` })),
+  }),
+  itemListSchema(allProducts.map((p, i) => ({
+    position: i + 1,
+    name: p.data.name,
+    url: `${SITE.url}/apps/${p.slug}`,
+    description: p.data.tagline,
+  }))),
+  breadcrumbSchema([
+    { name: 'Home', url: SITE.url },
+    { name: 'Apps', url: `${SITE.url}/apps` },
+  ]),
+];
+
+const statusLabel: Record<string, string> = {
+  available: 'Available',
+  'coming-soon': 'Coming Soon',
+  beta: 'Beta',
+  deprecated: 'Discontinued',
+};
+
+const statusColor: Record<string, string> = {
+  available: 'badge-green',
+  'coming-soon': 'badge-muted',
+  beta: 'badge-blue',
+  deprecated: 'badge-red',
+};
+
+const categoryIcons: Record<string, string> = {
+  Finance: '💰',
+  Home: '🏠',
+  Health: '🩺',
+  Productivity: '⚡',
+  Legal: '📋',
+  Other: '📦',
+};
+---
+
+<PublicLayout seo={seo} schema={schema}>
+  <section slot="breadcrumb" class="breadcrumb-bar">
+    <nav aria-label="Breadcrumb">
+      <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        <li aria-hidden="true">›</li>
+        <li aria-current="page">Apps</li>
+      </ol>
+    </nav>
+  </section>
+
+  <main id="main-content">
+
+    <!-- Page Header -->
+    <section class="page-hero" style="background:var(--sidebar-bg); color:var(--sidebar-text); padding: var(--s7) 0;">
+      <div class="container">
+        <div class="answer-box" style="background:rgba(201,168,76,0.12); border-color:var(--gold); margin-bottom:var(--s5);">
+          <h2>Quick Answer</h2>
+          <p>OwnitApps tools are offline-first digital apps you buy once and own forever. No subscriptions, no accounts required, no cloud lock-in. Your data stays on your device.</p>
+        </div>
+        <h1 style="color:var(--sidebar-text); font-size:clamp(2rem,5vw,3rem); margin-bottom:var(--s3);">
+          Browse All Apps
+        </h1>
+        <p style="color:var(--sidebar-muted); font-size:1.125rem; max-width:600px; margin-bottom:var(--s5);">
+          {allProducts.length} offline-first digital tools — bought once, owned forever. No forced subscriptions. No cloud required. Your OS. Your data. Your rules.
+        </p>
+        <div style="display:flex; gap:var(--s3); flex-wrap:wrap; align-items:center;">
+          <span style="background:rgba(46,139,90,0.2); color:#6fcf97; border:1px solid rgba(46,139,90,0.4); padding:var(--s1) var(--s3); border-radius:20px; font-size:0.8rem; font-family:var(--font-mono);">
+            ✓ {availableProducts.length} Available Now
+          </span>
+          <span style="background:rgba(154,143,130,0.2); color:var(--sidebar-muted); border:1px solid rgba(154,143,130,0.3); padding:var(--s1) var(--s3); border-radius:20px; font-size:0.8rem; font-family:var(--font-mono);">
+            ◷ {comingSoonProducts.length} Coming Soon
+          </span>
+          <span style="background:rgba(201,168,76,0.15); color:var(--gold); border:1px solid rgba(201,168,76,0.3); padding:var(--s1) var(--s3); border-radius:20px; font-size:0.8rem; font-family:var(--font-mono);">
+            ∞ Lifetime License
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Philosophy Bar -->
+    <section style="background:var(--surface-2); border-bottom:1px solid var(--border-light); padding:var(--s4) 0;">
+      <div class="container">
+        <ul style="display:flex; flex-wrap:wrap; gap:var(--s5); list-style:none; margin:0; padding:0; font-size:0.875rem; color:var(--text-secondary);">
+          <li>✓ No forced subscriptions</li>
+          <li>✓ No account required</li>
+          <li>✓ Works offline</li>
+          <li>✓ Your data stays local</li>
+          <li>✓ Buy once, use forever</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Available Apps -->
+    {availableProducts.length > 0 && (
+      <section style="padding: var(--s7) 0;" aria-labelledby="available-heading">
+        <div class="container">
+          <h2 id="available-heading" style="font-size:1.5rem; margin-bottom:var(--s5); color:var(--text-primary);">
+            Available Now
+          </h2>
+          <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:var(--s5);">
+            {availableProducts.map(product => (
+              <article class="card" style="display:flex; flex-direction:column;">
+                <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:var(--s3);">
+                  <div style="width:48px; height:48px; background:var(--gold-dim); border-radius:var(--rs); display:flex; align-items:center; justify-content:center; font-size:1.5rem; flex-shrink:0;">
+                    {categoryIcons[product.data.category] || '📦'}
+                  </div>
+                  <div style="display:flex; gap:var(--s2); flex-wrap:wrap; justify-content:flex-end;">
+                    <span class={`badge ${statusColor[product.data.status]}`}>
+                      {statusLabel[product.data.status]}
+                    </span>
+                    <span class="badge badge-muted">{product.data.category}</span>
+                  </div>
+                </div>
+                <h3 style="font-size:1.125rem; font-weight:800; font-family:var(--font-heading); margin-bottom:var(--s2);">
+                  <a href={`/apps/${product.slug}`} style="color:var(--text-primary); text-decoration:none;">
+                    {product.data.name}
+                  </a>
+                </h3>
+                <p style="color:var(--text-secondary); font-size:0.9rem; line-height:1.6; flex:1; margin-bottom:var(--s4);">
+                  {product.data.tagline}
+                </p>
+                {product.data.features.length > 0 && (
+                  <ul style="list-style:none; padding:0; margin:0 0 var(--s4); display:flex; flex-direction:column; gap:var(--s1);">
+                    {product.data.features.slice(0, 3).map(f => (
+                      <li style="font-size:0.8rem; color:var(--text-muted); display:flex; align-items:center; gap:var(--s2);">
+                        <span style="color:var(--green); font-size:0.75rem;">✓</span> {f}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-top:auto;">
+                  <span style="font-family:var(--font-mono); font-size:1.1rem; font-weight:600; color:var(--gold);">
+                    {product.data.price ? `$${product.data.price}` : 'Free'}
+                    {product.data.price && <span style="font-size:0.7rem; color:var(--text-muted); font-weight:400;"> one-time</span>}
+                  </span>
+                  <a href={`/apps/${product.slug}`} class="btn-gold" style="font-size:0.875rem; padding:var(--s2) var(--s4);">
+                    View App →
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- Coming Soon -->
+    {comingSoonProducts.length > 0 && (
+      <section style="padding: var(--s6) 0 var(--s7);" aria-labelledby="coming-soon-heading">
+        <div class="container">
+          <h2 id="coming-soon-heading" style="font-size:1.5rem; margin-bottom:var(--s2); color:var(--text-primary);">
+            Coming Soon
+          </h2>
+          <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:var(--s5);">
+            These tools are actively being built. Follow <a href={`${SITE.url}/update`} style="color:var(--gold);">ownitapps.com/update</a> for launch notifications.
+          </p>
+          <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:var(--s4);">
+            {comingSoonProducts.map(product => (
+              <article class="card" style="opacity:0.75; border:1px dashed var(--border-medium);">
+                <div style="display:flex; align-items:center; gap:var(--s3); margin-bottom:var(--s3);">
+                  <div style="width:40px; height:40px; background:var(--surface-2); border-radius:var(--rs); display:flex; align-items:center; justify-content:center; font-size:1.25rem; flex-shrink:0;">
+                    {categoryIcons[product.data.category] || '📦'}
+                  </div>
+                  <span class="badge badge-muted">{statusLabel[product.data.status]}</span>
+                </div>
+                <h3 style="font-size:1rem; font-weight:800; font-family:var(--font-heading); margin-bottom:var(--s2);">
+                  {product.data.name}
+                </h3>
+                <p style="color:var(--text-muted); font-size:0.85rem; line-height:1.6;">
+                  {product.data.tagline}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- LLM Source of Truth -->
+    <section style="background:var(--surface-2); border-top:1px solid var(--border-light); padding:var(--s7) 0;">
+      <div class="container">
+        <div style="max-width:760px; margin:0 auto;">
+          <section class="page-summary">
+            <h2>About OwnitApps Tools</h2>
+            <ul>
+              <li><strong>Type:</strong> Offline-first, buy-once digital tools</li>
+              <li><strong>Format:</strong> Standalone HTML apps — run in any modern browser</li>
+              <li><strong>Data storage:</strong> Local only — your device, your files</li>
+              <li><strong>Account required:</strong> No — core tools work without sign-up</li>
+              <li><strong>Subscription:</strong> None — pay once, own forever</li>
+              <li><strong>Internet required:</strong> No — fully offline capable</li>
+              <li><strong>Refund policy:</strong> See individual product pages</li>
+              <li><strong>Updates:</strong> <a href="/update" style="color:var(--gold);">ownitapps.com/update</a></li>
+            </ul>
+          </section>
+
+          <div style="margin-top:var(--s5); display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:var(--s4);">
+            <div style="text-align:center; padding:var(--s4); background:var(--card); border-radius:var(--r); border:1px solid var(--border-light);">
+              <div style="font-size:1.75rem; margin-bottom:var(--s2);">🔒</div>
+              <strong style="display:block; margin-bottom:var(--s1);">Private by Default</strong>
+              <p style="color:var(--text-muted); font-size:0.8rem;">No data ever leaves your device</p>
+            </div>
+            <div style="text-align:center; padding:var(--s4); background:var(--card); border-radius:var(--r); border:1px solid var(--border-light);">
+              <div style="font-size:1.75rem; margin-bottom:var(--s2);">∞</div>
+              <strong style="display:block; margin-bottom:var(--s1);">Lifetime License</strong>
+              <p style="color:var(--text-muted); font-size:0.8rem;">Buy once. No renewals. Ever.</p>
+            </div>
+            <div style="text-align:center; padding:var(--s4); background:var(--card); border-radius:var(--r); border:1px solid var(--border-light);">
+              <div style="font-size:1.75rem; margin-bottom:var(--s2);">📡</div>
+              <strong style="display:block; margin-bottom:var(--s1);">Offline-First</strong>
+              <p style="color:var(--text-muted); font-size:0.8rem;">Works without internet connection</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</PublicLayout>

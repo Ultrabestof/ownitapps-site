@@ -1,0 +1,78 @@
+---
+// src/components/seo/SEO.astro
+// Unified SEO head component
+// Generates: title, meta description, canonical, robots,
+//            OpenGraph, Twitter Card, article meta, JSON-LD
+
+import { buildSEO } from '../../lib/seo';
+import { SITE } from '../../data/site';
+import type { SEOProps } from '../../lib/seo';
+import { serializeSchema } from '../../lib/schema';
+
+interface Props {
+  seo: SEOProps;
+  path?: string;
+  schema?: object | object[] | string | null | undefined;
+}
+
+const { seo, path = '/', schema } = Astro.props;
+
+const resolved = buildSEO(seo, path);
+
+const schemaHtml = schema ? typeof schema === "string" ? schema : (schema ? serializeSchema(schema) : "") : '';
+---
+
+<!-- Primary Meta -->
+<title>{resolved.resolvedTitle}</title>
+<meta name="description" content={resolved.resolvedDescription} />
+<meta name="robots" content={resolved.robots} />
+<link rel="canonical" href={resolved.resolvedCanonical} />
+
+<!-- Keywords (informational, not ranking signal) -->
+{resolved.tags.length > 0 && (
+  <meta name="keywords" content={resolved.tags.join(', ')} />
+)}
+
+<!-- Author -->
+<meta name="author" content={resolved.author} />
+
+<!-- OpenGraph -->
+<meta property="og:type" content={resolved.type === 'article' ? 'article' : resolved.type === 'product' ? 'product' : 'website'} />
+<meta property="og:site_name" content={SITE.name} />
+<meta property="og:title" content={resolved.resolvedTitle} />
+<meta property="og:description" content={resolved.resolvedDescription} />
+<meta property="og:url" content={resolved.resolvedCanonical} />
+<meta property="og:image" content={resolved.resolvedImage} />
+<meta property="og:image:width" content={String(resolved.imageWidth)} />
+<meta property="og:image:height" content={String(resolved.imageHeight)} />
+<meta property="og:image:alt" content={resolved.imageAlt} />
+<meta property="og:locale" content="en_US" />
+
+<!-- Article meta (blog posts, pSEO pages) -->
+{resolved.type === 'article' && resolved.publishedTime && (
+  <meta property="article:published_time" content={resolved.publishedTime} />
+)}
+{resolved.type === 'article' && resolved.modifiedTime && (
+  <meta property="article:modified_time" content={resolved.modifiedTime} />
+)}
+{resolved.type === 'article' && resolved.author && (
+  <meta property="article:author" content={resolved.author} />
+)}
+{resolved.type === 'article' && resolved.section && (
+  <meta property="article:section" content={resolved.section} />
+)}
+{resolved.type === 'article' && resolved.tags.map(tag => (
+  <meta property="article:tag" content={tag} />
+))}
+
+<!-- Twitter / X Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content={SITE.twitterHandle} />
+<meta name="twitter:creator" content={SITE.twitterHandle} />
+<meta name="twitter:title" content={resolved.resolvedTitle} />
+<meta name="twitter:description" content={resolved.resolvedDescription} />
+<meta name="twitter:image" content={resolved.resolvedImage} />
+<meta name="twitter:image:alt" content={resolved.imageAlt} />
+
+<!-- JSON-LD Schema -->
+{schemaHtml && <Fragment set:html={schemaHtml} />}

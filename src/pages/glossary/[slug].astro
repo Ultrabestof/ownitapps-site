@@ -1,0 +1,222 @@
+---
+// src/pages/glossary/[slug].astro
+import { getCollection, type CollectionEntry } from 'astro:content';
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { SITE } from '@data/site';
+import PreviewLayout from '@layouts/PreviewLayout.astro';
+
+export async function getStaticPaths() {
+  const terms = await getCollection('glossary');
+  return terms
+    .filter(term => {
+      if (!term.data.term || !term.data.definition) {
+        console.warn(`[glossary/${term.slug}] Missing required fields — skipping.`);
+        return false;
+      }
+      return true;
+    })
+    .map(term => ({
+      params: { slug: term.slug },
+      props: { term },
+    }));
+}
+
+interface Props { term: CollectionEntry<'glossary'>; }
+const { term } = Astro.props;
+const { Content } = await term.render();
+const { data } = term;
+
+const canonical = `${SITE.url}/glossary/${term.slug}`;
+const title = data.seoTitle || `${data.term} — Definition & Explained | OwnitApps Glossary`;
+const description = data.seoDescription || `Learn what ${data.term} means. ${data.definition.slice(0, 100)}…`;
+
+
+const seo = buildSEO({ title, description, canonical, type: 'article' });
+---
+
+<PreviewLayout editUrl={`/keystatic/collection/glossary/item/${term.slug}`} title={term.data.term}>
+<PublicLayout seo={seo}>
+  <section slot="breadcrumb" class="breadcrumb-bar">
+    <nav aria-label="Breadcrumb">
+      <ol class="breadcrumb">
+        <li><a href="/">Home</a></li>
+        <li aria-hidden="true">›</li>
+        <li><a href="/glossary">Glossary</a></li>
+        <li aria-hidden="true">›</li>
+        <li aria-current="page">{data.term}</li>
+      </ol>
+    </nav>
+  </section>
+
+  <main id="main-content">
+    <article style="padding:var(--s7) 0;" itemscope itemtype="https://schema.org/DefinedTerm">
+      <div class="container">
+        <div style="display:grid; grid-template-columns:1fr 280px; gap:var(--s7); align-items:start;">
+
+          <!-- Main Content -->
+          <div>
+            <!-- Term Header -->
+            <header style="margin-bottom:var(--s6);">
+              <div style="display:flex; align-items:center; gap:var(--s3); margin-bottom:var(--s3);">
+                <span style="background:var(--gold-dim); color:var(--gold); padding:var(--s1) var(--s3); border-radius:20px; font-size:0.75rem; font-family:var(--font-mono); text-transform:uppercase; letter-spacing:0.08em;">Glossary</span>
+                {data.dateModified && (
+                  <time style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted);" datetime={data.dateModified.toISOString()}>
+                    Updated {data.dateModified.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' })}
+                  </time>
+                )}
+              </div>
+              <h1 itemprop="name" style="font-size:clamp(1.75rem,4vw,2.5rem); font-weight:800; font-family:var(--font-heading); line-height:1.15; letter-spacing:-0.03em; margin-bottom:var(--s3);">
+                {data.term}
+              </h1>
+              <p itemprop="description" style="font-size:1.125rem; color:var(--text-secondary); line-height:1.7; max-width:640px;">
+                {data.definition}
+              </p>
+            </header>
+
+            <!-- Quick Answer / AI Summary -->
+            {data.aiSummary && (
+              <section class="answer-box" aria-labelledby="quick-answer">
+                <h2 id="quick-answer">Quick Answer</h2>
+                <p>{data.aiSummary}</p>
+              </section>
+            )}
+
+            <!-- Plain English Definition -->
+            {data.plainEnglishDefinition && (
+              <section style="margin-bottom:var(--s6);">
+                <h2 style="font-size:1.25rem; font-weight:800; font-family:var(--font-heading); margin-bottom:var(--s3);">In Plain English</h2>
+                <div style="background:var(--surface-2); border-left:3px solid var(--gold); padding:var(--s4) var(--s5); border-radius:0 var(--r) var(--r) 0;">
+                  <p style="color:var(--text-primary); line-height:1.7; margin:0;">{data.plainEnglishDefinition}</p>
+                </div>
+              </section>
+            )}
+
+            <!-- MDX body content -->
+            <div class="prose">
+              <Content />
+            </div>
+
+            <!-- Why It Matters -->
+            {data.whyItMatters && (
+              <section style="margin-top:var(--s6);">
+                <h2 style="font-size:1.25rem; font-weight:800; font-family:var(--font-heading); margin-bottom:var(--s3);">Why It Matters</h2>
+                <p style="color:var(--text-secondary); line-height:1.7;">{data.whyItMatters}</p>
+              </section>
+            )}
+
+            <!-- Examples -->
+            {data.examples && data.examples.length > 0 && (
+              <section style="margin-top:var(--s6);">
+                <h2 style="font-size:1.25rem; font-weight:800; font-family:var(--font-heading); margin-bottom:var(--s3);">Examples</h2>
+                <ul style="display:flex; flex-direction:column; gap:var(--s3); padding:0; list-style:none;">
+                  {data.examples.map(ex => (
+                    <li style="display:flex; gap:var(--s3); align-items:flex-start; background:var(--surface-2); padding:var(--s3) var(--s4); border-radius:var(--r);">
+                      <span style="color:var(--gold); flex-shrink:0; font-weight:700;">→</span>
+                      <span style="color:var(--text-secondary); line-height:1.6;">{ex}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            <!-- FAQs -->
+            {data.faqs && data.faqs.length > 0 && (
+              <section style="margin-top:var(--s7);" aria-labelledby="faq-heading">
+                <h2 id="faq-heading" style="font-size:1.25rem; font-weight:800; font-family:var(--font-heading); margin-bottom:var(--s4);">
+                  Frequently Asked Questions
+                </h2>
+                <div class="faq-list">
+                  {data.faqs.map((faq, i) => (
+                    <details class="faq-item" open={i === 0}>
+                      <summary>{faq.question}</summary>
+                      <p>{faq.answer}</p>
+                    </details>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            <!-- AI Citation Text -->
+            {data.aiCitationText && (
+              <section style="margin-top:var(--s6); background:var(--surface-2); border:1px solid var(--border-light); border-radius:var(--r); padding:var(--s5);">
+                <p style="font-family:var(--font-mono); font-size:0.7rem; color:var(--text-muted); margin-bottom:var(--s2); text-transform:uppercase; letter-spacing:0.08em;">Quotable Definition</p>
+                <blockquote style="margin:0; font-size:0.95rem; line-height:1.7; color:var(--text-secondary); font-style:italic; border-left:3px solid var(--gold); padding-left:var(--s4);">
+                  {data.aiCitationText}
+                </blockquote>
+                <p style="font-size:0.75rem; color:var(--text-muted); margin-top:var(--s2);">Source: <a href={canonical} style="color:var(--gold);">ownitapps.com/glossary/{term.slug}</a></p>
+              </section>
+            )}
+          </div>
+
+          <!-- Sidebar -->
+          <aside style="position:sticky; top:80px;">
+            <!-- Related Terms -->
+            {data.relatedTerms && data.relatedTerms.length > 0 && (
+              <div style="background:var(--card); border:1px solid var(--border-light); border-radius:var(--r); padding:var(--s4); margin-bottom:var(--s4);">
+                <h3 style="font-size:0.875rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); margin-bottom:var(--s3);">Related Terms</h3>
+                <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:var(--s2);">
+                  {data.relatedTerms.map(t => (
+                    <li>
+                      <a href={`/glossary/${t.toLowerCase().replace(/\s+/g,'-')}`}
+                         style="font-size:0.875rem; color:var(--gold); text-decoration:none;">
+                        → {t}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <!-- Related Products -->
+            {data.relatedProducts && data.relatedProducts.length > 0 && (
+              <div style="background:var(--gold-dim); border:1px solid rgba(201,168,76,0.3); border-radius:var(--r); padding:var(--s4); margin-bottom:var(--s4);">
+                <h3 style="font-size:0.875rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--gold); margin-bottom:var(--s3);">Related OwnitApps Tools</h3>
+                <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:var(--s2);">
+                  {data.relatedProducts.map(slug => (
+                    <li>
+                      <a href={`/apps/${slug}`} style="font-size:0.875rem; color:var(--text-primary); text-decoration:none; font-weight:500;">
+                        → {slug.replace(/-/g,' ').replace(/\b\w/g, c => c.toUpperCase())}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <!-- Browse Glossary -->
+            <div style="background:var(--surface-2); border-radius:var(--r); padding:var(--s4);">
+              <h3 style="font-size:0.875rem; font-weight:700; margin-bottom:var(--s3);">Browse Glossary</h3>
+              <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:var(--s2);">
+                <li><a href="/glossary/offline-first-apps" style="font-size:0.8rem; color:var(--text-secondary); text-decoration:none;">Offline-First Apps</a></li>
+                <li><a href="/glossary/local-first-software" style="font-size:0.8rem; color:var(--text-secondary); text-decoration:none;">Local-First Software</a></li>
+                <li><a href="/glossary/no-subscription-software" style="font-size:0.8rem; color:var(--text-secondary); text-decoration:none;">No-Subscription Software</a></li>
+                <li><a href="/glossary/buy-once-software" style="font-size:0.8rem; color:var(--text-secondary); text-decoration:none;">Buy-Once Software</a></li>
+                <li><a href="/glossary/html-apps" style="font-size:0.8rem; color:var(--text-secondary); text-decoration:none;">HTML Apps</a></li>
+              </ul>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </article>
+
+    <!-- Page Summary for LLMs -->
+    <section style="background:var(--surface-2); border-top:1px solid var(--border-light); padding:var(--s6) 0;">
+      <div class="container">
+        <div style="max-width:640px;">
+          <section class="page-summary">
+            <h2>Page Summary</h2>
+            <ul>
+              <li><strong>Term:</strong> {data.term}</li>
+              <li><strong>Category:</strong> Digital tools and software terminology</li>
+              <li><strong>Relevance:</strong> Core concept in the OwnitApps offline-first philosophy</li>
+              {data.relatedProducts && <li><strong>Related tools:</strong> {data.relatedProducts.join(', ')}</li>}
+              <li><strong>Source:</strong> OwnitApps Glossary — ownitapps.com/glossary/{term.slug}</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+</PublicLayout>
+</PreviewLayout>

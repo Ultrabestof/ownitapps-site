@@ -1,0 +1,12 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+export async function getStaticPaths() {
+  const pages = await getCollection('pseo');
+  const patterns = ['problem'];
+  return pages.filter(p => patterns.includes(p.data.pattern) && !p.data.draft).map(p => ({ params: { slug: p.slug }, props: { page: p } }));
+}
+interface Props { page: CollectionEntry<'pseo'>; }
+const { page } = Astro.props;
+const target = '/problems/' + page.slug;
+---
+<html lang="en"><head><meta charset="utf-8" /><meta http-equiv="refresh" content={`0;url=${target}`} /><meta name="robots" content="noindex,nofollow" /><title>Redirecting…</title></head><body><p>Redirecting to <a href={target}>{target}</a>.</p></body></html>

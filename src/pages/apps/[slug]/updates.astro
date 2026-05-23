@@ -1,0 +1,131 @@
+---
+import { getCollection } from 'astro:content';
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { SITE } from '@data/site';
+
+export async function getStaticPaths() {
+  const products = await getCollection('products');
+  return products.map((product) => ({
+    params: { slug: product.slug },
+    props: { product },
+  }));
+}
+
+const { product } = Astro.props;
+const { data } = product;
+const name = data.name;
+
+const seo = buildSEO({
+  title: `${name} — Update History & Changelog`,
+  description: `Full version history and changelog for ${name}. See every update, bug fix, and new feature since launch.`,
+  canonical: `${SITE.url}/apps/${product.slug}/updates`,
+  noindex: data.status === 'coming-soon',
+});
+
+const changelog = data.changelog ?? [];
+---
+
+<PublicLayout seo={seo} schema={null}>
+  <div class="max-w-3xl mx-auto px-6 py-16">
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb mb-10" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="/">Home</a></li>
+        <li><a href="/apps">Apps</a></li>
+        <li><a href={`/apps/${product.slug}`}>{name}</a></li>
+        <li aria-current="page">Updates</li>
+      </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="mb-12">
+      <div class="flex items-center gap-3 mb-4">
+        <div>
+          <h1 class="text-3xl font-bold font-heading text-[var(--text-primary)]">
+            {name} — Changelog
+          </h1>
+          <p class="text-[var(--text-muted)] text-sm mt-1">
+            Current version: <span class="font-mono text-[var(--gold)]">v{data.version}</span>
+            {data.status === 'coming-soon' && (
+              <span class="ml-3 badge badge-amber">Coming Soon</span>
+            )}
+            {data.status === 'available' && (
+              <span class="ml-3 badge badge-green">Available</span>
+            )}
+          </p>
+        </div>
+      </div>
+      <p class="text-[var(--text-muted)] max-w-xl">
+        Full version history for {name}. Each update is included free for all owners of this major version.
+      </p>
+    </div>
+
+    <!-- Changelog timeline -->
+    {changelog.length === 0 ? (
+      <div class="p-8 rounded-xl border border-[var(--border-light)] bg-[var(--card)] text-center">
+        <p class="text-[var(--text-muted)]">No updates logged yet. Check back after launch.</p>
+      </div>
+    ) : (
+      <div class="relative">
+        <div class="absolute left-4 top-0 bottom-0 w-px bg-white/10" aria-hidden="true"></div>
+        <div class="space-y-10 pl-12">
+          {changelog.map((entry, i) => (
+            <div class="relative">
+              <div
+                class:list={[
+                  'absolute -left-[2.35rem] top-1.5 w-3 h-3 rounded-full border-2',
+                  i === 0
+                    ? 'bg-[var(--gold)] border-[var(--gold)]'
+                    : 'bg-[var(--surface-2)] border-[var(--border-medium)]',
+                ]}
+                aria-hidden="true"
+              ></div>
+              <div class="p-5 rounded-xl border border-[var(--border-light)] bg-[var(--card)]">
+                <div class="flex items-center justify-between gap-4 mb-3">
+                  <div class="flex items-center gap-3">
+                    <span class="font-mono text-[var(--gold)] font-semibold">v{entry.version}</span>
+                    {i === 0 && <span class="badge badge-green text-xs">Latest</span>}
+                  </div>
+                  <time datetime={entry.date instanceof Date ? entry.date.toISOString() : String(entry.date)} class="text-sm text-[var(--text-muted)] font-mono">
+                    {(entry.date instanceof Date ? entry.date : new Date(String(entry.date) + 'T12:00:00')).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                  </time>
+                </div>
+                <ul class="list-disc list-inside space-y-1">
+                  {(Array.isArray(entry.notes) ? entry.notes : [entry.notes]).map((note: string) => (
+                    <li class="text-[var(--text-muted)] text-sm">{note}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <!-- CTA -->
+    <div class="mt-16 p-6 rounded-xl border border-[var(--gold)]/20 bg-[var(--gold)]/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div>
+        <p class="text-[var(--text-primary)] font-semibold mb-1">Already own {name}?</p>
+        <p class="text-[var(--text-muted)] text-sm">
+          All updates for this major version are free. Check your purchase email for the latest file.
+        </p>
+      </div>
+      {data.status === 'available' && data.buyUrl && (
+        <a href={data.buyUrl} class="btn-gold flex-shrink-0" target="_blank" rel="noopener">
+          Get Latest Version
+        </a>
+      )}
+      {data.status === 'coming-soon' && (
+        <a href={`/apps/${product.slug}`} class="btn-ghost flex-shrink-0">View App Page →</a>
+      )}
+    </div>
+
+    <div class="mt-8">
+      <a href={`/apps/${product.slug}`} class="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
+        ← Back to {name}
+      </a>
+    </div>
+  </div>
+</PublicLayout>

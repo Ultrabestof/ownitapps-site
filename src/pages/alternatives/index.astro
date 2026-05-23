@@ -1,0 +1,36 @@
+---
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { SITE } from '@data/site';
+
+const seo = buildSEO({
+  title: 'OwnitApps Alternatives Hub',
+  description: 'Alternatives to subscription tools for people who prefer buy-once, offline-first, privacy-first workflows.',
+  canonical: `${SITE.url}${'/alternatives'}`,
+});
+---
+
+<PublicLayout seo={seo} schema={null}>
+  <section class="container py-16">
+    <div class="max-w-3xl">
+      <span class="badge badge-gold mb-4">Alternatives</span>
+      <h1 class="mb-4">Alternatives to Subscription Tools</h1>
+      <p class="text-lg leading-relaxed text-[var(--text-secondary)] mb-8">Find practical alternatives to cloud-first or subscription-heavy tools.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4 mt-8">
+      <a href="/no-subscription" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">No-Subscription Apps</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Explore no-subscription pages.</p>
+      </a>
+      <a href="/privacy-first" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Privacy-First Tools</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Explore privacy-first pages.</p>
+      </a>
+      <a href="/apps" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Apps</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Browse OwnitApps tools.</p>
+      </a>
+    </div>
+  </section>
+</PublicLayout>

@@ -1,0 +1,32 @@
+---
+import { getCollection } from 'astro:content';
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { SITE } from '@data/site';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  const categories = Array.from(new Set(posts.map((p) => p.data.category.toLowerCase().replace(/\s+/g, '-'))));
+  return categories.map((category) => ({ params: { category } }));
+}
+
+const { category } = Astro.params;
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+const filtered = posts.filter((p) => p.data.category.toLowerCase().replace(/\s+/g, '-') === category);
+const label = String(category).split('-').map((w) => w[0]?.toUpperCase() + w.slice(1)).join(' ');
+const seo = buildSEO({ title: `${label} Articles`, description: `OwnitApps articles in the ${label} category.`, canonical: `${SITE.url}/blog/category/${category}` });
+---
+<PublicLayout seo={seo} schema={null}>
+  <section class="container py-16">
+    <span class="badge badge-gold mb-4">Blog Category</span>
+    <h1 class="mb-6">{label}</h1>
+    <div class="grid md:grid-cols-2 gap-4">
+      {filtered.map((post) => (
+        <a class="card p-5" href={`/blog/${post.slug}`}>
+          <h2 class="text-lg mb-2">{post.data.title}</h2>
+          <p class="text-sm text-[var(--text-secondary)]">{post.data.description}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+</PublicLayout>

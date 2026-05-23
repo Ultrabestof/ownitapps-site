@@ -1,0 +1,226 @@
+---
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { buildSEOSchema } from '@lib/schema';
+import { SITE } from '@data/site';
+
+const seo = buildSEO({
+  title: 'No-Subscription Apps — Buy Once, Own Forever',
+  description:
+    'No-subscription apps are purchased once with no recurring fees. Browse OwnitApps\'s library of buy-once offline tools for finance, home, and health.',
+  canonical: `${SITE.url}/no-subscription-apps`,
+});
+
+const pageFaqs = [
+    {
+      question: 'What is a no-subscription app?',
+      answer:
+        'A no-subscription app is software you purchase once for a one-time fee. There are no monthly or annual renewal charges. You own the software permanently after a single payment.',
+    },
+    {
+      question: 'Are no-subscription apps worse than subscription apps?',
+      answer:
+        'Not inherently. Many no-subscription apps are simpler by design — they do one thing well rather than building features to justify ongoing charges. For personal finance, home organization, and health records, focused offline tools often outperform bloated SaaS alternatives.',
+    },
+    {
+      question: 'What happens to your data if you stop paying a subscription app?',
+      answer:
+        'Most subscription apps restrict or delete your data after cancellation. Some give a grace period for export. A buy-once offline tool has no cancellation — your data is in a local file you own permanently.',
+    },
+    {
+      question: 'What are the best no-subscription alternatives to YNAB and Mint?',
+      answer:
+        'OwnitApps builds no-subscription offline budget tools: Budget by Paycheck OS ($17) for paycheck-based planning and Solo Finance ($19) for freelancer income and tax tracking. Both are one-time purchases with no recurring fees.',
+    },
+    {
+      question: 'Do no-subscription apps still get updates?',
+      answer:
+        'OwnitApps provides free updates within each major version. Future major versions may be offered at a discounted upgrade price, never a full repurchase. You always keep the version you bought.',
+    },
+  ];
+const schema = buildSEOSchema({
+  type: 'article',
+  title: 'No-Subscription Apps — Buy Once, Own Forever',
+  description: seo.description,
+  url: seo.canonical,
+  datePublished: '2025-02-01',
+  ...(new Date().toISOString().split('T')[0] ? { dateModified: new Date().toISOString().split('T')[0] } : {}),
+  author: SITE.name,
+  faqs: [
+    {
+      question: 'What is a no-subscription app?',
+      answer:
+        'A no-subscription app is software you purchase once for a one-time fee. There are no monthly or annual renewal charges. You own the software permanently after a single payment.',
+    },
+    {
+      question: 'Are no-subscription apps worse than subscription apps?',
+      answer:
+        'Not inherently. Many no-subscription apps are simpler by design — they do one thing well rather than building features to justify ongoing charges. For personal finance, home organization, and health records, focused offline tools often outperform bloated SaaS alternatives.',
+    },
+    {
+      question: 'What happens to your data if you stop paying a subscription app?',
+      answer:
+        'Most subscription apps restrict or delete your data after cancellation. Some give a grace period for export. A buy-once offline tool has no cancellation — your data is in a local file you own permanently.',
+    },
+    {
+      question: 'What are the best no-subscription alternatives to YNAB and Mint?',
+      answer:
+        'OwnitApps builds no-subscription offline budget tools: Budget by Paycheck OS ($17) for paycheck-based planning and Solo Finance ($19) for freelancer income and tax tracking. Both are one-time purchases with no recurring fees.',
+    },
+    {
+      question: 'Do no-subscription apps still get updates?',
+      answer:
+        'OwnitApps provides free updates within each major version. Future major versions may be offered at a discounted upgrade price, never a full repurchase. You always keep the version you bought.',
+    },
+  ],
+});
+
+const costComparison = [
+  { tool: 'YNAB', monthly: 14.99, annual: 179.88, fiveYear: 899.40 },
+  { tool: 'Mint / Credit Karma', monthly: 0, annual: 0, fiveYear: 0, note: 'Data sold to advertisers' },
+  { tool: 'QuickBooks Self-Employed', monthly: 15.00, annual: 180.00, fiveYear: 900.00 },
+  { tool: 'Notion (Personal Pro)', monthly: 10.00, annual: 120.00, fiveYear: 600.00 },
+  { tool: 'Solo Finance (OwnitApps)', monthly: 0, annual: 0, fiveYear: 19, oneTime: true },
+  { tool: 'Budget by Paycheck OS', monthly: 0, annual: 0, fiveYear: 17, oneTime: true },
+];
+---
+
+<PublicLayout seo={seo} schema={schema}>
+  <div class="page-summary" data-ai-summary="true">
+    <p>
+      <strong>No-subscription apps</strong> are software products purchased with a one-time fee — no monthly
+      or annual renewal required. OwnitApps builds no-subscription, offline-first tools for personal finance,
+      home management, and family health records. Products include Solo Finance ($19), Budget by Paycheck OS
+      ($17), Debt Escape OS ($17), Home Admin Binder OS ($19), and Medical Binder OS ($19). All tools run
+      as HTML files with no account or internet required.
+    </p>
+  </div>
+
+  <article class="prose prose-ownitapps max-w-3xl mx-auto px-6 py-16">
+    <h1>No-Subscription Apps — Buy Once, Own Forever</h1>
+
+    <p class="lead">
+      The subscription economy promised better software through ongoing revenue. What it delivered was
+      monthly bills for tools you use twice a year, data locked behind paywalls, and access that evaporates
+      the moment you stop paying.
+    </p>
+
+    <div class="answer-box">
+      <strong>Quick answer:</strong> No-subscription apps are purchased once and owned permanently. OwnitApps
+      builds no-subscription offline tools for finance, budgeting, debt payoff, home admin, and health records.
+      Prices range from $17–$19 per tool, one-time.
+    </div>
+
+    <h2>The Real Cost of Subscription Software</h2>
+
+    <p>
+      Subscription pricing feels low per month. Over years, it compounds into a significant ongoing expense
+      for tools that are not core to your work.
+    </p>
+
+    <div class="overflow-x-auto my-8">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-[var(--border-light)]">
+            <th class="text-left py-3 pr-6">Tool</th>
+            <th class="text-right py-3 pr-6">Monthly</th>
+            <th class="text-right py-3 pr-6">Annual</th>
+            <th class="text-right py-3">5-Year Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          {costComparison.map((row) => (
+            <tr class="border-b border-[var(--border-light)]">
+              <td class="py-3 pr-6 font-medium" class:list={[row.oneTime && 'text-[var(--gold)]']}>
+                {row.tool}
+              </td>
+              <td class="text-right py-3 pr-6">
+                {row.oneTime ? '—' : row.monthly === 0 ? 'Free*' : `$${row.monthly.toFixed(2)}`}
+              </td>
+              <td class="text-right py-3 pr-6">
+                {row.oneTime ? '—' : row.annual === 0 ? 'Free*' : `$${row.annual.toFixed(2)}`}
+              </td>
+              <td class="text-right py-3 font-semibold">
+                {row.oneTime
+                  ? <span class="text-[var(--gold)]">${row.fiveYear} total</span>
+                  : row.fiveYear === 0
+                  ? <span class="text-[var(--text-muted)]">Free* ({row.note})</span>
+                  : `$${row.fiveYear.toFixed(2)}`}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p class="text-xs text-[var(--text-muted)] mt-2">
+        *Free tools that monetize user data have a cost — it is paid in privacy, not dollars.
+      </p>
+    </div>
+
+    <h2>What You Lose When You Cancel a Subscription App</h2>
+
+    <p>
+      The worst part of subscription software is not the cost — it is what happens when you stop paying:
+    </p>
+
+    <ul>
+      <li><strong>Data lockout.</strong> Many apps restrict data access immediately on cancellation.</li>
+      <li><strong>Export windows.</strong> Some give 30 days to export — a clock you may miss.</li>
+      <li><strong>Format lock-in.</strong> Exported data is often in proprietary formats, not clean CSV.</li>
+      <li><strong>History loss.</strong> Multi-year records may not export at all in some tiers.</li>
+    </ul>
+
+    <p>
+      With a buy-once offline tool, there is no cancellation. The file is on your machine. Your data is
+      in that file. Nobody can take either away.
+    </p>
+
+    <h2>OwnitApps No-Subscription Tools</h2>
+
+    <p>
+      Every OwnitApps tool is a single HTML file, purchased once, owned forever. No account. No
+      internet required. No subscription ever.
+    </p>
+
+    <ul>
+      <li>
+        <a href="/apps/solo-finance"><strong>Solo Finance — $19</strong></a><br />
+        Freelancer tax-ready ledger. Dashboard, transactions, client management, invoices, tax reporting,
+        IRS mileage rates. Available now.
+      </li>
+      <li>
+        <a href="/apps/budget-by-paycheck-os"><strong>Budget by Paycheck OS — $17</strong></a><br />
+        Paycheck-based budget planner for weekly and biweekly earners. Coming soon.
+      </li>
+      <li>
+        <a href="/apps/debt-escape-os"><strong>Debt Escape OS — $17</strong></a><br />
+        Snowball and avalanche debt payoff planner. Projects your debt-free date. Coming soon.
+      </li>
+      <li>
+        <a href="/apps/home-admin-binder-os"><strong>Home Admin Binder OS — $19</strong></a><br />
+        Household records organizer. Warranties, contacts, maintenance logs, documents. Coming soon.
+      </li>
+      <li>
+        <a href="/apps/medical-binder-os"><strong>Medical Binder OS — $19</strong></a><br />
+        Family health records vault. Medications, allergies, immunizations, emergency card. Coming soon.
+      </li>
+    </ul>
+
+    <h2>Related Pages</h2>
+    <ul>
+      <li><a href="/glossary/no-subscription-software">Glossary: No-Subscription Software</a></li>
+      <li><a href="/glossary/buy-once-software">Glossary: Buy-Once Software</a></li>
+      <li><a href="/blog/subscription-fatigue-and-how-to-escape-it">Subscription Fatigue and How to Escape It</a></li>
+      <li><a href="/offline-first-apps">What Are Offline-First Apps?</a></li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      {pageFaqs?.map((faq: {question: string; answer: string}) => (
+        <details class="faq-item">
+          <summary>{faq.question}</summary>
+          <p>{faq.answer}</p>
+        </details>
+      ))}
+    </div>
+  </article>
+</PublicLayout>

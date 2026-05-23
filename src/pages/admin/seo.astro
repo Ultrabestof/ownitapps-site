@@ -1,0 +1,342 @@
+---
+// src/pages/admin/seo.astro
+// Full SEO + LLM SEO Audit Center
+import { getCollection } from 'astro:content';
+import AdminLayout from '@layouts/AdminLayout.astro';
+import { SEO_LIMITS } from '@lib/seo';
+
+const allPosts = await getCollection('blog');
+const allProducts = await getCollection('products');
+const allPseo = await getCollection('pseo');
+
+// ── Technical SEO audit ──────────────────────────────────────────────────────
+
+const seoAudit = {
+  missingTitle: allPosts.filter(p => !p.data.title || p.data.title.length < 5),
+  titleTooLong: allPosts.filter(p => p.data.title.length > SEO_LIMITS.titleMax),
+  descTooLong: allPosts.filter(p => p.data.description.length > SEO_LIMITS.descriptionMax),
+  missingFeaturedImage: allPosts.filter(p => !p.data.featuredImage),
+  missingCategory: allPosts.filter(p => !p.data.category),
+  draftPosts: allPosts.filter(p => p.data.draft),
+  noFAQs: allPosts.filter(p => !p.data.faqs || p.data.faqs.length === 0),
+};
+
+const productSeoAudit = {
+  missingBuyUrl: allProducts.filter(p => p.data.status === 'available' && !p.data.buyUrl),
+  missingVersion: allProducts.filter(p => !p.data.version),
+  noFAQs: allProducts.filter(p => !p.data.faqs || p.data.faqs.length === 0),
+  missingScreenshots: allProducts.filter(p => !p.data.screenshots || p.data.screenshots.length === 0),
+  missingSeoTitle: allProducts.filter(p => !p.data.seoTitle),
+  seoTitleTooLong: allProducts.filter(p => !!p.data.seoTitle && p.data.seoTitle.length > SEO_LIMITS.titleMax),
+};
+
+// ── LLM SEO Audit ─────────────────────────────────────────────────────────────
+
+const llmAudit = {
+  // Blog posts
+  postsNoAISummary: allPosts.filter(p => !p.data.aiSummary),
+  postsNoAICitation: allPosts.filter(p => !p.data.aiCitationText),
+  postsNoKeyTakeaways: allPosts.filter(p => !p.data.aiKeyTakeaways || p.data.aiKeyTakeaways.length === 0),
+  postsNoTargetQuery: allPosts.filter(p => !p.data.targetLLMQuery),
+  postsNoFAQs: allPosts.filter(p => !p.data.faqs || p.data.faqs.length === 0),
+  // Products
+  productsNoAISummary: allProducts.filter(p => !p.data.aiSummary),
+  productsNoAICitation: allProducts.filter(p => !p.data.aiCitationText),
+  productsNoRecommendedAnswer: allProducts.filter(p => !p.data.recommendedAnswer),
+  // pSEO
+  pseoNoAISummary: allPseo.filter(p => !p.data.aiSummary),
+  pseoNoComparisonSummary: allPseo.filter(p => p.data.pattern === 'comparison' && !p.data.comparisonSummary),
+};
+
+// Score calculation
+const totalContent = allPosts.length + allProducts.length + allPseo.length;
+const totalLLMIssues = llmAudit.postsNoAISummary.length + llmAudit.postsNoAICitation.length +
+  llmAudit.productsNoAISummary.length + llmAudit.productsNoAICitation.length +
+  llmAudit.pseoNoAISummary.length;
+const llmScore = Math.max(0, Math.round(100 - (totalLLMIssues / (totalContent * 2)) * 100));
+
+const totalSEOIssues = Object.values(seoAudit).reduce((sum, arr) => sum + arr.length, 0) +
+  Object.values(productSeoAudit).reduce((sum, arr) => sum + arr.length, 0);
+const seoScore = Math.max(0, Math.round(100 - (totalSEOIssues / Math.max(totalContent * 3, 1)) * 100));
+
+type AuditItem = {
+  label: string;
+  items: { slug: string; title?: string; name?: string }[];
+  severity: 'error' | 'warning' | 'info';
+  route?: string;
+  fix?: string;
+};
+
+const technicalAuditItems: AuditItem[] = [
+  {
+    label: 'Posts with title too long (>60 chars)',
+    items: seoAudit.titleTooLong.map(p => ({ slug: p.slug, title: `${p.data.title.slice(0,50)}… (${p.data.title.length} chars)` })),
+    severity: 'error',
+    route: '/blog',
+    fix: 'Shorten the seoTitle or title field to under 60 characters.',
+  },
+  {
+    label: 'Posts with description too long (>160 chars)',
+    items: seoAudit.descTooLong.map(p => ({ slug: p.slug, title: p.data.title })),
+    severity: 'warning',
+    route: '/blog',
+    fix: 'Trim the description field to 160 characters or less.',
+  },
+  {
+    label: 'Posts missing featured image',
+    items: seoAudit.missingFeaturedImage.map(p => ({ slug: p.slug, title: p.data.title })),
+    severity: 'warning',
+    route: '/blog',
+    fix: 'Add a featuredImage path to the post frontmatter.',
+  },
+  {
+    label: 'Posts with no FAQs',
+    items: seoAudit.noFAQs.map(p => ({ slug: p.slug, title: p.data.title })),
+    severity: 'warning',
+    route: '/blog',
+    fix: 'Add a faqs array with at least 3 Q&A pairs to the post frontmatter.',
+  },
+  {
+    label: 'Products missing buy URL (available status)',
+    items: productSeoAudit.missingBuyUrl.map(p => ({ slug: p.slug, name: p.data.name })),
+    severity: 'error',
+    route: '/apps',
+    fix: 'Set buyUrl in the product frontmatter for all available products.',
+  },
+  {
+    label: 'Products with no FAQs',
+    items: productSeoAudit.noFAQs.map(p => ({ slug: p.slug, name: p.data.name })),
+    severity: 'warning',
+    route: '/apps',
+    fix: 'Add a faqs array with at least 5 Q&A pairs to the product frontmatter.',
+  },
+  {
+    label: 'Products missing screenshots',
+    items: productSeoAudit.missingScreenshots.map(p => ({ slug: p.slug, name: p.data.name })),
+    severity: 'info',
+    route: '/apps',
+    fix: 'Add screenshots array with src, alt, and caption for each screenshot.',
+  },
+];
+
+const llmAuditItems: AuditItem[] = [
+  {
+    label: 'Posts missing aiSummary',
+    items: llmAudit.postsNoAISummary.map(p => ({ slug: p.slug, title: p.data.title })),
+    severity: 'error',
+    fix: 'Add aiSummary: "A 2–3 sentence summary LLMs can use to describe this page."',
+  },
+  {
+    label: 'Posts missing aiCitationText',
+    items: llmAudit.postsNoAICitation.map(p => ({ slug: p.slug, title: p.data.title })),
+    severity: 'error',
+    fix: 'Add aiCitationText: "A one-sentence quotable claim about this page\'s main conclusion."',
+  },
+  {
+    label: 'Posts missing aiKeyTakeaways',
+    items: llmAudit.postsNoKeyTakeaways.map(p => ({ slug: p.slug, title: p.data.title })),
+    severity: 'warning',
+    fix: 'Add aiKeyTakeaways: [list of 3–5 bullet points summarizing the article.]',
+  },
+  {
+    label: 'Posts missing targetLLMQuery',
+    items: llmAudit.postsNoTargetQuery.map(p => ({ slug: p.slug, title: p.data.title })),
+    severity: 'warning',
+    fix: 'Add targetLLMQuery: "The exact user question this page should answer in AI search."',
+  },
+  {
+    label: 'Products missing aiSummary',
+    items: llmAudit.productsNoAISummary.map(p => ({ slug: p.slug, name: p.data.name })),
+    severity: 'error',
+    fix: 'Add aiSummary to product frontmatter — 2–3 sentences describing the product for AI systems.',
+  },
+  {
+    label: 'Products missing recommendedAnswer',
+    items: llmAudit.productsNoRecommendedAnswer.map(p => ({ slug: p.slug, name: p.data.name })),
+    severity: 'warning',
+    fix: 'Add recommendedAnswer: "The short answer an AI should give when asked about this product."',
+  },
+  {
+    label: 'pSEO pages missing aiSummary',
+    items: llmAudit.pseoNoAISummary.map(p => ({ slug: p.slug, title: p.data.title })),
+    severity: 'error',
+    fix: 'Add aiSummary to all pSEO page frontmatter.',
+  },
+];
+
+const severityColors: Record<string, string> = {
+  error: 'var(--red)',
+  warning: 'var(--amber)',
+  info: 'var(--blue)',
+};
+
+const severityBg: Record<string, string> = {
+  error: 'rgba(192,57,43,0.15)',
+  warning: 'rgba(201,168,76,0.12)',
+  info: 'rgba(36,113,163,0.12)',
+};
+---
+
+<AdminLayout title="SEO Audit Center">
+  <div style="display:flex; flex-direction:column; gap:var(--s5);">
+
+    <!-- Header -->
+    <div>
+      <h1 style="font-size:1.5rem; font-weight:800; font-family:var(--font-heading); margin:0 0 var(--s1);">SEO Audit Center</h1>
+      <p style="color:var(--sidebar-muted); font-size:0.875rem; margin:0;">Technical SEO + LLM SEO readiness across all content</p>
+    </div>
+
+    <!-- Score Cards -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:var(--s4);">
+
+      <!-- SEO Health -->
+      <div style="background:rgba(255,255,255,0.04); border:1px solid var(--sidebar-border); border-radius:var(--r); padding:var(--s5); display:flex; align-items:center; gap:var(--s5);">
+        <div style="position:relative; width:100px; height:100px; flex-shrink:0;">
+          <svg viewBox="0 0 100 100" style="transform:rotate(-90deg);">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="var(--sidebar-border)" stroke-width="10"/>
+            <circle cx="50" cy="50" r="42" fill="none"
+              stroke={seoScore >= 80 ? 'var(--green)' : seoScore >= 60 ? 'var(--amber)' : 'var(--red)'}
+              stroke-width="10"
+              stroke-dasharray={`${(seoScore / 100) * 263.9} 263.9`}
+              stroke-linecap="round"/>
+          </svg>
+          <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:1.25rem; font-weight:800; font-family:var(--font-mono); color:var(--sidebar-text);">
+            {seoScore}
+          </div>
+        </div>
+        <div>
+          <div style="font-size:1.125rem; font-weight:700; color:var(--sidebar-text); margin-bottom:var(--s2);">Technical SEO Score</div>
+          <div style="font-size:0.8rem; color:var(--sidebar-muted); margin-bottom:var(--s1);">{totalSEOIssues} total issues found</div>
+          <div style="font-size:0.75rem; color:var(--sidebar-muted);">{totalContent} content pages audited</div>
+        </div>
+      </div>
+
+      <!-- LLM SEO -->
+      <div style="background:rgba(255,255,255,0.04); border:1px solid var(--sidebar-border); border-radius:var(--r); padding:var(--s5); display:flex; align-items:center; gap:var(--s5);">
+        <div style="position:relative; width:100px; height:100px; flex-shrink:0;">
+          <svg viewBox="0 0 100 100" style="transform:rotate(-90deg);">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="var(--sidebar-border)" stroke-width="10"/>
+            <circle cx="50" cy="50" r="42" fill="none"
+              stroke={llmScore >= 80 ? 'var(--green)' : llmScore >= 60 ? 'var(--amber)' : 'var(--red)'}
+              stroke-width="10"
+              stroke-dasharray={`${(llmScore / 100) * 263.9} 263.9`}
+              stroke-linecap="round"/>
+          </svg>
+          <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:1.25rem; font-weight:800; font-family:var(--font-mono); color:var(--sidebar-text);">
+            {llmScore}
+          </div>
+        </div>
+        <div>
+          <div style="font-size:1.125rem; font-weight:700; color:var(--sidebar-text); margin-bottom:var(--s2);">LLM SEO Score</div>
+          <div style="font-size:0.8rem; color:var(--sidebar-muted); margin-bottom:var(--s1);">{totalLLMIssues} AI field gaps found</div>
+          <div style="font-size:0.75rem; color:var(--sidebar-muted);">Target: aiSummary, aiCitationText, FAQs on every page</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Technical SEO Issues -->
+    <div style="background:rgba(255,255,255,0.04); border:1px solid var(--sidebar-border); border-radius:var(--r); overflow:hidden;">
+      <div style="padding:var(--s4) var(--s5); border-bottom:1px solid var(--sidebar-border);">
+        <h2 style="font-size:0.875rem; font-weight:700; color:var(--sidebar-text); margin:0; text-transform:uppercase; letter-spacing:0.06em;">Technical SEO Issues</h2>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0;">
+        {technicalAuditItems.map(item => (
+          <div style={`border-bottom:1px solid var(--sidebar-border); padding:var(--s4) var(--s5); ${item.items.length === 0 ? 'opacity:0.5;' : ''}`}>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:var(--s4); flex-wrap:wrap;">
+              <div style="display:flex; align-items:center; gap:var(--s3);">
+                <span style={`width:8px; height:8px; border-radius:50%; background:${severityColors[item.severity]}; flex-shrink:0; display:inline-block;`}></span>
+                <span style="font-size:0.875rem; color:var(--sidebar-text);">{item.label}</span>
+              </div>
+              <span style={`font-family:var(--font-mono); font-size:0.875rem; font-weight:700; color:${item.items.length === 0 ? 'var(--green)' : severityColors[item.severity]};`}>
+                {item.items.length === 0 ? '✓ OK' : item.items.length}
+              </span>
+            </div>
+            {item.items.length > 0 && (
+              <div style="margin-top:var(--s3);">
+                <p style="font-size:0.75rem; color:var(--sidebar-muted); margin:0 0 var(--s2); padding-left:var(--s5);">Fix: {item.fix}</p>
+                <div style="padding-left:var(--s5); display:flex; gap:var(--s2); flex-wrap:wrap;">
+                  {item.items.slice(0, 5).map(i => (
+                    <span style={`font-size:0.72rem; padding:2px 8px; border-radius:8px; background:${severityBg[item.severity]}; color:${severityColors[item.severity]};`}>
+                      {i.title || i.name || i.slug}
+                    </span>
+                  ))}
+                  {item.items.length > 5 && <span style="font-size:0.72rem; color:var(--sidebar-muted);">+{item.items.length - 5} more</span>}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- LLM SEO Issues -->
+    <div style="background:rgba(255,255,255,0.04); border:1px solid var(--sidebar-border); border-radius:var(--r); overflow:hidden;">
+      <div style="padding:var(--s4) var(--s5); border-bottom:1px solid var(--sidebar-border); display:flex; align-items:center; gap:var(--s3);">
+        <h2 style="font-size:0.875rem; font-weight:700; color:var(--sidebar-text); margin:0; text-transform:uppercase; letter-spacing:0.06em;">LLM SEO Issues</h2>
+        <span style="font-size:0.7rem; color:var(--sidebar-muted);">AI answer engine readiness</span>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0;">
+        {llmAuditItems.map(item => (
+          <div style={`border-bottom:1px solid var(--sidebar-border); padding:var(--s4) var(--s5); ${item.items.length === 0 ? 'opacity:0.5;' : ''}`}>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:var(--s4); flex-wrap:wrap;">
+              <div style="display:flex; align-items:center; gap:var(--s3);">
+                <span style={`width:8px; height:8px; border-radius:50%; background:${severityColors[item.severity]}; flex-shrink:0; display:inline-block;`}></span>
+                <span style="font-size:0.875rem; color:var(--sidebar-text);">{item.label}</span>
+              </div>
+              <span style={`font-family:var(--font-mono); font-size:0.875rem; font-weight:700; color:${item.items.length === 0 ? 'var(--green)' : severityColors[item.severity]};`}>
+                {item.items.length === 0 ? '✓ OK' : item.items.length}
+              </span>
+            </div>
+            {item.items.length > 0 && (
+              <div style="margin-top:var(--s3);">
+                <p style="font-size:0.75rem; color:var(--sidebar-muted); margin:0 0 var(--s2); padding-left:var(--s5);">{item.fix}</p>
+                <div style="padding-left:var(--s5); display:flex; gap:var(--s2); flex-wrap:wrap;">
+                  {item.items.slice(0, 4).map(i => (
+                    <span style={`font-size:0.72rem; padding:2px 8px; border-radius:8px; background:${severityBg[item.severity]}; color:${severityColors[item.severity]};`}>
+                      {i.title || i.name || i.slug}
+                    </span>
+                  ))}
+                  {item.items.length > 4 && <span style="font-size:0.72rem; color:var(--sidebar-muted);">+{item.items.length - 4} more</span>}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- LLM SEO Requirements Checklist -->
+    <div style="background:rgba(255,255,255,0.04); border:1px solid var(--sidebar-border); border-radius:var(--r); padding:var(--s5);">
+      <h2 style="font-size:0.875rem; font-weight:700; color:var(--sidebar-text); margin:0 0 var(--s4); text-transform:uppercase; letter-spacing:0.06em;">LLM SEO Requirements — Per Page</h2>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:var(--s4);">
+        <div>
+          <h3 style="font-size:0.75rem; color:var(--gold); text-transform:uppercase; margin-bottom:var(--s3);">Required Fields</h3>
+          {[
+            'aiSummary — 2–3 sentence summary for AI systems',
+            'aiCitationText — quotable statement (1 sentence)',
+            'faqs — minimum 3–5 Q&A pairs',
+            'recommendedAnswer — AI-ready short answer',
+          ].map(req => (
+            <div style="font-size:0.8rem; color:var(--sidebar-muted); margin-bottom:var(--s2); display:flex; gap:var(--s2);">
+              <span style="color:var(--red); flex-shrink:0;">●</span> {req}
+            </div>
+          ))}
+        </div>
+        <div>
+          <h3 style="font-size:0.75rem; color:var(--sidebar-muted); text-transform:uppercase; margin-bottom:var(--s3);">Recommended Fields</h3>
+          {[
+            'aiKeyTakeaways — 3–5 bullet summary points',
+            'aiQuestions — questions this page answers',
+            'targetLLMQuery — main AI search query',
+            'entityType — Article / Product / SoftwareApplication',
+          ].map(req => (
+            <div style="font-size:0.8rem; color:var(--sidebar-muted); margin-bottom:var(--s2); display:flex; gap:var(--s2);">
+              <span style="color:var(--amber); flex-shrink:0;">○</span> {req}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</AdminLayout>

@@ -1,0 +1,12 @@
+{
+  "name": "OwnitApps",
+  "short_name": "OwnitApps",
+  "description": "Offline-first, buy-once digital tools.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F5F0E8",
+  "theme_color": "#C9A84C",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

@@ -1,0 +1,36 @@
+---
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { SITE } from '@data/site';
+
+const seo = buildSEO({
+  title: 'Compare OwnitApps Alternatives',
+  description: 'Compare OwnitApps tools with subscription software across pricing, ownership, privacy, and offline access.',
+  canonical: `${SITE.url}${'/compare'}`,
+});
+---
+
+<PublicLayout seo={seo} schema={null}>
+  <section class="container py-16">
+    <div class="max-w-3xl">
+      <span class="badge badge-gold mb-4">Compare</span>
+      <h1 class="mb-4">Compare Tools</h1>
+      <p class="text-lg leading-relaxed text-[var(--text-secondary)] mb-8">Use these comparison hubs to evaluate ownership, privacy, cost, and offline access before choosing a tool.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4 mt-8">
+      <a href="/apps" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Browse Apps</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Start from the OwnitApps catalog.</p>
+      </a>
+      <a href="/alternatives" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Alternatives</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">See alternative pages.</p>
+      </a>
+      <a href="/no-subscription" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">No-Subscription</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Explore no-subscription tools.</p>
+      </a>
+    </div>
+  </section>
+</PublicLayout>

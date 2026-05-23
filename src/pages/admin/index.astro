@@ -1,0 +1,254 @@
+---
+// src/pages/admin/index.astro
+// Admin Dashboard — noindex, uses AdminLayout
+// Static version: reads from content collections for audit data
+
+import { getCollection } from 'astro:content';
+import AdminLayout from '@layouts/AdminLayout.astro';
+import { SEO_LIMITS } from '@lib/seo';
+
+// Fetch all content collections
+const allPosts = await getCollection('blog');
+const allProducts = await getCollection('products');
+const allPseo = await getCollection('pseo');
+const allGlossary = await getCollection('glossary');
+
+const publishedPosts = allPosts.filter(p => !p.data.draft);
+const draftPosts = allPosts.filter(p => p.data.draft);
+const availableProducts = allProducts.filter(p => p.data.status === 'available');
+const comingSoonProducts = allProducts.filter(p => p.data.status === 'coming-soon');
+const publishedPseo = allPseo.filter(p => !p.data.draft);
+
+// SEO Audit
+const postSeoIssues = allPosts.filter(p => {
+  const title = p.data.title || '';
+  const desc = p.data.description || '';
+  return title.length > SEO_LIMITS.titleMax || desc.length > SEO_LIMITS.descriptionMax || !p.data.category;
+});
+
+const productsSeoIssues = allProducts.filter(p => {
+  return !p.data.faqs || p.data.faqs.length === 0;
+});
+
+// LLM SEO Audit
+const postsNeedingLLM = allPosts.filter(p => !p.data.aiSummary || !p.data.aiCitationText);
+const productsNeedingLLM = allProducts.filter(p => !p.data.aiSummary || !p.data.aiCitationText);
+const pseoNeedingLLM = allPseo.filter(p => !p.data.aiSummary);
+
+const totalPages = publishedPosts.length + allProducts.length + publishedPseo.length + allGlossary.length;
+const totalIssues = postSeoIssues.length + productsSeoIssues.length;
+const llmReadiness = Math.round(
+  ((allPosts.length - postsNeedingLLM.length + allProducts.length - productsNeedingLLM.length) /
+  Math.max(allPosts.length + allProducts.length, 1)) * 100
+);
+
+const seoHealth = Math.round(((totalPages - totalIssues) / Math.max(totalPages, 1)) * 100);
+
+// Recent posts for table
+const recentPosts = [...allPosts]
+  .sort((a, b) => b.data.datePublished.getTime() - a.data.datePublished.getTime())
+  .slice(0, 5);
+---
+
+<AdminLayout title="Dashboard Overview">
+  <div style="display:flex; flex-direction:column; gap:var(--s6);">
+
+    <!-- Page Header -->
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:var(--s3);">
+      <div>
+        <h1 style="font-size:1.5rem; font-weight:800; font-family:var(--font-heading); margin:0 0 var(--s1);">Dashboard</h1>
+        <p style="color:var(--sidebar-muted); font-size:0.875rem; margin:0;">OwnitApps content and SEO overview</p>
+      </div>
+      <div style="display:flex; gap:var(--s2);">
+        <a href="/admin/seo" style="background:rgba(201,168,76,0.15); color:var(--gold); border:1px solid rgba(201,168,76,0.3); padding:var(--s2) var(--s4); border-radius:var(--rs); font-size:0.8rem; text-decoration:none; font-weight:600;">
+          Run SEO Audit →
+        </a>
+      </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:var(--s4);">
+      {[
+        { label: 'Total Pages', value: totalPages, color: 'var(--gold)', icon: '📄' },
+        { label: 'Blog Posts', value: publishedPosts.length, color: 'var(--green)', icon: '✍️' },
+        { label: 'Products', value: allProducts.length, color: 'var(--blue)', icon: '📦' },
+        { label: 'pSEO Pages', value: publishedPseo.length, color: 'var(--amber)', icon: '🔍' },
+        { label: 'Glossary', value: allGlossary.length, color: 'var(--green)', icon: '📖' },
+        { label: 'Drafts', value: draftPosts.length, color: 'var(--text-muted)', icon: '✏️' },
+      ].map(card => (
+        <div style="background:rgba(255,255,255,0.05); border:1px solid var(--sidebar-border); border-radius:var(--r); padding:var(--s4);">
+          <div style="display:flex; align-items:center; gap:var(--s2); margin-bottom:var(--s3);">
+            <span style="font-size:1.25rem;">{card.icon}</span>
+            <span style="font-size:0.75rem; color:var(--sidebar-muted); text-transform:uppercase; letter-spacing:0.08em;">{card.label}</span>
+          </div>
+          <div style={`font-size:2rem; font-weight:800; font-family:var(--font-mono); color:${card.color};`}>{card.value}</div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Health Rings Row -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:var(--s4);">
+
+      <!-- SEO Health Ring -->
+      <div style="background:rgba(255,255,255,0.05); border:1px solid var(--sidebar-border); border-radius:var(--r); padding:var(--s5); display:flex; align-items:center; gap:var(--s4);">
+        <div style="position:relative; width:80px; height:80px; flex-shrink:0;">
+          <svg viewBox="0 0 80 80" style="transform:rotate(-90deg);">
+            <circle cx="40" cy="40" r="34" fill="none" stroke="var(--sidebar-border)" stroke-width="8"/>
+            <circle cx="40" cy="40" r="34" fill="none"
+              stroke={seoHealth >= 80 ? 'var(--green)' : seoHealth >= 60 ? 'var(--amber)' : 'var(--red)'}
+              stroke-width="8"
+              stroke-dasharray={`${(seoHealth / 100) * 213.6} 213.6`}
+              stroke-linecap="round"/>
+          </svg>
+          <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:1rem; font-weight:800; font-family:var(--font-mono); color:var(--sidebar-text);">
+            {seoHealth}%
+          </div>
+        </div>
+        <div>
+          <div style="font-size:0.875rem; font-weight:700; color:var(--sidebar-text); margin-bottom:var(--s1);">SEO Health</div>
+          <div style="font-size:0.75rem; color:var(--sidebar-muted);">{totalIssues} issues found</div>
+          <a href="/admin/seo" style="font-size:0.75rem; color:var(--gold); text-decoration:none; display:inline-block; margin-top:var(--s2);">View audit →</a>
+        </div>
+      </div>
+
+      <!-- LLM SEO Ring -->
+      <div style="background:rgba(255,255,255,0.05); border:1px solid var(--sidebar-border); border-radius:var(--r); padding:var(--s5); display:flex; align-items:center; gap:var(--s4);">
+        <div style="position:relative; width:80px; height:80px; flex-shrink:0;">
+          <svg viewBox="0 0 80 80" style="transform:rotate(-90deg);">
+            <circle cx="40" cy="40" r="34" fill="none" stroke="var(--sidebar-border)" stroke-width="8"/>
+            <circle cx="40" cy="40" r="34" fill="none"
+              stroke={llmReadiness >= 80 ? 'var(--green)' : llmReadiness >= 60 ? 'var(--amber)' : 'var(--red)'}
+              stroke-width="8"
+              stroke-dasharray={`${(llmReadiness / 100) * 213.6} 213.6`}
+              stroke-linecap="round"/>
+          </svg>
+          <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:1rem; font-weight:800; font-family:var(--font-mono); color:var(--sidebar-text);">
+            {llmReadiness}%
+          </div>
+        </div>
+        <div>
+          <div style="font-size:0.875rem; font-weight:700; color:var(--sidebar-text); margin-bottom:var(--s1);">LLM Readiness</div>
+          <div style="font-size:0.75rem; color:var(--sidebar-muted);">{postsNeedingLLM.length + productsNeedingLLM.length} pages need AI fields</div>
+          <a href="/admin/seo" style="font-size:0.75rem; color:var(--gold); text-decoration:none; display:inline-block; margin-top:var(--s2);">View audit →</a>
+        </div>
+      </div>
+
+      <!-- Products Status -->
+      <div style="background:rgba(255,255,255,0.05); border:1px solid var(--sidebar-border); border-radius:var(--r); padding:var(--s5);">
+        <div style="font-size:0.75rem; color:var(--sidebar-muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:var(--s3);">Products Status</div>
+        <div style="display:flex; flex-direction:column; gap:var(--s2);">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <span style="font-size:0.8rem; color:var(--green);">● Available</span>
+            <span style="font-family:var(--font-mono); font-size:0.875rem; color:var(--sidebar-text); font-weight:700;">{availableProducts.length}</span>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <span style="font-size:0.8rem; color:var(--sidebar-muted);">◷ Coming Soon</span>
+            <span style="font-family:var(--font-mono); font-size:0.875rem; color:var(--sidebar-text); font-weight:700;">{comingSoonProducts.length}</span>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <span style="font-size:0.8rem; color:var(--red);">⚠ Missing FAQs</span>
+            <span style="font-family:var(--font-mono); font-size:0.875rem; color:var(--red); font-weight:700;">{productsSeoIssues.length}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Quality -->
+      <div style="background:rgba(255,255,255,0.05); border:1px solid var(--sidebar-border); border-radius:var(--r); padding:var(--s5);">
+        <div style="font-size:0.75rem; color:var(--sidebar-muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:var(--s3);">LLM SEO Gaps</div>
+        <div style="display:flex; flex-direction:column; gap:var(--s2);">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <span style="font-size:0.8rem; color:var(--sidebar-muted);">Posts missing aiSummary</span>
+            <span style={`font-family:var(--font-mono); font-size:0.875rem; font-weight:700; color:${postsNeedingLLM.length > 0 ? 'var(--amber)' : 'var(--green)'};`}>{postsNeedingLLM.length}</span>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <span style="font-size:0.8rem; color:var(--sidebar-muted);">Products missing AI fields</span>
+            <span style={`font-family:var(--font-mono); font-size:0.875rem; font-weight:700; color:${productsNeedingLLM.length > 0 ? 'var(--amber)' : 'var(--green)'};`}>{productsNeedingLLM.length}</span>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <span style="font-size:0.8rem; color:var(--sidebar-muted);">pSEO missing AI summary</span>
+            <span style={`font-family:var(--font-mono); font-size:0.875rem; font-weight:700; color:${pseoNeedingLLM.length > 0 ? 'var(--amber)' : 'var(--green)'};`}>{pseoNeedingLLM.length}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Posts Table -->
+    <div style="background:rgba(255,255,255,0.05); border:1px solid var(--sidebar-border); border-radius:var(--r); overflow:hidden;">
+      <div style="padding:var(--s4) var(--s5); border-bottom:1px solid var(--sidebar-border); display:flex; align-items:center; justify-content:space-between;">
+        <h2 style="font-size:0.875rem; font-weight:700; color:var(--sidebar-text); margin:0; text-transform:uppercase; letter-spacing:0.06em;">Recent Blog Posts</h2>
+        <a href="/admin/posts" style="font-size:0.75rem; color:var(--gold); text-decoration:none;">View all →</a>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.8rem;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--sidebar-border);">
+              <th style="text-align:left; padding:var(--s3) var(--s5); color:var(--sidebar-muted); font-weight:600; white-space:nowrap;">Title</th>
+              <th style="text-align:left; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Category</th>
+              <th style="text-align:left; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Status</th>
+              <th style="text-align:left; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600; white-space:nowrap;">Title Len</th>
+              <th style="text-align:left; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">AI Fields</th>
+              <th style="text-align:left; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600; white-space:nowrap;">Published</th>
+            </tr>
+          </thead>
+          <tbody>
+            {recentPosts.map(post => {
+              const titleLen = post.data.title.length;
+              const hasAI = !!(post.data.aiSummary && post.data.aiCitationText);
+              const titleOk = titleLen < 61;
+              return (
+                <tr style="border-bottom:1px solid rgba(58,58,58,0.5);" class="table-row-hover">
+                  <td style="padding:var(--s3) var(--s5); color:var(--sidebar-text); max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    <a href={`/blog/${post.slug}`} target="_blank" style="color:var(--sidebar-text); text-decoration:none;">{post.data.title}</a>
+                  </td>
+                  <td style="padding:var(--s3) var(--s4);">
+                    <span style="background:rgba(201,168,76,0.15); color:var(--gold); padding:2px 8px; border-radius:10px; font-size:0.72rem;">{post.data.category}</span>
+                  </td>
+                  <td style="padding:var(--s3) var(--s4);">
+                    <span style={`font-size:0.72rem; padding:2px 8px; border-radius:10px; ${post.data.draft ? 'background:rgba(154,143,130,0.2); color:var(--sidebar-muted)' : 'background:rgba(46,139,90,0.2); color:#6fcf97'};`}>
+                      {post.data.draft ? 'Draft' : 'Published'}
+                    </span>
+                  </td>
+                  <td style="padding:var(--s3) var(--s4);">
+                    <span style={`font-family:var(--font-mono); font-size:0.8rem; color:${titleOk ? 'var(--green)' : 'var(--red)'};`}>{titleLen}/60</span>
+                  </td>
+                  <td style="padding:var(--s3) var(--s4);">
+                    <span style={`font-size:1rem;`}>{hasAI ? '✅' : '⚠️'}</span>
+                  </td>
+                  <td style="padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-family:var(--font-mono); font-size:0.75rem; white-space:nowrap;">
+                    {post.data.datePublished.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:var(--s3);">
+      {[
+        { href: '/admin/posts', label: 'Manage Posts', desc: 'View and audit all blog posts', icon: '✍️' },
+        { href: '/admin/products', label: 'Manage Products', desc: 'Product status and SEO review', icon: '📦' },
+        { href: '/admin/pseo', label: 'pSEO Manager', desc: 'Programmatic SEO pages', icon: '🔍' },
+        { href: '/admin/seo', label: 'SEO Audit', desc: 'Full technical SEO review', icon: '📊' },
+      ].map(action => (
+        <a href={action.href}
+           style="background:rgba(255,255,255,0.03); border:1px solid var(--sidebar-border); border-radius:var(--r); padding:var(--s4); text-decoration:none; transition:background 0.2s;"
+           onmouseover="this.style.background='rgba(201,168,76,0.08)'"
+           onmouseout="this.style.background='rgba(255,255,255,0.03)'">
+          <span style="font-size:1.25rem; display:block; margin-bottom:var(--s2);">{action.icon}</span>
+          <strong style="display:block; color:var(--sidebar-text); margin-bottom:var(--s1); font-size:0.875rem;">{action.label}</strong>
+          <span style="font-size:0.75rem; color:var(--sidebar-muted);">{action.desc}</span>
+        </a>
+      ))}
+    </div>
+
+  </div>
+</AdminLayout>
+
+<style>
+.table-row-hover:hover {
+  background: rgba(201,168,76,0.05);
+}
+</style>

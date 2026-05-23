@@ -1,0 +1,36 @@
+---
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { SITE } from '@data/site';
+
+const seo = buildSEO({
+  title: 'Local Data Tools by OwnitApps',
+  description: 'Local data tools store personal information on the user’s device where possible instead of locking it inside a remote account.',
+  canonical: `${SITE.url}${'/local-data-tools'}`,
+});
+---
+
+<PublicLayout seo={seo} schema={null}>
+  <section class="container py-16">
+    <div class="max-w-3xl">
+      <span class="badge badge-gold mb-4">Source of Truth</span>
+      <h1 class="mb-4">Local Data Tools</h1>
+      <p class="text-lg leading-relaxed text-[var(--text-secondary)] mb-8">Local data tools make your device the primary home for your records, exports, and personal systems.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4 mt-8">
+      <a href="/glossary/local-first-software" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Local-First Software</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Learn the software principle.</p>
+      </a>
+      <a href="/privacy-first-tools" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Privacy-First Tools</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">See the privacy angle.</p>
+      </a>
+      <a href="/glossary/html-apps" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">HTML Apps</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Understand browser-based tools.</p>
+      </a>
+    </div>
+  </section>
+</PublicLayout>

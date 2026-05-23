@@ -1,0 +1,265 @@
+---
+// src/pages/apps/[slug].astro
+// Dynamic product page route
+
+import { getCollection } from 'astro:content';
+import PublicLayout from '../../layouts/PublicLayout.astro';
+import { SITE } from '../../data/site';
+import { productSchema, faqSchema, breadcrumbSchema } from '../../lib/schema';
+import PreviewLayout from '@layouts/PreviewLayout.astro';
+
+export async function getStaticPaths() {
+  let products;
+  try {
+    products = await getCollection('products');
+  } catch (e) {
+    console.warn('[Products] Could not load products collection:', e);
+    return [];
+  }
+
+  return products
+    .filter(p => {
+      if (!p.data.name) { console.warn(`[Products] Missing name: ${p.slug}`); return false; }
+      return true;
+    })
+    .map(product => ({
+      params: { slug: product.slug },
+      props: { product },
+    }));
+}
+
+const { product } = Astro.props;
+const { Content } = await product.render();
+
+const path = `/apps/${product.slug}`;
+const productUrl = `${SITE.url}${path}`;
+
+const seo = {
+  title: product.data.seoTitle ?? `${product.data.name} — ${product.data.tagline}`,
+  description: product.data.seoDescription ?? product.data.description.substring(0, 159),
+  ...(product.data.screenshots?.[0]?.src && { image: product.data.screenshots[0].src }),
+  ...(product.data.screenshots?.[0]?.alt && { imageAlt: product.data.screenshots[0].alt }),
+  type: 'product' as const,
+  canonical: productUrl,
+};
+
+const faqData = product.data.faqs ?? [];
+
+const [softwareSchema, productSchemaObj] = productSchema({
+  name: product.data.name,
+  description: product.data.description,
+  url: productUrl,
+  ...(product.data.screenshots?.[0]?.src && { image: product.data.screenshots[0].src }),
+  ...(product.data.price !== undefined && { price: product.data.price }),
+  currency: product.data.currency,
+  ...(product.data.version && { version: product.data.version }),
+  features: product.data.features,
+  ...(product.data.updateUrl && { updateUrl: product.data.updateUrl }),
+});
+
+const schema = [
+  softwareSchema,
+  productSchemaObj,
+  breadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Apps', url: '/apps' },
+    { name: product.data.name, url: path },
+  ]),
+  ...(faqData.length > 0 ? [faqSchema(faqData)] : []),
+].filter(Boolean);
+---
+
+<PreviewLayout editUrl={`/keystatic/collection/products/item/${product.slug}`} title={product.data.name}>
+<PublicLayout
+  {seo}
+ 
+  {schema}
+  breadcrumbs={[{ name: 'Apps', href: '/apps' }]}
+>
+  <div style="padding-bottom: 5rem;">
+
+    <!-- Hero -->
+    <section style="background: var(--surface-2); padding: 4rem 0 3.5rem; border-bottom: 1px solid var(--border-light);">
+      <div class="container" style="max-width: 900px;">
+        <div style="display: flex; align-items: flex-start; gap: 2rem; flex-wrap: wrap;">
+
+          <!-- Icon -->
+          <div
+            style="width: 80px; height: 80px; background: var(--gold-dim); border: 2px solid rgba(201,168,76,0.3); border-radius: var(--r); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; flex-shrink: 0;"
+          >
+            💰
+          </div>
+
+          <div style="flex: 1; min-width: 200px;">
+            <!-- Badges -->
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1rem;">
+              <span class={`badge ${product.data.status === 'available' ? 'badge-green' : 'badge-muted'}`}>
+                {product.data.status === 'available' ? '✓ Available Now' : product.data.status}
+              </span>
+              <span class="badge badge-muted">{product.data.category}</span>
+              {product.data.version && (
+                <span class="badge badge-muted" style="font-family: var(--font-mono);">v{product.data.version}</span>
+              )}
+            </div>
+
+            <!-- Name & Tagline -->
+            <h1 style="font-family: var(--font-heading); font-weight: 800; font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -0.04em; line-height: 1.05; margin-bottom: 0.5rem;">
+              {product.data.name}
+            </h1>
+            <p style="font-family: var(--font-mono); font-size: 0.8125rem; color: var(--gold); letter-spacing: 0.08em; margin-bottom: 1.25rem; text-transform: uppercase;">
+              {product.data.tagline}
+            </p>
+            <p style="font-size: 1.0625rem; color: var(--text-secondary); line-height: 1.65; max-width: 580px; margin-bottom: 2rem;">
+              {product.data.description}
+            </p>
+
+            <!-- CTAs -->
+            <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+              {product.data.buyUrl ? (
+                <a href={product.data.buyUrl} class="btn-gold" target="_blank" rel="noopener">
+                  {product.data.price != null ? `Get ${product.data.name} — $${product.data.price}` : `Get ${product.data.name}`}
+                </a>
+              ) : product.data.status === 'available' ? (
+                <span class="btn-gold" style="pointer-events: none; opacity: 0.7;">Coming Soon</span>
+              ) : (
+                <span class="btn-ghost" style="pointer-events: none; opacity: 0.6;">Notify Me</span>
+              )}
+              {product.data.updateUrl && (
+                <a href={`/apps/${product.slug}/updates`} class="btn-ghost">
+                  View Updates
+                </a>
+              )}
+            </div>
+
+            <!-- Trust bullets -->
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 1.25rem;">
+              {['One-time purchase', 'Offline-first', 'No account required', 'Local data only'].map(t => (
+                <span class="philosophy-pill" style="font-size: 0.75rem; padding: 3px 10px;">
+                  <span style="color: var(--green);">✓</span> {t}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="container" style="max-width: 900px; padding-top: 3.5rem;">
+
+      <!-- Quick Answer (LLM-optimized) -->
+      {product.data.aiSummary && (
+        <div class="answer-box" style="margin-bottom: 2.5rem;">
+          <h2>Quick Answer</h2>
+          <p>{product.data.aiSummary}</p>
+        </div>
+      )}
+
+      <!-- Key Takeaways -->
+      {product.data.aiKeyTakeaways && (
+        <div class="takeaway-box" style="margin-bottom: 2.5rem;">
+          <strong>Key Takeaways</strong>
+          <ul style="margin: 0; padding-left: 1.25rem;">
+            {product.data.aiKeyTakeaways.map(t => (
+              <li style="font-size: 0.9375rem; color: var(--text-secondary); margin-bottom: 4px;">{t}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <!-- Features Grid -->
+      {product.data.features.length > 0 && (
+        <section aria-labelledby="features-heading" style="margin-bottom: 3.5rem;">
+          <h2 id="features-heading" style="font-family: var(--font-heading); font-size: 1.75rem; letter-spacing: -0.025em; margin-bottom: 1.5rem;">
+            What's included
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {product.data.features.map(feature => (
+              <div style="display: flex; align-items: flex-start; gap: 10px; padding: 0.875rem 1rem; background: var(--surface-2); border: 1px solid var(--border-light); border-radius: var(--rs);">
+                <span style="color: var(--green); flex-shrink: 0; margin-top: 1px;">✓</span>
+                <span style="font-size: 0.9375rem; color: var(--text-primary);">{feature}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- Product content (MDX) -->
+      <article class="prose prose-ownitapps max-w-none" style="margin-bottom: 3.5rem;">
+        <Content />
+      </article>
+
+      <!-- Changelog preview -->
+      {product.data.changelog && product.data.changelog.length > 0 && (
+        <section aria-labelledby="changelog-heading" style="margin-bottom: 3.5rem; padding: 2rem; background: var(--surface-2); border: 1px solid var(--border-light); border-radius: var(--r);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+            <h2 id="changelog-heading" style="font-family: var(--font-heading); font-size: 1.375rem; letter-spacing: -0.02em; margin: 0;">
+              Recent Updates
+            </h2>
+            <a href={`/apps/${product.slug}/updates`} class="btn-ghost" style="font-size: 0.8125rem; padding: 0.4rem 0.875rem; min-height: 36px;">
+              Full changelog →
+            </a>
+          </div>
+          {product.data.changelog.slice(0, 2).map(entry => (
+            <div style="margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border-light);">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <span style="font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 500; color: var(--text-primary);">v{entry.version}</span>
+                <span style="font-family: var(--font-mono); font-size: 0.6875rem; color: var(--text-muted);">
+                  {(entry.date instanceof Date ? entry.date : new Date(String(entry.date) + 'T12:00:00')).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                </span>
+              </div>
+              <ul style="list-style: none; padding: 0; margin: 0; display: grid; gap: 4px;">
+                {entry.notes.slice(0, 4).map(note => (
+                  <li style="font-size: 0.875rem; color: var(--text-secondary); display: flex; gap: 8px;">
+                    <span style="color: var(--gold); flex-shrink: 0;">+</span> {note}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </section>
+      )}
+
+      <!-- FAQs -->
+      {faqData.length > 0 && (
+        <section aria-labelledby="product-faq-heading" style="margin-bottom: 3.5rem;">
+          <h2 id="product-faq-heading" style="font-family: var(--font-heading); font-size: 1.75rem; letter-spacing: -0.025em; margin-bottom: 1.5rem;">
+            Frequently Asked Questions
+          </h2>
+          <div role="list">
+            {faqData.map(faq => (
+              <div class="faq-item" role="listitem">
+                <button class="faq-question" type="button">
+                  {faq.question}
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style="flex-shrink: 0;">
+                    <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                <div class="faq-answer">
+                  <p style="margin: 0;">{faq.answer}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- Page Summary -->
+      <section class="page-summary" aria-label="Product summary">
+        <h2>Product Summary</h2>
+        <ul>
+          <li><strong>Product:</strong> {product.data.name}</li>
+          <li><strong>Category:</strong> {product.data.category}</li>
+          <li><strong>Price:</strong> {product.data.price != null ? `$${product.data.price} (one-time)` : 'Coming soon'}</li>
+          <li><strong>Works offline:</strong> Yes — no internet required</li>
+          <li><strong>Subscription:</strong> None — buy once, use forever</li>
+          <li><strong>Account required:</strong> No — core features work without login</li>
+          <li><strong>Data location:</strong> Your device (local browser storage + file export)</li>
+          {product.data.version && <li><strong>Version:</strong> {product.data.version}</li>}
+          <li><strong>Updates:</strong> <a href={`/apps/${product.slug}/updates`}>ownitapps.com/apps/{product.slug}/updates</a></li>
+        </ul>
+      </section>
+
+    </div>
+  </div>
+</PublicLayout>
+</PreviewLayout>

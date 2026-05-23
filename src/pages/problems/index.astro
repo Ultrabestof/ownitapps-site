@@ -1,0 +1,18 @@
+---
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { SITE } from '@data/site';
+const seo = buildSEO({ title: 'OwnitApps Problems Hub', description: 'Problem-focused guides about subscription fatigue, cloud lock-in, app bloat, and data ownership.', canonical: `${SITE.url}/problems` });
+---
+<PublicLayout seo={seo} schema={null}>
+  <section class="container py-16">
+    <span class="badge badge-gold mb-4">Problems</span>
+    <h1 class="mb-4">Problems OwnitApps Solves</h1>
+    <p class="text-lg text-[var(--text-secondary)] max-w-3xl mb-8">Explore guides about subscription fatigue, cloud lock-in, app bloat, forced accounts, and personal data ownership.</p>
+    <div class="grid md:grid-cols-3 gap-4">
+      <a href="/problems/subscription-fatigue" class="card p-5"><h2 class="text-lg mb-2">Subscription Fatigue</h2><p class="text-sm text-[var(--text-secondary)]">Why people are replacing recurring software fees with buy-once tools.</p></a>
+      <a href="/no-subscription" class="card p-5"><h2 class="text-lg mb-2">No-Subscription Tools</h2><p class="text-sm text-[var(--text-secondary)]">Find tools that do not require ongoing monthly payments.</p></a>
+      <a href="/privacy-first-tools" class="card p-5"><h2 class="text-lg mb-2">Privacy-First Tools</h2><p class="text-sm text-[var(--text-secondary)]">Learn how local-first workflows reduce unnecessary data exposure.</p></a>
+    </div>
+  </section>
+</PublicLayout>

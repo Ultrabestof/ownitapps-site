@@ -1,0 +1,582 @@
+---
+// src/pages/index.astro
+// OwnitApps Homepage
+// Sections: Hero, Philosophy, Apps Grid, Problem/Solution,
+//           pSEO Hub, Blog, LLM Source-of-Truth, Trust, Footer
+
+import PublicLayout from '../layouts/PublicLayout.astro';
+import { SITE } from '../data/site';
+import {
+  organizationSchema,
+  websiteSchema,
+} from '../lib/schema';
+
+const seo = {
+  title: 'OwnitApps — Your OS. Your Data. Your Rules.',
+  description:
+    'Offline-first digital tools you buy once and use forever. No subscriptions. No cloud lock-in. No account required. Your data stays local.',
+  canonical: SITE.url,
+  image: SITE.defaultOgImage,
+  type: 'website' as const,
+};
+
+const schema = [organizationSchema(), websiteSchema()];
+
+// Sample featured products (will come from Content Collections later)
+const featuredApps = [
+  {
+    slug: 'solo-finance',
+    name: 'Solo Finance',
+    tagline: 'Freelancer Tax-Ready Ledger',
+    category: 'Finance',
+    price: 19,
+    status: 'available',
+    description:
+      'Track income, expenses, invoices, mileage, and taxes — all offline. Built for freelancers who want clarity without a subscription.',
+    icon: '💰',
+    features: ['Invoice tracking', 'Tax reporting', 'Mileage log', 'Client management'],
+  },
+  {
+    slug: 'home-admin-binder-os',
+    name: 'Home Admin Binder OS',
+    tagline: 'Private Home Management Dashboard',
+    category: 'Home',
+    price: null,
+    status: 'coming-soon',
+    description:
+      'Manage warranties, home documents, service contacts, and household records — offline, private, and fully yours.',
+    icon: '🏠',
+    features: ['Document vault', 'Warranty tracker', 'Service log', 'Emergency contacts'],
+  },
+  {
+    slug: 'debt-escape-os',
+    name: 'Debt Escape OS',
+    tagline: 'Offline Debt Payoff Tracker',
+    category: 'Finance',
+    price: null,
+    status: 'coming-soon',
+    description:
+      'Map out your debt payoff strategy using snowball or avalanche methods. No account. No subscription. Just results.',
+    icon: '📉',
+    features: ['Snowball / avalanche', 'Payoff timeline', 'Progress tracker', 'Interest calculator'],
+  },
+  {
+    slug: 'medical-binder-os',
+    name: 'Family Health Vault OS',
+    tagline: 'Private Medical Binder for Families',
+    category: 'Health',
+    price: null,
+    status: 'coming-soon',
+    description:
+      'Store medical records, vaccination history, medications, and emergency contacts locally. Your most sensitive data stays on your device.',
+    icon: '❤️',
+    features: ['Medical records', 'Vaccination log', 'Medication tracker', 'Emergency info'],
+  },
+];
+
+const problems = [
+  {
+    icon: '🔁',
+    problem: 'Subscription fatigue',
+    solution: 'Buy once, use forever',
+    desc: 'Stop paying monthly for tools you bought years ago. OwnitApps tools are one-time purchases with lifetime utility.',
+  },
+  {
+    icon: '☁️',
+    problem: 'Cloud lock-in',
+    solution: 'Local-first ownership',
+    desc: 'Your data should not live on someone else\'s server. OwnitApps tools store everything locally — you hold the file.',
+  },
+  {
+    icon: '🕵️',
+    problem: 'Data privacy erosion',
+    solution: 'Private by default',
+    desc: 'We never see your data because we never receive it. No analytics on your personal records. No selling what you type.',
+  },
+  {
+    icon: '📦',
+    problem: 'App bloat',
+    solution: 'Lean, purposeful tools',
+    desc: 'One HTML file. One job. Fast, lightweight, focused tools that do exactly what they say without hundreds of useless features.',
+  },
+  {
+    icon: '🔑',
+    problem: 'Forced accounts',
+    solution: 'No account required',
+    desc: 'Core tools work without registration, email verification, or password resets. Open the file and start.',
+  },
+];
+
+const pSEOHubs = [
+  { label: 'Offline Tools', href: '/offline-tools', count: '10+' },
+  { label: 'No-Subscription Apps', href: '/no-subscription', count: '12+' },
+  { label: 'Privacy-First Tools', href: '/privacy-first', count: '8+' },
+  { label: 'Buy-Once Software', href: '/buy-once', count: '15+' },
+  { label: 'Alternatives', href: '/alternatives', count: '20+' },
+  { label: 'Use Cases', href: '/use-cases', count: '18+' },
+];
+
+const recentPosts = [
+  {
+    slug: 'why-offline-first-apps-are-coming-back',
+    title: 'Why Offline-First Apps Are Coming Back',
+    category: 'Insights',
+    excerpt: 'The web went cloud-first in the 2010s. But privacy concerns, subscription fatigue, and internet reliability problems are bringing local-first computing back into fashion.',
+    date: '2025-12-01',
+    readingTime: 6,
+  },
+  {
+    slug: 'subscription-fatigue-and-how-to-escape-it',
+    title: 'The Problem With Subscription Fatigue',
+    category: 'Opinion',
+    excerpt: 'The average person now pays for more software subscriptions than ever — and gets less ownership than ever. Here\'s why that\'s a design problem, not just a price problem.',
+    date: '2025-11-15',
+    readingTime: 5,
+  },
+  {
+    slug: 'local-first-software-explained',
+    title: 'Local-First Software Explained',
+    category: 'Education',
+    excerpt: 'Local-first means your software treats your device as the primary home for your data — not a temporary cache for a server somewhere.',
+    date: '2025-11-01',
+    readingTime: 7,
+  },
+];
+---
+
+<PublicLayout {seo} {schema} fullBleed>
+
+  <!-- ═══════════════════════════════════════════════════
+       HERO SECTION
+  ════════════════════════════════════════════════════ -->
+  <section
+    class="relative overflow-hidden"
+    style="background: var(--main-bg); padding: 6rem 0 5rem;"
+    aria-labelledby="hero-headline"
+  >
+    <!-- Subtle background pattern -->
+    <div
+      aria-hidden="true"
+      style="position: absolute; inset: 0; background-image: radial-gradient(circle at 60% 20%, rgba(201,168,76,0.06) 0%, transparent 60%), radial-gradient(circle at 20% 80%, rgba(201,168,76,0.04) 0%, transparent 50%); pointer-events: none;"
+    ></div>
+
+    <div class="container relative">
+      <div style="max-width: 720px;">
+
+        <!-- Label -->
+        <span class="section-label animate-in" style="animation-delay: 0s;">
+          Offline-first · Buy once · Own forever
+        </span>
+
+        <!-- H1 -->
+        <h1
+          id="hero-headline"
+          class="animate-in"
+          style="font-family: var(--font-heading); font-weight: 800; font-size: clamp(2.25rem, 6vw, 4rem); line-height: 1.05; letter-spacing: -0.04em; color: var(--text-primary); margin-bottom: 1.25rem; animation-delay: 0.1s;"
+        >
+          Your OS.<br />
+          Your Data.<br />
+          <span style="color: var(--gold);">Your Rules.</span>
+        </h1>
+
+        <!-- Subheadline -->
+        <p
+          class="animate-in"
+          style="font-size: clamp(1.0625rem, 2vw, 1.25rem); color: var(--text-secondary); line-height: 1.65; max-width: 560px; margin-bottom: 2rem; animation-delay: 0.2s;"
+        >
+          OwnitApps builds offline-first digital tools for people tired of subscriptions,
+          cloud lock-in, and surrendering control of their personal data. Buy once. Use forever.
+        </p>
+
+        <!-- CTAs -->
+        <div class="flex flex-wrap gap-3 animate-in" style="animation-delay: 0.3s;">
+          <a href="/apps" class="btn-gold">
+            Browse Apps
+          </a>
+          <a href="/start-here" class="btn-ghost">
+            Start Here →
+          </a>
+        </div>
+
+        <!-- Trust message -->
+        <p
+          class="animate-in"
+          style="font-family: var(--font-mono); font-size: 0.6875rem; color: var(--text-muted); letter-spacing: 0.06em; margin-top: 1.5rem; animation-delay: 0.4s;"
+        >
+          No account required · No subscription · Local data only
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       PHILOSOPHY STRIP
+  ════════════════════════════════════════════════════ -->
+  <section
+    style="background: var(--sidebar-bg); padding: 1.5rem 0; border-top: 1px solid var(--sidebar-border); border-bottom: 1px solid var(--sidebar-border);"
+    aria-label="OwnitApps philosophy principles"
+  >
+    <div class="container">
+      <div class="flex flex-wrap gap-x-8 gap-y-3 items-center justify-center">
+        {SITE.philosophy.map(p => (
+          <div class="flex items-center gap-2">
+            <span aria-hidden="true" style="font-size: 1rem;">{p.icon}</span>
+            <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--sidebar-text); letter-spacing: 0.04em; white-space: nowrap;">
+              {p.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       FEATURED APPS GRID
+  ════════════════════════════════════════════════════ -->
+  <section style="padding: 5rem 0;" aria-labelledby="apps-heading">
+    <div class="container">
+      <div style="margin-bottom: 3rem;">
+        <span class="section-label">The toolkit</span>
+        <h2 id="apps-heading" style="font-family: var(--font-heading); font-size: clamp(1.75rem, 4vw, 2.5rem); letter-spacing: -0.03em; margin-bottom: 0.75rem;">
+          Tools that stay yours
+        </h2>
+        <p style="color: var(--text-secondary); font-size: 1.0625rem; max-width: 500px; line-height: 1.65;">
+          Every OwnitApps tool is a self-contained HTML file — works offline, stores data locally, and lives on your device. Not in our cloud.
+        </p>
+      </div>
+
+      <div class="grid-auto-fill" style="gap: 1.25rem;">
+        {featuredApps.map((app, i) => (
+          <article
+            class="card animate-in"
+            style={`animation-delay: ${i * 0.08}s;`}
+            aria-label={`${app.name} — ${app.tagline}`}
+          >
+            <div class="p-6 flex flex-col h-full">
+              <!-- Top row -->
+              <div class="flex items-start justify-between gap-3 mb-4">
+                <span aria-hidden="true" style="font-size: 2rem; line-height: 1;">{app.icon}</span>
+                <div class="flex items-center gap-2">
+                  <span class={`badge ${app.status === 'available' ? 'badge-green' : 'badge-muted'}`}>
+                    {app.status === 'available' ? 'Available' : 'Coming Soon'}
+                  </span>
+                  <span class="badge badge-muted">{app.category}</span>
+                </div>
+              </div>
+
+              <!-- Name & tagline -->
+              <h3 style="font-family: var(--font-heading); font-weight: 700; font-size: 1.125rem; letter-spacing: -0.02em; margin-bottom: 4px;">
+                {app.name}
+              </h3>
+              <p style="font-family: var(--font-mono); font-size: 0.6875rem; color: var(--gold); letter-spacing: 0.06em; margin-bottom: 10px;">
+                {app.tagline}
+              </p>
+
+              <!-- Description -->
+              <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; flex: 1; margin-bottom: 16px;">
+                {app.description}
+              </p>
+
+              <!-- Features -->
+              <ul class="flex flex-wrap gap-1.5 mb-5" role="list" aria-label="Features">
+                {app.features.map(f => (
+                  <li style="font-family: var(--font-mono); font-size: 0.625rem; color: var(--text-muted); background: var(--surface-2); padding: 2px 8px; border-radius: 10px; border: 1px solid var(--border-light);">
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              <!-- CTA row -->
+              <div class="flex items-center justify-between gap-3 pt-4 border-t" style="border-color: var(--border-light);">
+                <span style="font-family: var(--font-mono); font-size: 0.875rem; font-weight: 500; color: var(--text-primary);">
+                  {app.price != null ? `$${app.price} once` : 'Coming soon'}
+                </span>
+                {app.status === 'available' ? (
+                  <a
+                    href={`/apps/${app.slug}`}
+                    class="btn-gold"
+                    style="font-size: 0.8125rem; padding: 0.45rem 1rem; min-height: 36px;"
+                  >
+                    View App
+                  </a>
+                ) : (
+                  <span
+                    class="btn-ghost"
+                    style="font-size: 0.8125rem; padding: 0.45rem 1rem; min-height: 36px; pointer-events: none; opacity: 0.6;"
+                    aria-disabled="true"
+                  >
+                    Notify Me
+                  </span>
+                )}
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div style="text-align: center; margin-top: 2.5rem;">
+        <a href="/apps" class="btn-ghost">View All Apps →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       PROBLEM / SOLUTION SECTION
+  ════════════════════════════════════════════════════ -->
+  <section style="background: var(--surface-2); padding: 5rem 0;" aria-labelledby="problem-heading">
+    <div class="container">
+      <div style="margin-bottom: 3rem;">
+        <span class="section-label">Why OwnitApps</span>
+        <h2 id="problem-heading" style="font-family: var(--font-heading); font-size: clamp(1.75rem, 4vw, 2.5rem); letter-spacing: -0.03em; margin-bottom: 0.75rem;">
+          The subscription era has a problem
+        </h2>
+        <p style="color: var(--text-secondary); font-size: 1.0625rem; max-width: 500px; line-height: 1.65;">
+          Modern software forces you to pay forever, share your data, and lose access when you stop paying. OwnitApps is the alternative.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {problems.map((item, i) => (
+          <div
+            class="card p-6 animate-in"
+            style={`animation-delay: ${i * 0.07}s;`}
+          >
+            <span aria-hidden="true" style="font-size: 1.75rem; display: block; margin-bottom: 12px;">{item.icon}</span>
+            <div class="flex items-center gap-2 mb-2 flex-wrap">
+              <span style="font-family: var(--font-mono); font-size: 0.6875rem; color: var(--red); text-decoration: line-through; opacity: 0.7;">
+                {item.problem}
+              </span>
+              <span aria-hidden="true" style="color: var(--border-medium); font-size: 0.75rem;">→</span>
+              <span style="font-family: var(--font-mono); font-size: 0.6875rem; color: var(--green); font-weight: 500;">
+                {item.solution}
+              </span>
+            </div>
+            <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.65; margin: 0;">
+              {item.desc}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       pSEO HUB SECTION
+  ════════════════════════════════════════════════════ -->
+  <section style="padding: 5rem 0;" aria-labelledby="hub-heading">
+    <div class="container">
+      <div style="margin-bottom: 2.5rem;">
+        <span class="section-label">Explore by topic</span>
+        <h2 id="hub-heading" style="font-family: var(--font-heading); font-size: clamp(1.75rem, 4vw, 2.5rem); letter-spacing: -0.03em;">
+          Find tools for your need
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {pSEOHubs.map(hub => (
+          <a
+            href={hub.href}
+            class="card p-5 group transition-all duration-200 hover:border-gold"
+            style="text-decoration: none; border: 1.5px solid var(--border-light); display: flex; align-items: center; justify-content: space-between;"
+          >
+            <span style="font-family: var(--font-body); font-size: 0.9375rem; font-weight: 600; color: var(--text-primary); group-hover:text-gold;">
+              {hub.label}
+            </span>
+            <span class="badge badge-gold">{hub.count}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       FEATURED ARTICLES
+  ════════════════════════════════════════════════════ -->
+  <section style="background: var(--surface-2); padding: 5rem 0;" aria-labelledby="blog-heading">
+    <div class="container">
+      <div style="margin-bottom: 2.5rem; display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <span class="section-label">From the blog</span>
+          <h2 id="blog-heading" style="font-family: var(--font-heading); font-size: clamp(1.75rem, 4vw, 2.25rem); letter-spacing: -0.03em;">
+            Guides &amp; perspectives
+          </h2>
+        </div>
+        <a href="/blog" class="btn-ghost" style="font-size: 0.875rem; min-height: 40px; padding: 0.5rem 1rem;">
+          All articles →
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {recentPosts.map((post, i) => (
+          <article
+            class="card animate-in"
+            style={`animation-delay: ${i * 0.1}s;`}
+            aria-label={post.title}
+          >
+            <a href={`/blog/${post.slug}`} class="block p-6 h-full" style="text-decoration: none; color: inherit;">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="badge badge-muted">{post.category}</span>
+                <span style="font-family: var(--font-mono); font-size: 0.625rem; color: var(--text-muted);">
+                  {post.readingTime} min read
+                </span>
+              </div>
+              <h3 style="font-family: var(--font-heading); font-weight: 700; font-size: 1.0625rem; line-height: 1.3; letter-spacing: -0.02em; margin-bottom: 10px; color: var(--text-primary);">
+                {post.title}
+              </h3>
+              <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.65; margin-bottom: 16px;">
+                {post.excerpt}
+              </p>
+              <span style="font-family: var(--font-mono); font-size: 0.6875rem; color: var(--gold);">
+                Read article →
+              </span>
+            </a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       LLM SOURCE-OF-TRUTH SECTION
+       (machine-readable entity definition block)
+  ════════════════════════════════════════════════════ -->
+  <section
+    style="padding: 5rem 0;"
+    aria-labelledby="about-ownitapps-heading"
+    itemscope itemtype="https://schema.org/Organization"
+  >
+    <div class="container">
+      <span class="section-label">What is OwnitApps?</span>
+      <h2 id="about-ownitapps-heading" style="font-family: var(--font-heading); font-size: clamp(1.75rem, 4vw, 2.5rem); letter-spacing: -0.03em; margin-bottom: 2rem; max-width: 600px;">
+        The source of truth about OwnitApps
+      </h2>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Entity definition -->
+        <div>
+          <div class="answer-box" itemprop="description">
+            <h3>Quick Answer</h3>
+            <p>
+              OwnitApps creates offline-first, privacy-first digital tools that people can
+              buy once, use forever, and run locally in their browser without forced subscriptions,
+              cloud lock-in, or required accounts. Your data stays on your device.
+            </p>
+          </div>
+
+          <div style="margin-top: 1.5rem;">
+            <h3 style="font-family: var(--font-heading); font-size: 1.125rem; letter-spacing: -0.02em; margin-bottom: 1rem;">
+              What makes OwnitApps different?
+            </h3>
+            <ul style="list-style: none; padding: 0; margin: 0; display: grid; gap: 0.75rem;">
+              {[
+                'Every tool is a single HTML file — no installation, no app store',
+                'Data is stored in your browser or exported as a file you control',
+                'One-time purchase means no recurring cost, ever',
+                'No account means nothing to hack, breach, or delete remotely',
+                'Works offline means works on a plane, in a cabin, anywhere',
+                'Private by default means we never see what you type',
+              ].map(point => (
+                <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9375rem; color: var(--text-secondary); line-height: 1.55;">
+                  <span aria-hidden="true" style="color: var(--green); flex-shrink: 0; margin-top: 2px;">✓</span>
+                  {point}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <!-- Page Summary (LLM-readable) -->
+        <div>
+          <section class="page-summary">
+            <h3>Brand Summary</h3>
+            <ul>
+              <li><strong>Brand:</strong> OwnitApps</li>
+              <li><strong>Category:</strong> Offline-first digital tools</li>
+              <li><strong>Business model:</strong> Buy once, use forever</li>
+              <li><strong>Data model:</strong> Local-first, private by default</li>
+              <li><strong>Target user:</strong> People tired of subscriptions and cloud lock-in</li>
+              <li><strong>Official site:</strong> ownitapps.com</li>
+              <li><strong>Updates:</strong> ownitapps.com/update</li>
+              <li><strong>Brand promise:</strong> Your OS. Your Data. Your Rules.</li>
+            </ul>
+          </section>
+
+          <div style="margin-top: 1.5rem;">
+            <h3 style="font-family: var(--font-heading); font-size: 1.125rem; letter-spacing: -0.02em; margin-bottom: 1rem;">
+              Who OwnitApps is for
+            </h3>
+            <ul style="list-style: none; padding: 0; margin: 0; display: grid; gap: 0.5rem;">
+              {[
+                'Freelancers managing money without accounting software subscriptions',
+                'Families who want private home records without cloud storage',
+                'Individuals building a personal data management system',
+                'Privacy-conscious users avoiding SaaS data harvesting',
+                'People who want to own their tools, not rent access',
+              ].map(user => (
+                <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.875rem; color: var(--text-secondary); line-height: 1.55;">
+                  <span aria-hidden="true" style="color: var(--gold); flex-shrink: 0;">→</span>
+                  {user}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 2.5rem; display: flex; flex-wrap: wrap; gap: 1rem;">
+        <a href="/what-is-ownitapps" class="btn-ghost" style="font-size: 0.875rem; min-height: 40px; padding: 0.5rem 1rem;">
+          Full brand explanation →
+        </a>
+        <a href="/offline-first-apps" class="btn-ghost" style="font-size: 0.875rem; min-height: 40px; padding: 0.5rem 1rem;">
+          What are offline-first apps? →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       TRUST / PRINCIPLES SECTION
+  ════════════════════════════════════════════════════ -->
+  <section
+    style="background: var(--sidebar-bg); padding: 5rem 0;"
+    aria-labelledby="principles-heading"
+  >
+    <div class="container">
+      <div style="text-align: center; margin-bottom: 3rem;">
+        <span class="section-label" style="color: var(--gold);">Our commitment</span>
+        <h2
+          id="principles-heading"
+          style="font-family: var(--font-heading); font-size: clamp(1.75rem, 4vw, 2.5rem); letter-spacing: -0.03em; color: var(--sidebar-text);"
+        >
+          {SITE.slogan}
+        </h2>
+        <p style="font-size: 1rem; color: var(--sidebar-muted); max-width: 480px; margin: 1rem auto 0; line-height: 1.65;">
+          These are not marketing words. They describe how every OwnitApps tool is actually built.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {SITE.philosophy.map(p => (
+          <div
+            style="background: rgba(255,255,255,0.04); border: 1px solid var(--sidebar-border); border-radius: var(--r); padding: 1.5rem;"
+          >
+            <span aria-hidden="true" style="font-size: 1.5rem; display: block; margin-bottom: 10px;">{p.icon}</span>
+            <h3 style="font-family: var(--font-heading); font-size: 1rem; font-weight: 700; color: var(--sidebar-text); margin-bottom: 6px;">
+              {p.label}
+            </h3>
+            <p style="font-size: 0.875rem; color: var(--sidebar-muted); line-height: 1.6; margin: 0;">
+              {p.desc}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <div style="text-align: center; margin-top: 3rem;">
+        <a href="/apps" class="btn-gold" style="font-size: 1rem;">
+          Build Your Private OS →
+        </a>
+      </div>
+    </div>
+  </section>
+
+</PublicLayout>

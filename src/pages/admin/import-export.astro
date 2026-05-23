@@ -1,0 +1,25 @@
+---
+import AdminLayout from '@layouts/AdminLayout.astro';
+import { buildSEO } from '@lib/seo';
+
+const seo = buildSEO({
+  title: 'Import / Export Center',
+  description: 'OwnitApps content import and export foundation.',
+  canonical: '/admin/import-export',
+  noindex: true,
+});
+---
+
+<AdminLayout seo={seo} title="Import / Export Center">
+  <section class="space-y-6">
+    <div>
+      <h1 class="text-2xl font-heading font-bold text-[var(--sidebar-text)] mb-2">Import / Export Center</h1>
+      <p class="text-[var(--sidebar-muted)]">Prepare JSON backups, content imports, and validation workflows for future CMS integration.</p>
+    </div>
+    <div class="grid md:grid-cols-3 gap-4">
+      <div class="p-5 rounded-xl border border-white/10 bg-white/3"><strong class="text-[var(--sidebar-text)]">Status</strong><p class="text-sm text-[var(--sidebar-muted)] mt-2">Ready for backend integration.</p></div>
+      <div class="p-5 rounded-xl border border-white/10 bg-white/3"><strong class="text-[var(--sidebar-text)]">Mode</strong><p class="text-sm text-[var(--sidebar-muted)] mt-2">Static-first admin foundation.</p></div>
+      <div class="p-5 rounded-xl border border-white/10 bg-white/3"><strong class="text-[var(--sidebar-text)]">Next</strong><p class="text-sm text-[var(--sidebar-muted)] mt-2">Connect content source or CMS.</p></div>
+    </div>
+  </section>
+</AdminLayout>

@@ -1,0 +1,220 @@
+---
+// src/pages/blog/[slug].astro
+// Dynamic blog post route — generated from content collection
+
+import { getCollection } from 'astro:content';
+import PublicLayout from '../../layouts/PublicLayout.astro';
+import { SITE } from '../../data/site';
+import { buildSEO, readingTime, formatDate } from '../../lib/seo';
+import { blogPostSchema, faqSchema, breadcrumbSchema } from '../../lib/schema';
+import PreviewLayout from '@layouts/PreviewLayout.astro';
+
+export async function getStaticPaths() {
+  let posts;
+  try {
+    posts = await getCollection('blog', ({ data }) => !data.draft);
+  } catch (e) {
+    console.warn('[Blog] Could not load blog collection:', e);
+    return [];
+  }
+
+  return posts
+    .filter(post => {
+      if (!post.data.title) { console.warn(`[Blog] Missing title: ${post.slug}`); return false; }
+      if (!post.data.description) { console.warn(`[Blog] Missing description: ${post.slug}`); return false; }
+      return true;
+    })
+    .map(post => ({
+      params: { slug: post.slug },
+      props: { post },
+    }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+
+const seo = buildSEO({
+  title: post.data.title,
+  description: post.data.description,
+  canonical: `${SITE.url}/blog/${post.slug}`,
+  ...(post.data.featuredImage ? { image: post.data.featuredImage } : {}),
+  ...(post.data.featuredImageAlt ? { imageAlt: post.data.featuredImageAlt } : {}),
+  type: 'article' as const,
+  publishedTime: formatDate(post.data.datePublished),
+  ...(post.data.dateModified ? { modifiedTime: formatDate(post.data.dateModified) } : {}),
+  author: post.data.author,
+  tags: post.data.tags,
+  section: post.data.category,
+});
+
+const path = `/blog/${post.slug}`;
+
+const breadcrumbs = [
+  { name: 'Blog', href: '/blog' },
+  { name: post.data.category, href: `/blog/category/${post.data.category.toLowerCase().replace(/\s+/g, '-')}` },
+];
+
+const faqData = post.data.faqs ?? [];
+
+const schema = [
+  blogPostSchema({
+    title: post.data.title,
+    description: post.data.description,
+    url: `${SITE.url}${path}`,
+    ...(post.data.featuredImage && { image: post.data.featuredImage }),
+    publishedTime: formatDate(post.data.datePublished),
+    ...(post.data.dateModified ? { modifiedTime: formatDate(post.data.dateModified) } : {}),
+    author: post.data.author,
+    tags: post.data.tags,
+    category: post.data.category,
+  }),
+  breadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Blog', url: '/blog' },
+    { name: post.data.title, url: path },
+  ]),
+  ...(faqData.length > 0 ? [faqSchema(faqData)] : []),
+].filter(Boolean);
+---
+
+<PreviewLayout editUrl={`/keystatic/collection/blog/item/${post.slug}`} title={post.data.title}>
+<PublicLayout {seo} {schema} breadcrumbs={breadcrumbs}>
+  <div class="container" style="max-width: 800px; padding-top: 3rem; padding-bottom: 5rem;">
+
+    <!-- Post header -->
+    <header style="margin-bottom: 2.5rem;">
+      <!-- Category + meta -->
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 1.25rem;">
+        <a
+          href={`/blog/category/${post.data.category.toLowerCase().replace(/\s+/g, '-')}`}
+          class="badge badge-gold"
+          style="text-decoration: none;"
+        >
+          {post.data.category}
+        </a>
+        <span style="font-family: var(--font-mono); font-size: 0.6875rem; color: var(--text-muted);">
+          {post.data.datePublished.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+        </span>
+        <span style="color: var(--border-medium); font-size: 0.75rem;">·</span>
+        <span style="font-family: var(--font-mono); font-size: 0.6875rem; color: var(--text-muted);">
+          {readingTime(post.body ?? '')} min read
+        </span>
+      </div>
+
+      <!-- Title -->
+      <h1 style="font-family: var(--font-heading); font-weight: 800; font-size: clamp(1.75rem, 4vw, 2.75rem); line-height: 1.1; letter-spacing: -0.035em; margin-bottom: 1rem;">
+        {post.data.title}
+      </h1>
+
+      <!-- Description -->
+      <p style="font-size: 1.125rem; color: var(--text-secondary); line-height: 1.65; max-width: 600px; margin-bottom: 1.5rem;">
+        {post.data.description}
+      </p>
+
+      <!-- Author -->
+      <div style="display: flex; align-items: center; gap: 10px; padding: 1rem 0; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);">
+        <div style="width: 36px; height: 36px; background: var(--gold-dim); border-radius: 50%; border: 2px solid var(--gold); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: var(--font-heading); font-weight: 800; font-size: 0.875rem; color: var(--gold);">
+          O
+        </div>
+        <div>
+          <p style="font-family: var(--font-heading); font-weight: 700; font-size: 0.875rem; margin: 0; color: var(--text-primary);">
+            {post.data.author ?? SITE.defaultAuthor}
+          </p>
+          <p style="font-family: var(--font-mono); font-size: 0.625rem; color: var(--text-muted); margin: 0; letter-spacing: 0.04em;">
+            {SITE.name} Editorial
+            {post.data.dateModified && (
+              <> · Updated {post.data.dateModified.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</>
+            )}
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Quick Answer / AI Summary (if exists) -->
+    {post.data.aiSummary && (
+      <div class="answer-box" style="margin-bottom: 2.5rem;">
+        <h2>Quick Answer</h2>
+        <p>{post.data.aiSummary}</p>
+      </div>
+    )}
+
+    <!-- Key Takeaways -->
+    {post.data.aiKeyTakeaways && post.data.aiKeyTakeaways.length > 0 && (
+      <div class="takeaway-box" style="margin-bottom: 2.5rem;">
+        <strong>Key Takeaways</strong>
+        <ul style="margin: 0; padding-left: 1.25rem;">
+          {post.data.aiKeyTakeaways.map(point => (
+            <li style="font-size: 0.9375rem; color: var(--text-secondary); margin-bottom: 4px; line-height: 1.5;">{point}</li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    <!-- Article content -->
+    <article
+      class="prose prose-ownitapps max-w-none"
+      itemscope itemtype="https://schema.org/BlogPosting"
+      style="line-height: 1.75;"
+    >
+      <Content />
+    </article>
+
+    <!-- FAQ Section -->
+    {faqData.length > 0 && (
+      <section style="margin-top: 4rem; padding-top: 3rem; border-top: 1px solid var(--border-light);" aria-labelledby="faq-heading">
+        <h2 id="faq-heading" style="font-family: var(--font-heading); font-size: 1.75rem; letter-spacing: -0.025em; margin-bottom: 1.5rem;">
+          Frequently Asked Questions
+        </h2>
+        <div role="list">
+          {faqData.map(faq => (
+            <div class="faq-item" role="listitem">
+              <button class="faq-question" type="button">
+                {faq.question}
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style="flex-shrink: 0; transition: transform 0.2s;">
+                  <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <div class="faq-answer">
+                <p style="margin: 0;">{faq.answer}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- CTA Box -->
+    {post.data.cta && (
+      <div
+        style="margin-top: 3rem; padding: 2rem; background: linear-gradient(135deg, var(--surface-2), var(--card)); border: 1.5px solid var(--border-medium); border-radius: var(--r); text-align: center;"
+      >
+        {post.data.cta.description && (
+          <p style="font-size: 0.9375rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.6;">
+            {post.data.cta.description}
+          </p>
+        )}
+        <a href={post.data.cta.href} class="btn-gold">
+          {post.data.cta.label}
+        </a>
+      </div>
+    )}
+
+    <!-- Page Summary (LLM-readable) -->
+    {post.data.aiCitationText && (
+      <section class="page-summary" style="margin-top: 3rem;" aria-label="Article summary">
+        <h2>Article Summary</h2>
+        <ul>
+          <li><strong>Topic:</strong> {post.data.category}</li>
+          <li><strong>Key insight:</strong> {post.data.aiCitationText}</li>
+          {post.data.tags.length > 0 && (
+            <li><strong>Tags:</strong> {post.data.tags.join(', ')}</li>
+          )}
+          <li><strong>Published:</strong> {post.data.datePublished.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</li>
+          <li><strong>Author:</strong> {post.data.author ?? SITE.defaultAuthor}</li>
+        </ul>
+      </section>
+    )}
+
+  </div>
+</PublicLayout>
+</PreviewLayout>

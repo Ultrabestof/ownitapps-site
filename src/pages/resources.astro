@@ -1,0 +1,36 @@
+---
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { SITE } from '@data/site';
+
+const seo = buildSEO({
+  title: 'OwnitApps Resources',
+  description: 'Guides, glossary pages, comparisons, and practical resources about offline-first apps, no-subscription software, and local data ownership.',
+  canonical: `${SITE.url}${'/resources'}`,
+});
+---
+
+<PublicLayout seo={seo} schema={null}>
+  <section class="container py-16">
+    <div class="max-w-3xl">
+      <span class="badge badge-gold mb-4">Resources</span>
+      <h1 class="mb-4">OwnitApps Resources</h1>
+      <p class="text-lg leading-relaxed text-[var(--text-secondary)] mb-8">Start here for guides about offline-first tools, privacy-first dashboards, no-subscription software, and local data ownership.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4 mt-8">
+      <a href="/blog" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Blog</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Read practical guides and explainers.</p>
+      </a>
+      <a href="/glossary/offline-first-apps" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Glossary</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Learn key offline-first terms.</p>
+      </a>
+      <a href="/compare" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Comparisons</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Compare subscription tools with buy-once alternatives.</p>
+      </a>
+    </div>
+  </section>
+</PublicLayout>

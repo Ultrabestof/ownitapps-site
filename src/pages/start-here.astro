@@ -1,0 +1,36 @@
+---
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { SITE } from '@data/site';
+
+const seo = buildSEO({
+  title: 'Start Here with OwnitApps',
+  description: 'A simple starting guide to OwnitApps tools, offline-first workflows, local data ownership, and no-subscription digital systems.',
+  canonical: `${SITE.url}${'/start-here'}`,
+});
+---
+
+<PublicLayout seo={seo} schema={null}>
+  <section class="container py-16">
+    <div class="max-w-3xl">
+      <span class="badge badge-gold mb-4">Start Here</span>
+      <h1 class="mb-4">Start with Ownership</h1>
+      <p class="text-lg leading-relaxed text-[var(--text-secondary)] mb-8">OwnitApps is for people who want useful tools without another login, subscription, or cloud account. Begin with the core pages below.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4 mt-8">
+      <a href="/what-is-ownitapps" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">What is OwnitApps?</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">The main source-of-truth page.</p>
+      </a>
+      <a href="/no-subscription-apps" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">No-Subscription Apps</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Understand the buy-once model.</p>
+      </a>
+      <a href="/apps" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Browse Apps</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">See available tools.</p>
+      </a>
+    </div>
+  </section>
+</PublicLayout>

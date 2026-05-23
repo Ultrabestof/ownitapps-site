@@ -1,0 +1,36 @@
+---
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { SITE } from '@data/site';
+
+const seo = buildSEO({
+  title: 'No-Subscription Software Hub',
+  description: 'Programmatic SEO hub for no-subscription tools, buy-once dashboards, and practical alternatives to rented software.',
+  canonical: `${SITE.url}${'/no-subscription'}`,
+});
+---
+
+<PublicLayout seo={seo} schema={null}>
+  <section class="container py-16">
+    <div class="max-w-3xl">
+      <span class="badge badge-gold mb-4">pSEO Hub</span>
+      <h1 class="mb-4">No-Subscription Software</h1>
+      <p class="text-lg leading-relaxed text-[var(--text-secondary)] mb-8">Pages for people searching for tools they can buy once and use without recurring subscriptions.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4 mt-8">
+      <a href="/no-subscription/no-subscription-budget-planner" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Budget Planner</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">No-subscription budget planner.</p>
+      </a>
+      <a href="/buy-once-apps" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Buy-Once Apps</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Source page.</p>
+      </a>
+      <a href="/apps" class="card p-5 hover:-translate-y-0.5 transition-transform">
+        <h2 class="text-lg mb-2">Apps</h2>
+        <p class="text-sm text-[var(--text-secondary)] leading-relaxed">Browse tools.</p>
+      </a>
+    </div>
+  </section>
+</PublicLayout>

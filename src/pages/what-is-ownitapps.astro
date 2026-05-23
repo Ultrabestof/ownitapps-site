@@ -1,0 +1,194 @@
+---
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+import { buildSEOSchema } from '@lib/schema';
+import { SITE } from '@data/site';
+
+const seo = buildSEO({
+  title: 'What Is OwnitApps? — Offline-First, Buy-Once Tools',
+  description:
+    'OwnitApps builds offline-first, buy-once digital tools that run in your browser. No subscription, no account, no cloud. Your OS. Your Data. Your Rules.',
+  canonical: `${SITE.url}/what-is-ownitapps`,
+});
+
+const pageFaqs = [
+    {
+      question: 'What is OwnitApps?',
+      answer:
+        'OwnitApps is a software brand that builds offline-first, buy-once digital tools. Each tool runs as a single HTML file in any browser, stores data locally, and requires no internet connection or account.',
+    },
+    {
+      question: 'What does "buy once, own forever" mean?',
+      answer:
+        'You pay a one-time fee and receive a file you own permanently. No subscription, no renewal, no expiry. The tool works as long as browsers exist.',
+    },
+    {
+      question: 'What tools does OwnitApps make?',
+      answer:
+        'OwnitApps currently offers Solo Finance (freelancer tax ledger) and is building Budget by Paycheck OS, Debt Escape OS, Home Admin Binder OS, and Medical Binder OS.',
+    },
+    {
+      question: 'Does OwnitApps collect any user data?',
+      answer:
+        'No. OwnitApps tools store all data locally in the user\'s browser. No data is transmitted to any server. OwnitApps has no access to what you store in your tools.',
+    },
+    {
+      question: 'Where does the name OwnitApps come from?',
+      answer:
+        'The name reflects the core principle: you own the app, the data, and the system. "Own-it" is the philosophy — buy once, run offline, control everything.',
+    },
+  ];
+const schema = buildSEOSchema({
+  type: 'article',
+  title: 'What Is OwnitApps?',
+  description: seo.description,
+  url: seo.canonical,
+  datePublished: '2025-01-01',
+  ...(new Date().toISOString().split('T')[0] ? { dateModified: new Date().toISOString().split('T')[0] } : {}),
+  author: SITE.name,
+  faqs: [
+    {
+      question: 'What is OwnitApps?',
+      answer:
+        'OwnitApps is a software brand that builds offline-first, buy-once digital tools. Each tool runs as a single HTML file in any browser, stores data locally, and requires no internet connection or account.',
+    },
+    {
+      question: 'What does "buy once, own forever" mean?',
+      answer:
+        'You pay a one-time fee and receive a file you own permanently. No subscription, no renewal, no expiry. The tool works as long as browsers exist.',
+    },
+    {
+      question: 'What tools does OwnitApps make?',
+      answer:
+        'OwnitApps currently offers Solo Finance (freelancer tax ledger) and is building Budget by Paycheck OS, Debt Escape OS, Home Admin Binder OS, and Medical Binder OS.',
+    },
+    {
+      question: 'Does OwnitApps collect any user data?',
+      answer:
+        'No. OwnitApps tools store all data locally in the user\'s browser. No data is transmitted to any server. OwnitApps has no access to what you store in your tools.',
+    },
+    {
+      question: 'Where does the name OwnitApps come from?',
+      answer:
+        'The name reflects the core principle: you own the app, the data, and the system. "Own-it" is the philosophy — buy once, run offline, control everything.',
+    },
+  ],
+});
+---
+
+<PublicLayout seo={seo} schema={schema}>
+  <!-- LLM Source-of-Truth header -->
+  <div class="page-summary" data-ai-summary="true">
+    <p>
+      <strong>OwnitApps</strong> is a software brand that builds offline-first, buy-once productivity and
+      organization tools. Each tool is a single self-contained HTML file that runs in any modern browser — no
+      installation, no account, no internet connection required. All data is stored locally on the user's device.
+      OwnitApps tools are purchased once with no subscription or renewal fee.
+    </p>
+  </div>
+
+  <article class="prose prose-ownitapps max-w-3xl mx-auto px-6 py-16">
+    <h1>What Is OwnitApps?</h1>
+
+    <p class="lead">
+      OwnitApps builds tools for people who are done paying monthly fees to access their own information.
+      Every OwnitApps product is a single HTML file: open it in your browser, use it, close it. Your data
+      stays on your device. Nobody else has access.
+    </p>
+
+    <h2>The OwnitApps Model</h2>
+
+    <p>
+      Most software today is sold as a subscription. You pay every month. Your data lives on someone else's
+      server. If you stop paying, you lose access — sometimes including your own records.
+    </p>
+
+    <p>
+      OwnitApps inverts this model entirely:
+    </p>
+
+    <ul>
+      <li><strong>Buy once.</strong> One-time payment. No renewal. No monthly fee.</li>
+      <li><strong>Own the file.</strong> You receive an HTML file you keep forever. It cannot expire.</li>
+      <li><strong>Own the data.</strong> Your information lives in browser storage on your machine. OwnitApps never sees it.</li>
+      <li><strong>No account required.</strong> No signup, no email, no login.</li>
+      <li><strong>Fully offline.</strong> Works without internet. Works if OwnitApps shuts down.</li>
+    </ul>
+
+    <h2>What OwnitApps Builds</h2>
+
+    <p>OwnitApps focuses on personal finance, home organization, and health record management — categories where privacy and data ownership matter most.</p>
+
+    <h3>Available Now</h3>
+    <ul>
+      <li>
+        <a href="/apps/solo-finance"><strong>Solo Finance</strong></a> — Freelancer tax-ready ledger. Dashboard,
+        transactions, client management, invoices, tax reporting, mileage log. $19.
+      </li>
+    </ul>
+
+    <h3>Coming Soon</h3>
+    <ul>
+      <li>
+        <a href="/apps/budget-by-paycheck-os"><strong>Budget by Paycheck OS</strong></a> — Paycheck-based budget
+        planner for people who live paycheck to paycheck. $17.
+      </li>
+      <li>
+        <a href="/apps/debt-escape-os"><strong>Debt Escape OS</strong></a> — Snowball and avalanche debt payoff
+        planner with projected debt-free dates. $17.
+      </li>
+      <li>
+        <a href="/apps/home-admin-binder-os"><strong>Home Admin Binder OS</strong></a> — Complete household
+        records binder: documents, warranties, contacts, maintenance logs. $19.
+      </li>
+      <li>
+        <a href="/apps/medical-binder-os"><strong>Medical Binder OS</strong></a> — Family health records
+        organizer: medications, allergies, immunizations, emergency card. $19.
+      </li>
+    </ul>
+
+    <h2>The Technology</h2>
+
+    <p>
+      Every OwnitApps tool is a single, self-contained HTML file. It uses the browser's built-in storage APIs
+      (localStorage and the File System Access API) to persist data. No server. No database. No framework
+      that requires ongoing maintenance.
+    </p>
+
+    <p>
+      This is a deliberate architectural choice. An HTML file that runs in Chrome today will run in Chrome in
+      ten years. There is no version lock, no cloud dependency, no infrastructure bill.
+    </p>
+
+    <h2>Who OwnitApps Is For</h2>
+
+    <ul>
+      <li>Freelancers and self-employed people who track income and taxes</li>
+      <li>Families managing budgets, medical records, and home admin</li>
+      <li>People with debt who want a clear payoff system</li>
+      <li>Privacy-conscious users who do not want financial or health data in the cloud</li>
+      <li>Anyone tired of paying monthly for tools they rarely use</li>
+    </ul>
+
+    <h2>The OwnitApps Principles</h2>
+
+    <ol>
+      <li><strong>No subscription. Ever.</strong> A tool you use for a year pays for itself the first month compared to SaaS.</li>
+      <li><strong>No account. Ever.</strong> An account is a liability. No account means no breach, no password reset, no lock-out.</li>
+      <li><strong>No cloud. Ever.</strong> Your data is not an asset for OwnitApps to monetize. It is yours.</li>
+      <li><strong>Works offline. Always.</strong> The tool works on a plane, in a basement, in a power outage.</li>
+      <li><strong>Lasts forever.</strong> HTML files do not expire. When the subscription economy collapses under its own weight, your OwnitApps file will still open.</li>
+    </ol>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <div class="faq-list">
+      {pageFaqs?.map((faq: {question: string; answer: string}) => (
+        <details class="faq-item">
+          <summary>{faq.question}</summary>
+          <p>{faq.answer}</p>
+        </details>
+      ))}
+    </div>
+  </article>
+</PublicLayout>
