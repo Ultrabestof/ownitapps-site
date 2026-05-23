@@ -1,0 +1,19 @@
+﻿{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ownitapps",
+  "compatibility_date": "2026-05-23",
+  "pages_build_output_dir": "dist",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ownitapps_db",
+      "database_id": "852f18dd-5abb-4d2b-a658-d7621addf12a"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "MEDIA",
+      "bucket_name": "ownitapps-media"
+    }
+  ]
+}
