@@ -1,160 +1,745 @@
----
-// src/pages/admin/products.astro
-import { getCollection } from 'astro:content';
-import AdminLayout from '@layouts/AdminLayout.astro';
-
-const allProducts = await getCollection('products');
-const products = [...allProducts].sort((a, b) => a.data.name.localeCompare(b.data.name));
-
-function productIssues(p: typeof products[0]) {
-  const issues: string[] = [];
-  if (!p.data.faqs || p.data.faqs.length === 0) issues.push('No FAQs');
-  if (!p.data.screenshots || p.data.screenshots.length === 0) issues.push('No screenshots');
-  if (!p.data.aiSummary) issues.push('No aiSummary');
-  if (!p.data.aiCitationText) issues.push('No aiCitation');
-  if (!p.data.buyUrl && p.data.status === 'available') issues.push('No buy URL');
-  if (!p.data.seoTitle) issues.push('No seoTitle');
-  if (!p.data.seoDescription) issues.push('No seoDesc');
-  if (p.data.features.length < 5) issues.push('Few features');
-  return issues;
-}
-
-const statusColors: Record<string, string> = {
-  available: 'rgba(46,139,90,0.2); color:#6fcf97',
-  'coming-soon': 'rgba(154,143,130,0.15); color:var(--sidebar-muted)',
-  beta: 'rgba(36,113,163,0.2); color:#74b9ff',
-  deprecated: 'rgba(192,57,43,0.2); color:#ff7675',
-};
+﻿---
 ---
 
-<AdminLayout title="Product Manager">
-  <div style="display:flex; flex-direction:column; gap:var(--s5);">
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Products Manager | OwnitApps Admin</title>
+    <style>
+      :root {
+        --sidebar-bg: #2B2B2B;
+        --sidebar-text: #E8DDD0;
+        --sidebar-muted: #9A8F82;
+        --sidebar-border: #3A3A3A;
+        --main-bg: #F5F0E8;
+        --card: #FFFFFF;
+        --surface-2: #F0EBE0;
+        --border-light: rgba(0,0,0,0.07);
+        --border-medium: rgba(0,0,0,0.12);
+        --gold: #C9A84C;
+        --gold-hover: #B8932E;
+        --green: #2E8B5A;
+        --red: #C0392B;
+        --blue: #2471A3;
+        --text-primary: #2B2B2B;
+        --text-secondary: #6B6258;
+        --text-muted: #9A8F82;
+        --r: 10px;
+        --rs: 6px;
+        --font-heading: "Syne", "Inter", "Segoe UI", system-ui, sans-serif;
+        --font-body: "DM Sans", "Inter", "Segoe UI", system-ui, sans-serif;
+        --font-mono: "DM Mono", "SFMono-Regular", Consolas, monospace;
+      }
 
-    <!-- Header -->
-    <div>
-      <h1 style="font-size:1.5rem; font-weight:800; font-family:var(--font-heading); margin:0 0 var(--s1);">Product Manager</h1>
-      <p style="color:var(--sidebar-muted); font-size:0.875rem; margin:0;">
-        {products.length} products · {products.filter(p => p.data.status === 'available').length} available · {products.filter(p => p.data.status === 'coming-soon').length} coming soon
-      </p>
-    </div>
+      * { box-sizing: border-box; }
 
-    <!-- Summary Cards -->
-    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:var(--s3);">
-      {[
-        { label: 'Available', value: products.filter(p => p.data.status === 'available').length, color: 'var(--green)' },
-        { label: 'Coming Soon', value: products.filter(p => p.data.status === 'coming-soon').length, color: 'var(--sidebar-muted)' },
-        { label: 'Missing FAQs', value: products.filter(p => !p.data.faqs || p.data.faqs.length === 0).length, color: 'var(--amber)' },
-        { label: 'Missing AI Fields', value: products.filter(p => !p.data.aiSummary).length, color: 'var(--amber)' },
-        { label: 'Missing Screenshots', value: products.filter(p => !p.data.screenshots || p.data.screenshots.length === 0).length, color: 'var(--red)' },
-        { label: 'No Buy URL', value: products.filter(p => p.data.status === 'available' && !p.data.buyUrl).length, color: 'var(--red)' },
-      ].map(stat => (
-        <div style="background:rgba(255,255,255,0.04); border:1px solid var(--sidebar-border); border-radius:var(--r); padding:var(--s3) var(--s4);">
-          <div style="font-size:0.7rem; color:var(--sidebar-muted); margin-bottom:var(--s1);">{stat.label}</div>
-          <div style={`font-size:1.5rem; font-weight:800; font-family:var(--font-mono); color:${stat.color};`}>{stat.value}</div>
-        </div>
-      ))}
-    </div>
+      body {
+        margin: 0;
+        background: var(--main-bg);
+        color: var(--text-primary);
+        font-family: var(--font-body);
+      }
 
-    <!-- Products Table -->
-    <div style="background:rgba(255,255,255,0.04); border:1px solid var(--sidebar-border); border-radius:var(--r); overflow:hidden;">
-      <div style="padding:var(--s3) var(--s5); border-bottom:1px solid var(--sidebar-border);">
-        <h2 style="font-size:0.8rem; font-weight:700; color:var(--sidebar-muted); margin:0; text-transform:uppercase; letter-spacing:0.08em;">All Products</h2>
-      </div>
-      <div style="overflow-x:auto;">
-        <table style="width:100%; border-collapse:collapse; font-size:0.78rem;">
-          <thead>
-            <tr style="border-bottom:1px solid var(--sidebar-border);">
-              <th style="text-align:left; padding:var(--s3) var(--s5); color:var(--sidebar-muted); font-weight:600;">Name</th>
-              <th style="text-align:left; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Category</th>
-              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Status</th>
-              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Price</th>
-              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Version</th>
-              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">FAQs</th>
-              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Schema</th>
-              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">AI</th>
-              <th style="text-align:left; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Issues</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map(product => {
-              const issues = productIssues(product);
-              const hasFaqs = !!(product.data.faqs && product.data.faqs.length > 0);
-              const hasAI = !!(product.data.aiSummary && product.data.aiCitationText);
-              const hasSchema = !!(product.data.seoTitle && product.data.seoDescription);
-              const statusStyle = statusColors[product.data.status] || 'rgba(154,143,130,0.15); color:var(--sidebar-muted)';
+      .shell {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: 240px 1fr;
+      }
 
-              return (
-                <tr style={`border-bottom:1px solid rgba(58,58,58,0.5); ${issues.length > 3 ? 'background:rgba(192,57,43,0.04);' : ''}`}>
-                  <td style="padding:var(--s3) var(--s5); max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                    <a href={`/apps/${product.slug}`} target="_blank"
-                       style="color:var(--sidebar-text); text-decoration:none; font-weight:600;">{product.data.name}</a>
-                  </td>
-                  <td style="padding:var(--s3) var(--s4);">
-                    <span style="font-size:0.7rem; color:var(--gold);">{product.data.category}</span>
-                  </td>
-                  <td style="padding:var(--s3) var(--s4); text-align:center;">
-                    <span style={`font-size:0.7rem; padding:2px 8px; border-radius:10px; background:${statusStyle};`}>
-                      {product.data.status}
-                    </span>
-                  </td>
-                  <td style="padding:var(--s3) var(--s4); text-align:center; font-family:var(--font-mono); font-size:0.8rem; color:var(--gold);">
-                    {product.data.price ? `$${product.data.price}` : '—'}
-                  </td>
-                  <td style="padding:var(--s3) var(--s4); text-align:center; font-family:var(--font-mono); font-size:0.75rem; color:var(--sidebar-muted);">
-                    {product.data.version || '—'}
-                  </td>
-                  <td style="padding:var(--s3) var(--s4); text-align:center;">
-                    {hasFaqs ? `✅ ${product.data.faqs!.length}` : '❌'}
-                  </td>
-                  <td style="padding:var(--s3) var(--s4); text-align:center;">{hasSchema ? '✅' : '❌'}</td>
-                  <td style="padding:var(--s3) var(--s4); text-align:center;">{hasAI ? '✅' : '⚠️'}</td>
-                  <td style="padding:var(--s3) var(--s4);">
-                    {issues.length === 0 ? (
-                      <span style="font-size:0.7rem; color:var(--green);">All good</span>
-                    ) : (
-                      <div style="display:flex; gap:4px; flex-wrap:wrap;">
-                        {issues.slice(0, 3).map(i => (
-                          <span style="background:rgba(201,168,76,0.12); color:var(--amber); font-size:0.65rem; padding:1px 5px; border-radius:6px;">{i}</span>
-                        ))}
-                        {issues.length > 3 && <span style="font-size:0.65rem; color:var(--sidebar-muted);">+{issues.length - 3}</span>}
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
+      aside {
+        background: var(--sidebar-bg);
+        color: var(--sidebar-text);
+        padding: 24px 18px;
+        border-right: 1px solid var(--sidebar-border);
+      }
 
-    <!-- Product Completion Checklist -->
-    <div style="background:rgba(255,255,255,0.04); border:1px solid var(--sidebar-border); border-radius:var(--r); padding:var(--s5);">
-      <h2 style="font-size:0.875rem; font-weight:700; color:var(--sidebar-text); margin:0 0 var(--s4); text-transform:uppercase; letter-spacing:0.06em;">Product Launch Checklist</h2>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:var(--s3);">
-        {[
-          'Product name and tagline',
-          'Price set (or free clearly stated)',
-          'Status set (available/coming-soon)',
-          'Minimum 6 features listed',
-          'Minimum 5 FAQs',
-          'seoTitle under 60 chars',
-          'seoDescription under 160 chars',
-          'aiSummary written',
-          'aiCitationText written',
-          'aiKeyTakeaways listed',
-          'recommendedAnswer written',
-          'buyUrl set (if available)',
-          'updateUrl set',
-          'version number set',
-          'SoftwareApplication schema fields complete',
-        ].map(item => (
-          <div style="display:flex; gap:var(--s2); align-items:flex-start; font-size:0.8rem; color:var(--sidebar-muted);">
-            <span style="flex-shrink:0; color:var(--sidebar-border); margin-top:1px;">☐</span>
-            {item}
+      .brand {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        font-size: 22px;
+        margin-bottom: 6px;
+      }
+
+      aside .muted {
+        color: var(--sidebar-muted);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      nav {
+        display: grid;
+        gap: 8px;
+        margin-top: 28px;
+      }
+
+      nav a {
+        color: var(--sidebar-text);
+        text-decoration: none;
+        padding: 10px 12px;
+        border-radius: var(--rs);
+        font-size: 14px;
+      }
+
+      nav a.active,
+      nav a:hover {
+        background: rgba(201,168,76,.14);
+        color: #fff;
+      }
+
+      main {
+        padding: 32px;
+        max-width: 1500px;
+        width: 100%;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 24px;
+      }
+
+      h1 {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        font-size: clamp(32px, 4vw, 52px);
+        margin: 0 0 8px;
+      }
+
+      .subtitle {
+        color: var(--text-secondary);
+        max-width: 760px;
+        line-height: 1.6;
+        margin: 0;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: minmax(340px, 460px) 1fr;
+        gap: 20px;
+        align-items: start;
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border-light);
+        border-radius: var(--r);
+        box-shadow: 0 18px 50px rgba(43,43,43,.06);
+      }
+
+      .card-head { padding: 18px 18px 0; }
+      .card-body { padding: 18px; }
+
+      h2 {
+        font-family: var(--font-heading);
+        letter-spacing: -0.03em;
+        margin: 0 0 10px;
+        font-size: 22px;
+      }
+
+      label {
+        display: block;
+        font-size: 12px;
+        font-family: var(--font-mono);
+        color: var(--text-secondary);
+        margin: 13px 0 6px;
+      }
+
+      input,
+      textarea,
+      select {
+        width: 100%;
+        border: 1px solid var(--border-medium);
+        border-radius: var(--rs);
+        padding: 10px 12px;
+        background: #fff;
+        color: var(--text-primary);
+        font: inherit;
+        min-height: 42px;
+      }
+
+      textarea {
+        min-height: 110px;
+        resize: vertical;
+        line-height: 1.55;
+      }
+
+      .content-area {
+        min-height: 220px;
+        font-family: var(--font-mono);
+        font-size: 13px;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 18px;
+      }
+
+      button,
+      .button {
+        appearance: none;
+        border: 0;
+        border-radius: var(--rs);
+        padding: 10px 14px;
+        min-height: 42px;
+        cursor: pointer;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .primary { background: var(--gold); color: #1f1f1f; }
+      .primary:hover { background: var(--gold-hover); }
+
+      .secondary {
+        background: var(--surface-2);
+        color: var(--text-primary);
+        border: 1px solid var(--border-medium);
+      }
+
+      .danger {
+        background: rgba(192,57,43,.1);
+        color: var(--red);
+        border: 1px solid rgba(192,57,43,.22);
+      }
+
+      .info {
+        background: rgba(36,113,163,.1);
+        color: var(--blue);
+        border: 1px solid rgba(36,113,163,.2);
+      }
+
+      .product-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .product-item {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        padding: 14px;
+        border: 1px solid var(--border-light);
+        border-radius: var(--r);
+        background: #fff;
+      }
+
+      .product-title {
+        font-weight: 800;
+        margin-bottom: 4px;
+      }
+
+      .product-meta {
+        font-family: var(--font-mono);
+        color: var(--text-muted);
+        font-size: 12px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 8px;
+        border-radius: 99px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        border: 1px solid var(--border-light);
+        background: var(--surface-2);
+        color: var(--text-secondary);
+      }
+
+      .badge.published {
+        color: var(--green);
+        background: rgba(46,139,90,.1);
+        border-color: rgba(46,139,90,.2);
+      }
+
+      .toolbar {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+      }
+
+      .search { max-width: 340px; }
+
+      .toast {
+        position: fixed;
+        right: 18px;
+        bottom: 18px;
+        background: var(--sidebar-bg);
+        color: var(--sidebar-text);
+        padding: 12px 14px;
+        border-radius: var(--r);
+        box-shadow: 0 18px 60px rgba(0,0,0,.22);
+        display: none;
+        z-index: 999;
+        max-width: 360px;
+      }
+
+      .toast.show { display: block; }
+
+      .small {
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+
+      .empty {
+        padding: 30px;
+        text-align: center;
+        color: var(--text-muted);
+        border: 1px dashed var(--border-medium);
+        border-radius: var(--r);
+        background: rgba(255,255,255,.6);
+      }
+
+      @media (max-width: 980px) {
+        .shell { grid-template-columns: 1fr; }
+        aside { position: static; }
+        nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        main { padding: 20px; padding-bottom: 100px; }
+        .grid, .row { grid-template-columns: 1fr; }
+        .topbar { display: block; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="shell">
+      <aside>
+        <div class="brand">OwnitApps</div>
+        <p class="muted">Private product dashboard. Protected by Cloudflare Access.</p>
+
+        <nav>
+          <a href="/admin/">Dashboard</a>
+          <a href="/admin/posts">Posts</a>
+          <a class="active" href="/admin/products">Products</a>
+          <a href="/admin/media">Media</a>
+          <a href="/admin/pseo">pSEO</a>
+          <a href="/admin/seo">SEO</a>
+          <a href="/admin/settings">Settings</a>
+          <a href="/">View Site</a>
+        </nav>
+      </aside>
+
+      <main>
+        <div class="topbar">
+          <div>
+            <h1>Products Manager</h1>
+            <p class="subtitle">
+              Create, edit, publish, and delete OwnitApps product records. Products are saved in Cloudflare D1 and can later power product pages, updates, and pSEO templates.
+            </p>
           </div>
-        ))}
-      </div>
+          <button class="secondary" id="refreshBtn">Refresh</button>
+        </div>
+
+        <div class="grid">
+          <section class="card">
+            <div class="card-head">
+              <h2 id="formTitle">Create Product</h2>
+              <p class="small" id="editingLabel">New product draft</p>
+            </div>
+
+            <div class="card-body">
+              <input type="hidden" id="productId" />
+
+              <label for="name">Product Name</label>
+              <input id="name" placeholder="Example: Budget by Paycheck OS" />
+
+              <label for="slug">Slug</label>
+              <input id="slug" placeholder="budget-by-paycheck-os" />
+
+              <label for="tagline">Tagline</label>
+              <input id="tagline" placeholder="Private paycheck planning without a monthly app." />
+
+              <div class="row">
+                <div>
+                  <label for="status">Status</label>
+                  <select id="status">
+                    <option value="draft">Draft</option>
+                    <option value="published">Published</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="category">Category</label>
+                  <input id="category" placeholder="Finance" />
+                </div>
+              </div>
+
+              <div class="row">
+                <div>
+                  <label for="price">Price</label>
+                  <input id="price" placeholder="19" />
+                </div>
+                <div>
+                  <label for="currency">Currency</label>
+                  <input id="currency" placeholder="USD" value="USD" />
+                </div>
+              </div>
+
+              <label for="description">Short Description</label>
+              <textarea id="description" placeholder="Short product description for cards and product pages."></textarea>
+
+              <label for="seoTitle">SEO Title</label>
+              <input id="seoTitle" maxlength="60" placeholder="Under 60 characters" />
+
+              <label for="seoDescription">Meta Description</label>
+              <textarea id="seoDescription" maxlength="160" placeholder="Under 160 characters"></textarea>
+
+              <label for="features">Features</label>
+              <textarea id="features" placeholder="One feature per line"></textarea>
+
+              <label for="screenshots">Screenshots</label>
+              <textarea id="screenshots" placeholder="One image URL per line"></textarea>
+
+              <div class="row">
+                <div>
+                  <label for="buyUrl">Buy URL</label>
+                  <input id="buyUrl" placeholder="https://..." />
+                </div>
+                <div>
+                  <label for="demoUrl">Demo URL</label>
+                  <input id="demoUrl" placeholder="https://..." />
+                </div>
+              </div>
+
+              <label for="updateUrl">Update URL</label>
+              <input id="updateUrl" placeholder="https://ownitapps.com/update" />
+
+              <label for="content">Product Markdown Content</label>
+              <textarea id="content" class="content-area" placeholder="# Product overview..."></textarea>
+
+              <div class="actions">
+                <button class="primary" id="saveBtn">Save Product</button>
+                <button class="secondary" id="newBtn">New</button>
+                <button class="danger" id="deleteBtn" disabled>Delete</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-body">
+              <div class="toolbar">
+                <div>
+                  <h2>All Products</h2>
+                  <p class="small"><span id="count">0</span> product(s) in D1</p>
+                </div>
+                <input class="search" id="search" placeholder="Search products..." />
+              </div>
+
+              <div id="products" class="product-list">
+                <div class="empty">Loading products...</div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
     </div>
-  </div>
-</AdminLayout>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+      const API = "/api/admin/products";
+
+      const els = {
+        productId: document.getElementById("productId"),
+        name: document.getElementById("name"),
+        slug: document.getElementById("slug"),
+        tagline: document.getElementById("tagline"),
+        status: document.getElementById("status"),
+        category: document.getElementById("category"),
+        price: document.getElementById("price"),
+        currency: document.getElementById("currency"),
+        description: document.getElementById("description"),
+        seoTitle: document.getElementById("seoTitle"),
+        seoDescription: document.getElementById("seoDescription"),
+        features: document.getElementById("features"),
+        screenshots: document.getElementById("screenshots"),
+        buyUrl: document.getElementById("buyUrl"),
+        demoUrl: document.getElementById("demoUrl"),
+        updateUrl: document.getElementById("updateUrl"),
+        content: document.getElementById("content"),
+        saveBtn: document.getElementById("saveBtn"),
+        newBtn: document.getElementById("newBtn"),
+        deleteBtn: document.getElementById("deleteBtn"),
+        refreshBtn: document.getElementById("refreshBtn"),
+        products: document.getElementById("products"),
+        count: document.getElementById("count"),
+        search: document.getElementById("search"),
+        formTitle: document.getElementById("formTitle"),
+        editingLabel: document.getElementById("editingLabel"),
+        toast: document.getElementById("toast"),
+      };
+
+      let allProducts = [];
+
+      function toast(message) {
+        els.toast.textContent = message;
+        els.toast.classList.add("show");
+        setTimeout(() => els.toast.classList.remove("show"), 2600);
+      }
+
+      function slugify(value) {
+        return String(value || "")
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "")
+          .slice(0, 120);
+      }
+
+      function lines(value) {
+        return String(value || "")
+          .split("\n")
+          .map((x) => x.trim())
+          .filter(Boolean);
+      }
+
+      function safeJsonArray(value) {
+        if (!value) return [];
+        try {
+          const parsed = JSON.parse(value);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch {
+          return [];
+        }
+      }
+
+      function resetForm() {
+        els.productId.value = "";
+        els.name.value = "";
+        els.slug.value = "";
+        els.tagline.value = "";
+        els.status.value = "draft";
+        els.category.value = "";
+        els.price.value = "";
+        els.currency.value = "USD";
+        els.description.value = "";
+        els.seoTitle.value = "";
+        els.seoDescription.value = "";
+        els.features.value = "";
+        els.screenshots.value = "";
+        els.buyUrl.value = "";
+        els.demoUrl.value = "";
+        els.updateUrl.value = "";
+        els.content.value = "";
+        els.deleteBtn.disabled = true;
+        els.formTitle.textContent = "Create Product";
+        els.editingLabel.textContent = "New product draft";
+      }
+
+      function fillForm(product) {
+        els.productId.value = product.id || "";
+        els.name.value = product.name || "";
+        els.slug.value = product.slug || "";
+        els.tagline.value = product.tagline || "";
+        els.status.value = product.status || "draft";
+        els.category.value = product.category || "";
+        els.price.value = product.price || "";
+        els.currency.value = product.currency || "USD";
+        els.description.value = product.description || "";
+        els.seoTitle.value = product.seo_title || "";
+        els.seoDescription.value = product.seo_description || "";
+        els.features.value = safeJsonArray(product.features_json).join("\n");
+        els.screenshots.value = safeJsonArray(product.screenshots_json).join("\n");
+        els.buyUrl.value = product.buy_url || "";
+        els.demoUrl.value = product.demo_url || "";
+        els.updateUrl.value = product.update_url || "";
+        els.content.value = product.content_markdown || "";
+        els.deleteBtn.disabled = false;
+        els.formTitle.textContent = "Edit Product";
+        els.editingLabel.textContent = product.slug ? "/" + product.slug : product.id;
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function getPayload() {
+        return {
+          name: els.name.value.trim(),
+          slug: slugify(els.slug.value || els.name.value),
+          tagline: els.tagline.value.trim() || null,
+          status: els.status.value,
+          category: els.category.value.trim() || null,
+          price: els.price.value.trim() || null,
+          currency: els.currency.value.trim() || "USD",
+          description: els.description.value.trim() || null,
+          seo_title: els.seoTitle.value.trim() || null,
+          seo_description: els.seoDescription.value.trim() || null,
+          features: lines(els.features.value),
+          screenshots: lines(els.screenshots.value),
+          buy_url: els.buyUrl.value.trim() || null,
+          demo_url: els.demoUrl.value.trim() || null,
+          update_url: els.updateUrl.value.trim() || null,
+          content_markdown: els.content.value.trim() || null,
+        };
+      }
+
+      async function api(path, options = {}) {
+        const response = await fetch(path, {
+          ...options,
+          headers: {
+            "content-type": "application/json",
+            ...(options.headers || {}),
+          },
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || data.ok === false) {
+          throw new Error(data.error || "Request failed");
+        }
+
+        return data;
+      }
+
+      async function loadProducts() {
+        els.products.innerHTML = '<div class="empty">Loading products...</div>';
+
+        try {
+          const data = await api(API);
+          allProducts = data.products || [];
+          renderProducts();
+        } catch (error) {
+          els.products.innerHTML = '<div class="empty">Could not load products.</div>';
+          toast(error.message);
+        }
+      }
+
+      async function loadFullProduct(id) {
+        try {
+          const data = await api(API + "/" + encodeURIComponent(id));
+          fillForm(data.product);
+        } catch (error) {
+          toast(error.message);
+        }
+      }
+
+      function renderProducts() {
+        const query = els.search.value.trim().toLowerCase();
+        const filtered = allProducts.filter((product) => {
+          const text = [
+            product.name,
+            product.slug,
+            product.status,
+            product.category,
+            product.tagline,
+            product.description,
+          ].join(" ").toLowerCase();
+          return text.includes(query);
+        });
+
+        els.count.textContent = String(filtered.length);
+
+        if (!filtered.length) {
+          els.products.innerHTML = '<div class="empty">No products found. Create your first product.</div>';
+          return;
+        }
+
+        els.products.innerHTML = filtered.map((product) => `
+          <article class="product-item">
+            <div>
+              <div class="product-title">${escapeHtml(product.name || "Untitled")}</div>
+              <div class="product-meta">
+                <span class="badge ${product.status === "published" ? "published" : ""}">${escapeHtml(product.status || "draft")}</span>
+                <span>${escapeHtml(product.slug || "")}</span>
+                <span>${escapeHtml(product.category || "No category")}</span>
+                <span>${escapeHtml(product.price || "")} ${escapeHtml(product.currency || "")}</span>
+              </div>
+            </div>
+            <button class="info" data-edit="${escapeHtml(product.id)}">Edit</button>
+          </article>
+        `).join("");
+
+        document.querySelectorAll("[data-edit]").forEach((btn) => {
+          btn.addEventListener("click", () => loadFullProduct(btn.dataset.edit));
+        });
+      }
+
+      function escapeHtml(value) {
+        return String(value || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      async function saveProduct() {
+        const payload = getPayload();
+
+        if (!payload.name) {
+          toast("Product name is required.");
+          return;
+        }
+
+        try {
+          const id = els.productId.value;
+          const data = id
+            ? await api(API + "/" + encodeURIComponent(id), {
+                method: "PUT",
+                body: JSON.stringify(payload),
+              })
+            : await api(API, {
+                method: "POST",
+                body: JSON.stringify(payload),
+              });
+
+          toast(id ? "Product updated." : "Product created.");
+          fillForm(data.product);
+          await loadProducts();
+        } catch (error) {
+          toast(error.message);
+        }
+      }
+
+      async function deleteProduct() {
+        const id = els.productId.value;
+        if (!id) return;
+
+        const ok = confirm("Delete this product permanently?");
+        if (!ok) return;
+
+        try {
+          await api(API + "/" + encodeURIComponent(id), { method: "DELETE" });
+          toast("Product deleted.");
+          resetForm();
+          await loadProducts();
+        } catch (error) {
+          toast(error.message);
+        }
+      }
+
+      els.name.addEventListener("input", () => {
+        if (!els.productId.value && !els.slug.value) {
+          els.slug.value = slugify(els.name.value);
+        }
+      });
+
+      els.search.addEventListener("input", renderProducts);
+      els.saveBtn.addEventListener("click", saveProduct);
+      els.newBtn.addEventListener("click", resetForm);
+      els.deleteBtn.addEventListener("click", deleteProduct);
+      els.refreshBtn.addEventListener("click", loadProducts);
+
+      loadProducts();
+    </script>
+  </body>
+</html>
