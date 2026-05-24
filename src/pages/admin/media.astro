@@ -1,4 +1,4 @@
-﻿---
+---
 ---
 
 <html lang="en">
@@ -405,6 +405,26 @@
         setTimeout(() => els.toast.classList.remove("show"), 2600);
       }
 
+      function publicUrl(item) {
+        if (!item || !item.r2_key) return "";
+        return `${window.location.origin}/media/${String(item.r2_key).replace(/^\/+/, "")}`;
+      }
+
+      async function copyText(value) {
+        try {
+          await navigator.clipboard.writeText(value);
+          toast("Public URL copied.");
+        } catch {
+          const temp = document.createElement("textarea");
+          temp.value = value;
+          document.body.appendChild(temp);
+          temp.select();
+          document.execCommand("copy");
+          temp.remove();
+          toast("Public URL copied.");
+        }
+      }
+
       function formatBytes(bytes) {
         if (!bytes) return "0 B";
         const units = ["B", "KB", "MB", "GB"];
@@ -503,10 +523,17 @@
               <span>Created: ${escapeHtml(item.created_at || "")}</span>
               <span>R2 key: ${escapeHtml(item.r2_key || "")}</span>
               <span>Internal URL: ${escapeHtml(item.url || "")}</span>
+              <span>Public URL: <a href="${escapeHtml(publicUrl(item))}" target="_blank" rel="noopener">${escapeHtml(publicUrl(item))}</a></span>
+              <span><button class="secondary" data-copy-url="${escapeHtml(publicUrl(item))}" type="button">Copy Public URL</button></span>
               <span>Alt: ${escapeHtml(item.alt || "")}</span>
             </div>
           </article>
         `).join("");
+              document.querySelectorAll("[data-copy-url]").forEach((button) => {
+          button.addEventListener("click", () => {
+            copyText(button.getAttribute("data-copy-url") || "");
+          });
+        });
       }
 
       els.file.addEventListener("change", () => {
