@@ -22,7 +22,7 @@ function cleanSlug(input: string) {
 
 export const onRequestGet = async ({ env }: PagesContext) => {
   const result = await env.DB.prepare(
-    `SELECT id, name, slug, tagline, status, category, price, currency, description, seo_title, seo_description, published_at, modified_at, created_at
+    `SELECT id, name, slug, tagline, status, category, price, currency, description, og_image, seo_title, seo_description, published_at, modified_at, created_at
      FROM products
      ORDER BY COALESCE(modified_at, created_at) DESC
      LIMIT 200`
@@ -48,11 +48,10 @@ export const onRequestPost = async ({ request, env }: PagesContext) => {
   try {
     await env.DB.prepare(
       `INSERT INTO products (
-        id, name, slug, tagline, status, category, price, currency, description,
-        content_markdown, features_json, screenshots_json, buy_url, demo_url, update_url,
+        id, name, slug, tagline, status, category, price, currency, description, og_image, content_markdown, features_json, screenshots_json, buy_url, demo_url, update_url,
         seo_title, seo_description, faqs_json, ai_summary, ai_citation_text,
         published_at, modified_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).bind(
       id,
       String(body.name).trim(),
@@ -63,6 +62,7 @@ export const onRequestPost = async ({ request, env }: PagesContext) => {
       body.price != null ? String(body.price) : null,
       body.currency || 'USD',
       body.description || null,
+      body.og_image || null,
       body.content_markdown || body.content || null,
       JSON.stringify(body.features || []),
       JSON.stringify(body.screenshots || []),

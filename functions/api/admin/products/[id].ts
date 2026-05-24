@@ -41,8 +41,7 @@ export const onRequestPut = async ({ request, env, params }: PagesContext) => {
 
   await env.DB.prepare(
     `UPDATE products SET
-      name = ?, slug = ?, tagline = ?, status = ?, category = ?, price = ?, currency = ?, description = ?,
-      content_markdown = ?, features_json = ?, screenshots_json = ?, buy_url = ?, demo_url = ?, update_url = ?,
+      name = ?, slug = ?, tagline = ?, status = ?, category = ?, price = ?, currency = ?, description = ?, og_image = ?, content_markdown = ?, features_json = ?, screenshots_json = ?, buy_url = ?, demo_url = ?, update_url = ?,
       seo_title = ?, seo_description = ?, faqs_json = ?, ai_summary = ?, ai_citation_text = ?,
       published_at = ?, modified_at = ?
      WHERE id = ?`
@@ -55,6 +54,7 @@ export const onRequestPut = async ({ request, env, params }: PagesContext) => {
     body.price != null ? String(body.price) : existing.price,
     body.currency ?? existing.currency,
     body.description ?? existing.description,
+    body.og_image ?? existing.og_image,
     body.content_markdown ?? body.content ?? existing.content_markdown,
     body.features ? JSON.stringify(body.features) : existing.features_json,
     body.screenshots ? JSON.stringify(body.screenshots) : existing.screenshots_json,

@@ -1,4 +1,4 @@
-﻿---
+---
 ---
 
 <html lang="en">
@@ -400,6 +400,9 @@
               <label for="description">Short Description</label>
               <textarea id="description" placeholder="Short product description for cards and product pages."></textarea>
 
+              <label for="ogImage">Product Preview / OG Image Public URL</label>
+              <input id="ogImage" placeholder="https://ownitapps.com/media/uploads/..." />
+
               <label for="seoTitle">SEO Title</label>
               <input id="seoTitle" maxlength="60" placeholder="Under 60 characters" />
 
@@ -471,6 +474,7 @@
         price: document.getElementById("price"),
         currency: document.getElementById("currency"),
         description: document.getElementById("description"),
+        ogImage: document.getElementById("ogImage"),
         seoTitle: document.getElementById("seoTitle"),
         seoDescription: document.getElementById("seoDescription"),
         features: document.getElementById("features"),
@@ -535,6 +539,7 @@
         els.price.value = "";
         els.currency.value = "USD";
         els.description.value = "";
+        els.ogImage.value = "";
         els.seoTitle.value = "";
         els.seoDescription.value = "";
         els.features.value = "";
@@ -558,6 +563,7 @@
         els.price.value = product.price || "";
         els.currency.value = product.currency || "USD";
         els.description.value = product.description || "";
+        els.ogImage.value = product.og_image || "";
         els.seoTitle.value = product.seo_title || "";
         els.seoDescription.value = product.seo_description || "";
         els.features.value = safeJsonArray(product.features_json).join("\n");
@@ -582,6 +588,7 @@
           price: els.price.value.trim() || null,
           currency: els.currency.value.trim() || "USD",
           description: els.description.value.trim() || null,
+          og_image: els.ogImage.value.trim() || null,
           seo_title: els.seoTitle.value.trim() || null,
           seo_description: els.seoDescription.value.trim() || null,
           features: lines(els.features.value),
