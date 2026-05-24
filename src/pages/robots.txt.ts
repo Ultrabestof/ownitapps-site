@@ -1,5 +1,5 @@
 // src/pages/robots.txt.ts
-// Robots.txt — allow public content, block admin & draft routes
+// Robots.txt â€” allow public content, block admin & draft routes
 
 import type { APIRoute } from 'astro';
 import { SITE } from '../data/site';
@@ -23,7 +23,7 @@ Crawl-delay: 10
 User-agent: SemrushBot
 Crawl-delay: 10
 
-# AI crawlers — allow (llms.txt provides guidance)
+# AI crawlers â€” allow (llms.txt provides guidance)
 User-agent: GPTBot
 Allow: /
 
@@ -39,6 +39,7 @@ Allow: /
 # Sitemap location
 Sitemap: ${SITE.url}/sitemap-index.xml
 Sitemap: ${SITE.url}/sitemap.xml
+Sitemap: ${SITE.url}/sitemap-d1.xml
 `.trim();
 
   return new Response(content, {
