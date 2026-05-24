@@ -436,6 +436,7 @@
                 <button class="primary" id="saveBtn">Save Product</button>
                 <button class="secondary" id="newBtn">New</button>
                 <button class="danger" id="deleteBtn" disabled>Delete</button>
+                <button class="secondary" id="previewBtn" disabled>Preview</button>
               </div>
             </div>
           </section>
@@ -486,6 +487,7 @@
         saveBtn: document.getElementById("saveBtn"),
         newBtn: document.getElementById("newBtn"),
         deleteBtn: document.getElementById("deleteBtn"),
+        previewBtn: document.getElementById("previewBtn"),
         refreshBtn: document.getElementById("refreshBtn"),
         products: document.getElementById("products"),
         count: document.getElementById("count"),
@@ -549,6 +551,7 @@
         els.updateUrl.value = "";
         els.content.value = "";
         els.deleteBtn.disabled = true;
+        els.previewBtn.disabled = true;
         els.formTitle.textContent = "Create Product";
         els.editingLabel.textContent = "New product draft";
       }
@@ -573,6 +576,7 @@
         els.updateUrl.value = product.update_url || "";
         els.content.value = product.content_markdown || "";
         els.deleteBtn.disabled = false;
+        els.previewBtn.disabled = false;
         els.formTitle.textContent = "Edit Product";
         els.editingLabel.textContent = product.slug ? "/" + product.slug : product.id;
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -728,6 +732,16 @@
         }
       }
 
+      function previewProduct() {
+        const slug = slugify(els.slug.value || els.name.value);
+        if (!slug) {
+          toast("Save the product with a valid slug first.");
+          return;
+        }
+
+        window.open(`/preview/product/${encodeURIComponent(slug)}`, "_blank", "noopener");
+      }
+
       async function deleteProduct() {
         const id = els.productId.value;
         if (!id) return;
@@ -766,6 +780,7 @@
       els.saveBtn.addEventListener("click", saveProduct);
       els.newBtn.addEventListener("click", resetForm);
       els.deleteBtn.addEventListener("click", deleteProduct);
+      els.previewBtn.addEventListener("click", previewProduct);
       els.refreshBtn.addEventListener("click", loadProducts);
 
       async function initProductsPage() {
