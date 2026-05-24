@@ -444,6 +444,7 @@
                 <button class="secondary" id="newBtn">New</button>
                 <button class="danger" id="deleteBtn" disabled>Delete</button>
                 <button class="secondary" id="previewBtn" disabled>Preview</button>
+                <button class="secondary" id="liveBtn" disabled>Live</button>
               </div>
             </div>
           </section>
@@ -488,6 +489,7 @@
         newBtn: document.getElementById("newBtn"),
         deleteBtn: document.getElementById("deleteBtn"),
         previewBtn: document.getElementById("previewBtn"),
+        liveBtn: document.getElementById("liveBtn"),
         refreshBtn: document.getElementById("refreshBtn"),
         posts: document.getElementById("posts"),
         count: document.getElementById("count"),
@@ -535,6 +537,7 @@
         els.content.value = "";
         els.deleteBtn.disabled = true;
         els.previewBtn.disabled = true;
+        els.liveBtn.disabled = true;
         els.formTitle.textContent = "Create Post";
         els.editingLabel.textContent = "New draft";
       }
@@ -553,6 +556,7 @@
         els.content.value = post.content_markdown || "";
         els.deleteBtn.disabled = false;
         els.previewBtn.disabled = false;
+        els.liveBtn.disabled = false;
         els.formTitle.textContent = "Edit Post";
         els.editingLabel.textContent = post.slug ? "/" + post.slug : post.id;
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -724,6 +728,16 @@
         window.open(`/preview/post/${encodeURIComponent(slug)}`, "_blank", "noopener");
       }
 
+      function openLivePost() {
+        const slug = slugify(els.slug.value || els.title.value);
+        if (!slug) {
+          toast("Save the post with a valid slug first.");
+          return;
+        }
+
+        window.open(`/blog-live/${encodeURIComponent(slug)}`, "_blank", "noopener");
+      }
+
       async function deletePost() {
         const id = els.postId.value;
         if (!id) return;
@@ -763,6 +777,7 @@
       els.newBtn.addEventListener("click", resetForm);
       els.deleteBtn.addEventListener("click", deletePost);
       els.previewBtn.addEventListener("click", previewPost);
+      els.liveBtn.addEventListener("click", openLivePost);
       els.refreshBtn.addEventListener("click", loadPosts);
 
       async function initPostsPage() {

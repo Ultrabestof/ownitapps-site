@@ -437,6 +437,7 @@
                 <button class="secondary" id="newBtn">New</button>
                 <button class="danger" id="deleteBtn" disabled>Delete</button>
                 <button class="secondary" id="previewBtn" disabled>Preview</button>
+                <button class="secondary" id="liveBtn" disabled>Live</button>
               </div>
             </div>
           </section>
@@ -488,6 +489,7 @@
         newBtn: document.getElementById("newBtn"),
         deleteBtn: document.getElementById("deleteBtn"),
         previewBtn: document.getElementById("previewBtn"),
+        liveBtn: document.getElementById("liveBtn"),
         refreshBtn: document.getElementById("refreshBtn"),
         products: document.getElementById("products"),
         count: document.getElementById("count"),
@@ -552,6 +554,7 @@
         els.content.value = "";
         els.deleteBtn.disabled = true;
         els.previewBtn.disabled = true;
+        els.liveBtn.disabled = true;
         els.formTitle.textContent = "Create Product";
         els.editingLabel.textContent = "New product draft";
       }
@@ -577,6 +580,7 @@
         els.content.value = product.content_markdown || "";
         els.deleteBtn.disabled = false;
         els.previewBtn.disabled = false;
+        els.liveBtn.disabled = false;
         els.formTitle.textContent = "Edit Product";
         els.editingLabel.textContent = product.slug ? "/" + product.slug : product.id;
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -742,6 +746,16 @@
         window.open(`/preview/product/${encodeURIComponent(slug)}`, "_blank", "noopener");
       }
 
+      function openLiveProduct() {
+        const slug = slugify(els.slug.value || els.name.value);
+        if (!slug) {
+          toast("Save the product with a valid slug first.");
+          return;
+        }
+
+        window.open(`/apps-live/${encodeURIComponent(slug)}`, "_blank", "noopener");
+      }
+
       async function deleteProduct() {
         const id = els.productId.value;
         if (!id) return;
@@ -781,6 +795,7 @@
       els.newBtn.addEventListener("click", resetForm);
       els.deleteBtn.addEventListener("click", deleteProduct);
       els.previewBtn.addEventListener("click", previewProduct);
+      els.liveBtn.addEventListener("click", openLiveProduct);
       els.refreshBtn.addEventListener("click", loadProducts);
 
       async function initProductsPage() {
