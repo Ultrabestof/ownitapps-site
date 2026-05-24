@@ -91,8 +91,16 @@
 
       main {
         padding: 32px;
-        max-width: 1300px;
+        max-width: 1400px;
         width: 100%;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 24px;
       }
 
       h1 {
@@ -107,7 +115,7 @@
         color: var(--text-secondary);
         max-width: 780px;
         line-height: 1.6;
-        margin: 0 0 24px;
+        margin: 0;
       }
 
       .grid {
@@ -214,6 +222,19 @@
         color: var(--text-secondary);
       }
 
+      .toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+      }
+
+      .search {
+        max-width: 320px;
+      }
+
       .media-list {
         display: grid;
         gap: 10px;
@@ -237,6 +258,20 @@
         font-size: 12px;
         display: grid;
         gap: 4px;
+        word-break: break-word;
+      }
+
+      .pill {
+        display: inline-flex;
+        width: fit-content;
+        padding: 3px 8px;
+        border-radius: 999px;
+        background: rgba(201,168,76,.14);
+        color: #806515;
+        border: 1px solid rgba(201,168,76,.24);
+        font-family: var(--font-mono);
+        font-size: 11px;
+        margin-bottom: 8px;
       }
 
       .toast {
@@ -260,6 +295,7 @@
         nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         main { padding: 20px; padding-bottom: 100px; }
         .grid { grid-template-columns: 1fr; }
+        .topbar { display: block; }
       }
     </style>
   </head>
@@ -283,10 +319,15 @@
       </aside>
 
       <main>
-        <h1>Media Library</h1>
-        <p class="subtitle">
-          Upload product screenshots, blog images, OG images, icons, PDFs, and update files to Cloudflare R2. Each upload is also recorded in the D1 media table.
-        </p>
+        <div class="topbar">
+          <div>
+            <h1>Media Library</h1>
+            <p class="subtitle">
+              Upload product screenshots, blog images, OG images, icons, PDFs, and update files to Cloudflare R2. Each upload is also recorded in the D1 media table.
+            </p>
+          </div>
+          <button class="secondary" id="refreshBtn">Refresh Library</button>
+        </div>
 
         <div class="grid">
           <section class="card">
@@ -318,14 +359,18 @@
 
           <section class="card">
             <div class="card-body">
-              <h2>Uploaded Media</h2>
-              <p class="small">
-                This page shows uploads from this browser session. The file is stored in R2 and the record is saved in D1.
-              </p>
+              <div class="toolbar">
+                <div>
+                  <h2>Uploaded Media</h2>
+                  <p class="small"><span id="count">0</span> file(s) saved in D1.</p>
+                </div>
+                <input class="search" id="search" placeholder="Search media..." />
+              </div>
+
               <div id="mediaList" class="media-list">
                 <div class="media-item">
-                  <div class="media-title">No uploads yet</div>
-                  <div class="media-meta">Upload a file to see it here.</div>
+                  <div class="media-title">Loading media...</div>
+                  <div class="media-meta">Reading saved records from D1.</div>
                 </div>
               </div>
             </div>
@@ -343,13 +388,16 @@
         drop: document.getElementById("drop"),
         uploadBtn: document.getElementById("uploadBtn"),
         clearBtn: document.getElementById("clearBtn"),
+        refreshBtn: document.getElementById("refreshBtn"),
         result: document.getElementById("result"),
         resultCode: document.getElementById("resultCode"),
         mediaList: document.getElementById("mediaList"),
+        count: document.getElementById("count"),
+        search: document.getElementById("search"),
         toast: document.getElementById("toast"),
       };
 
-      let uploaded = [];
+      let media = [];
 
       function toast(message) {
         els.toast.textContent = message;
@@ -375,31 +423,6 @@
         els.drop.textContent = "Choose a file above, then upload it to R2.";
       }
 
-      function renderUploads() {
-        if (!uploaded.length) {
-          els.mediaList.innerHTML = `
-            <div class="media-item">
-              <div class="media-title">No uploads yet</div>
-              <div class="media-meta">Upload a file to see it here.</div>
-            </div>
-          `;
-          return;
-        }
-
-        els.mediaList.innerHTML = uploaded.map((item) => `
-          <article class="media-item">
-            <div class="media-title">${escapeHtml(item.filename || "Upload")}</div>
-            <div class="media-meta">
-              <span>Type: ${escapeHtml(item.mime_type || "")}</span>
-              <span>Size: ${escapeHtml(formatBytes(item.size))}</span>
-              <span>R2 key: ${escapeHtml(item.r2_key || "")}</span>
-              <span>URL: ${escapeHtml(item.url || "")}</span>
-              <span>Alt: ${escapeHtml(item.alt || "")}</span>
-            </div>
-          </article>
-        `).join("");
-      }
-
       function escapeHtml(value) {
         return String(value || "")
           .replace(/&/g, "&amp;")
@@ -407,6 +430,83 @@
           .replace(/>/g, "&gt;")
           .replace(/"/g, "&quot;")
           .replace(/'/g, "&#039;");
+      }
+
+      async function api(path, options = {}) {
+        const response = await fetch(path, options);
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok || data.ok === false) {
+          throw new Error(data.error || "Request failed.");
+        }
+
+        return data;
+      }
+
+      async function loadMedia() {
+        els.mediaList.innerHTML = `
+          <div class="media-item">
+            <div class="media-title">Loading media...</div>
+            <div class="media-meta">Reading saved records from D1.</div>
+          </div>
+        `;
+
+        try {
+          const data = await api("/api/admin/media");
+          media = data.media || [];
+          renderMedia();
+        } catch (error) {
+          els.mediaList.innerHTML = `
+            <div class="media-item">
+              <div class="media-title">Could not load media</div>
+              <div class="media-meta">${escapeHtml(error.message)}</div>
+            </div>
+          `;
+          toast(error.message);
+        }
+      }
+
+      function renderMedia() {
+        const query = els.search.value.trim().toLowerCase();
+
+        const filtered = media.filter((item) => {
+          const text = [
+            item.filename,
+            item.url,
+            item.alt,
+            item.mime_type,
+            item.r2_key,
+            item.created_at,
+          ].join(" ").toLowerCase();
+
+          return text.includes(query);
+        });
+
+        els.count.textContent = String(filtered.length);
+
+        if (!filtered.length) {
+          els.mediaList.innerHTML = `
+            <div class="media-item">
+              <div class="media-title">No media found</div>
+              <div class="media-meta">Upload a file or change your search.</div>
+            </div>
+          `;
+          return;
+        }
+
+        els.mediaList.innerHTML = filtered.map((item) => `
+          <article class="media-item">
+            <span class="pill">${escapeHtml(item.mime_type || "file")}</span>
+            <div class="media-title">${escapeHtml(item.filename || "Upload")}</div>
+            <div class="media-meta">
+              <span>Size: ${escapeHtml(formatBytes(item.size))}</span>
+              <span>Created: ${escapeHtml(item.created_at || "")}</span>
+              <span>R2 key: ${escapeHtml(item.r2_key || "")}</span>
+              <span>Internal URL: ${escapeHtml(item.url || "")}</span>
+              <span>Alt: ${escapeHtml(item.alt || "")}</span>
+            </div>
+          </article>
+        `).join("");
       }
 
       els.file.addEventListener("change", () => {
@@ -420,6 +520,8 @@
       });
 
       els.clearBtn.addEventListener("click", clearForm);
+      els.refreshBtn.addEventListener("click", loadMedia);
+      els.search.addEventListener("input", renderMedia);
 
       els.uploadBtn.addEventListener("click", async () => {
         const file = els.file.files && els.file.files[0];
@@ -448,14 +550,12 @@
             throw new Error(data.error || "Upload failed.");
           }
 
-          uploaded.unshift(data.media);
-          renderUploads();
-
           els.result.classList.add("show");
           els.resultCode.textContent = JSON.stringify(data.media, null, 2);
 
           toast("Upload saved to R2.");
           clearForm();
+          await loadMedia();
         } catch (error) {
           toast(error.message || "Upload failed.");
         } finally {
@@ -464,7 +564,7 @@
         }
       });
 
-      renderUploads();
+      loadMedia();
     </script>
   </body>
 </html>
