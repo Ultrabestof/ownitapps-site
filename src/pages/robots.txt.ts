@@ -1,5 +1,5 @@
 // src/pages/robots.txt.ts
-// Robots.txt â€” allow public content, block admin & draft routes
+// Robots.txt أ¢â‚¬â€‌ allow public content, block admin & draft routes
 
 import type { APIRoute } from 'astro';
 import { SITE } from '../data/site';
@@ -9,10 +9,14 @@ export const GET: APIRoute = () => {
 # Official site: ${SITE.url}
 
 User-agent: *
+Content-Signal: search=yes,ai-input=yes,ai-train=yes
 Allow: /
 Disallow: /admin/
 Disallow: /admin
 Disallow: /api/
+Disallow: /api
+Disallow: /preview/
+Disallow: /preview
 Disallow: /drafts/
 Disallow: /drafts
 
@@ -23,7 +27,7 @@ Crawl-delay: 10
 User-agent: SemrushBot
 Crawl-delay: 10
 
-# AI crawlers â€” allow (llms.txt provides guidance)
+# AI crawlers أ¢â‚¬â€‌ allow (llms.txt provides guidance)
 User-agent: GPTBot
 Allow: /
 
