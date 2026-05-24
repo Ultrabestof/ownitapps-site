@@ -1,4 +1,4 @@
-﻿---
+---
 ---
 
 <html lang="en">
@@ -430,6 +430,9 @@
               <label for="seoDescription">Meta Description</label>
               <textarea id="seoDescription" maxlength="160" placeholder="Under 160 characters"></textarea>
 
+              <label for="ogImage">Featured / OG Image Public URL</label>
+              <input id="ogImage" placeholder="https://ownitapps.com/media/uploads/..." />
+
               <label for="tags">Tags</label>
               <input id="tags" placeholder="offline-first, privacy, no subscription" />
 
@@ -477,6 +480,7 @@
         excerpt: document.getElementById("excerpt"),
         seoTitle: document.getElementById("seoTitle"),
         seoDescription: document.getElementById("seoDescription"),
+        ogImage: document.getElementById("ogImage"),
         tags: document.getElementById("tags"),
         content: document.getElementById("content"),
         saveBtn: document.getElementById("saveBtn"),
@@ -524,6 +528,7 @@
         els.excerpt.value = "";
         els.seoTitle.value = "";
         els.seoDescription.value = "";
+        els.ogImage.value = "";
         els.tags.value = "";
         els.content.value = "";
         els.deleteBtn.disabled = true;
@@ -540,6 +545,7 @@
         els.excerpt.value = post.excerpt || "";
         els.seoTitle.value = post.seo_title || "";
         els.seoDescription.value = post.seo_description || "";
+        els.ogImage.value = post.og_image || "";
         els.tags.value = safeJsonArray(post.tags_json).join(", ");
         els.content.value = post.content_markdown || "";
         els.deleteBtn.disabled = false;
@@ -567,6 +573,7 @@
           excerpt: els.excerpt.value.trim() || null,
           seo_title: els.seoTitle.value.trim() || null,
           seo_description: els.seoDescription.value.trim() || null,
+          og_image: els.ogImage.value.trim() || null,
           tags: parseCsv(els.tags.value),
           content_markdown: els.content.value.trim(),
         };
