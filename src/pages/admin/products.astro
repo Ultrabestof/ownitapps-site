@@ -711,7 +711,18 @@
 
           toast(id ? "Product updated." : "Product created.");
           fillForm(data.product);
-          await loadProducts();
+          await async function initProductsPage() {
+        await loadProducts();
+
+        const params = new URLSearchParams(window.location.search);
+        const editId = params.get("edit");
+
+        if (editId) {
+          await loadFullProduct(editId);
+        }
+      }
+
+      initProductsPage();
         } catch (error) {
           toast(error.message);
         }
@@ -728,7 +739,18 @@
           await api(API + "/" + encodeURIComponent(id), { method: "DELETE" });
           toast("Product deleted.");
           resetForm();
-          await loadProducts();
+          await async function initProductsPage() {
+        await loadProducts();
+
+        const params = new URLSearchParams(window.location.search);
+        const editId = params.get("edit");
+
+        if (editId) {
+          await loadFullProduct(editId);
+        }
+      }
+
+      initProductsPage();
         } catch (error) {
           toast(error.message);
         }
@@ -746,7 +768,18 @@
       els.deleteBtn.addEventListener("click", deleteProduct);
       els.refreshBtn.addEventListener("click", loadProducts);
 
-      loadProducts();
+      async function initProductsPage() {
+        await loadProducts();
+
+        const params = new URLSearchParams(window.location.search);
+        const editId = params.get("edit");
+
+        if (editId) {
+          await loadFullProduct(editId);
+        }
+      }
+
+      initProductsPage();
     </script>
   </body>
 </html>

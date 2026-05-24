@@ -693,7 +693,18 @@
 
           toast(id ? "Post updated." : "Post created.");
           fillForm(data.post);
-          await loadPosts();
+          await async function initPostsPage() {
+        await loadPosts();
+
+        const params = new URLSearchParams(window.location.search);
+        const editId = params.get("edit");
+
+        if (editId) {
+          await loadFullPost(editId);
+        }
+      }
+
+      initPostsPage();
         } catch (error) {
           toast(error.message);
         }
@@ -710,7 +721,18 @@
           await api(API + "/" + encodeURIComponent(id), { method: "DELETE" });
           toast("Post deleted.");
           resetForm();
-          await loadPosts();
+          await async function initPostsPage() {
+        await loadPosts();
+
+        const params = new URLSearchParams(window.location.search);
+        const editId = params.get("edit");
+
+        if (editId) {
+          await loadFullPost(editId);
+        }
+      }
+
+      initPostsPage();
         } catch (error) {
           toast(error.message);
         }
@@ -728,7 +750,18 @@
       els.deleteBtn.addEventListener("click", deletePost);
       els.refreshBtn.addEventListener("click", loadPosts);
 
-      loadPosts();
+      async function initPostsPage() {
+        await loadPosts();
+
+        const params = new URLSearchParams(window.location.search);
+        const editId = params.get("edit");
+
+        if (editId) {
+          await loadFullPost(editId);
+        }
+      }
+
+      initPostsPage();
     </script>
   </body>
 </html>

@@ -340,37 +340,37 @@
         <section class="kpis">
           <div class="card kpi">
             <div class="kpi-label">Total Posts</div>
-            <div class="kpi-value" id="postsTotal">—</div>
+            <div class="kpi-value" id="postsTotal">â€”</div>
             <div class="kpi-note">All saved posts</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Draft Posts</div>
-            <div class="kpi-value" id="postsDraft">—</div>
+            <div class="kpi-value" id="postsDraft">â€”</div>
             <div class="kpi-note">Not published</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Published Posts</div>
-            <div class="kpi-value" id="postsPublished">—</div>
+            <div class="kpi-value" id="postsPublished">â€”</div>
             <div class="kpi-note">Live-ready content</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Products</div>
-            <div class="kpi-value" id="productsTotal">—</div>
+            <div class="kpi-value" id="productsTotal">â€”</div>
             <div class="kpi-note">All product records</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Product Drafts</div>
-            <div class="kpi-value" id="productsDraft">—</div>
+            <div class="kpi-value" id="productsDraft">â€”</div>
             <div class="kpi-note">Needs review</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Published Products</div>
-            <div class="kpi-value" id="productsPublished">—</div>
+            <div class="kpi-value" id="productsPublished">â€”</div>
             <div class="kpi-note">Ready to sell</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Media Files</div>
-            <div class="kpi-value" id="mediaTotal">—</div>
+            <div class="kpi-value" id="mediaTotal">â€”</div>
             <div class="kpi-note">Stored in R2</div>
           </div>
         </section>
@@ -453,13 +453,25 @@
         els[id].textContent = String(value ?? 0);
       }
 
-      function item(title, meta = []) {
+      function item(title, meta = [], href = "") {
+        const inner = `
+          <div class="item-title">${escapeHtml(title)}</div>
+          <div class="item-meta">
+            ${meta.map((m) => `<span class="badge ${m === "published" ? "published" : ""}">${escapeHtml(m)}</span>`).join("")}
+          </div>
+        `;
+
+        if (href) {
+          return `
+            <a class="item" href="${escapeHtml(href)}" style="display:block; color:inherit; text-decoration:none;">
+              ${inner}
+            </a>
+          `;
+        }
+
         return `
           <article class="item">
-            <div class="item-title">${escapeHtml(title)}</div>
-            <div class="item-meta">
-              ${meta.map((m) => `<span class="badge ${m === "published" ? "published" : ""}">${escapeHtml(m)}</span>`).join("")}
-            </div>
+            ${inner}
           </article>
         `;
       }
@@ -486,19 +498,19 @@
 
           els.recentPosts.innerHTML = (recent.posts || []).length
             ? recent.posts.map((post) =>
-                item(post.title || "Untitled post", [post.status || "draft", post.slug || "", post.created_at || ""])
+                item(post.title || "Untitled post", [post.status || "draft", post.slug || "", post.created_at || ""], `/admin/posts?edit=${encodeURIComponent(post.id)}`)
               ).join("")
             : '<div class="empty">No posts yet.</div>';
 
           els.recentProducts.innerHTML = (recent.products || []).length
             ? recent.products.map((product) =>
-                item(product.name || "Untitled product", [product.status || "draft", product.slug || "", `${product.price || ""} ${product.currency || ""}`.trim()])
+                item(product.name || "Untitled product", [product.status || "draft", product.slug || "", `${product.price || ""} ${product.currency || ""}`.trim()], `/admin/products?edit=${encodeURIComponent(product.id)}`)
               ).join("")
             : '<div class="empty">No products yet.</div>';
 
           els.recentMedia.innerHTML = (recent.media || []).length
             ? recent.media.map((media) =>
-                item(media.filename || "Untitled media", [media.mime_type || "", media.created_at || ""])
+                item(media.filename || "Untitled media", [media.mime_type || "", media.created_at || ""], `/admin/media`)
               ).join("")
             : '<div class="empty">No media yet.</div>';
         } catch (error) {
