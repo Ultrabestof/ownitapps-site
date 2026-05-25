@@ -454,6 +454,56 @@ const schema = [organizationSchema(), websiteSchema()];
         grid-template-columns: 1fr;
       }
     }
+  
+    /* Homepage D1 card polish */
+    .oa-grid {
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 360px));
+      justify-content: start;
+      align-items: stretch;
+    }
+
+    .oa-card {
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .oa-card-img {
+      height: 170px;
+      object-fit: cover;
+      object-position: top center;
+    }
+
+    .oa-card h3 {
+      overflow-wrap: anywhere;
+    }
+
+    .oa-card-foot {
+      flex-wrap: wrap;
+      row-gap: 8px;
+    }
+
+    .oa-card-foot span:first-child {
+      max-width: 100%;
+      overflow-wrap: anywhere;
+    }
+
+    .oa-section-head .oa-button {
+      white-space: nowrap;
+    }
+
+    @media (max-width: 760px) {
+      .oa-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .oa-card {
+        max-width: none;
+      }
+
+      .oa-card-img {
+        height: 190px;
+      }
+    }
   </style>
 
   <main class="oa-page">
