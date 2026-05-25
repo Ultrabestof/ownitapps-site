@@ -124,8 +124,8 @@ function pageHtml(page: any) {
       <div class="intro">${escapeHtml(intro)}</div>
       <div class="meta">
         Keyword: ${escapeHtml(page.target_keyword || "Not set")}
-        ${page.search_intent ? ` • Intent: ${escapeHtml(page.search_intent)}` : ""}
-        ${page.modified_at ? ` • Updated: ${escapeHtml(page.modified_at)}` : ""}
+        ${page.search_intent ? ` â€¢ Intent: ${escapeHtml(page.search_intent)}` : ""}
+        ${page.modified_at ? ` â€¢ Updated: ${escapeHtml(page.modified_at)}` : ""}
       </div>
       ${image ? `<img class="featured" src="${escapeHtml(image)}" alt="${escapeHtml(page.title || "pSEO image")}">` : ""}
       <div class="buttons">
