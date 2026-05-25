@@ -1,6 +1,6 @@
 ---
 // src/layouts/PublicLayout.astro
-// Public website layout — header + main content + footer
+// Public website layout â€” header + main content + footer
 // Used by: homepage, blog, product pages, pSEO pages, glossary, etc.
 
 import BaseLayout from './BaseLayout.astro';
@@ -33,7 +33,7 @@ const path = Astro.url.pathname;
             <a href="/">Home</a>
             {breadcrumbs.map((crumb, i) => (
               <>
-                <span class="sep" aria-hidden="true">›</span>
+                <span class="sep" aria-hidden="true">â€؛</span>
                 {i === breadcrumbs.length - 1
                   ? <span class="current" aria-current="page">{crumb.name}</span>
                   : <a href={crumb.href}>{crumb.name}</a>
