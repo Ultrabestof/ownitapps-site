@@ -1,192 +1,481 @@
 ---
-// src/pages/admin/pseo.astro
-import { getCollection } from 'astro:content';
-import AdminLayout from '@layouts/AdminLayout.astro';
-
-const allPseo = await getCollection('pseo');
-const pages = [...allPseo].sort((a, b) => a.data.pattern.localeCompare(b.data.pattern));
-
-function pseoIssues(p: typeof pages[0]) {
-  const issues: string[] = [];
-  if (!p.data.targetKeyword) issues.push('No target keyword');
-  if (!p.data.aiSummary) issues.push('No aiSummary');
-  if (!p.data.aiCitationText) issues.push('No aiCitation');
-  if (!p.data.faqs || p.data.faqs.length === 0) issues.push('No FAQs');
-  if (!p.data.relatedProducts || p.data.relatedProducts.length === 0) issues.push('No related products');
-  if (!p.data.seoTitle) issues.push('No seoTitle');
-  if (!p.data.intro) issues.push('No intro');
-  return issues;
-}
-
-// Group by pattern
-const byPattern = pages.reduce<Record<string, typeof pages>>((acc, p) => {
-  if (!acc[p.data.pattern]) acc[p.data.pattern] = [];
-  if (acc[p.data.pattern]) acc[p.data.pattern]!.push(p);
-  return acc;
-}, {});
-
-const patternLabels: Record<string, string> = {
-  alternative: 'Alternatives',
-  comparison: 'Comparisons',
-  'use-case': 'Use Cases',
-  problem: 'Problems',
-  solution: 'Solutions',
-  'no-subscription': 'No-Subscription',
-  'privacy-first': 'Privacy-First',
-  'offline-tools': 'Offline Tools',
-  'buy-once': 'Buy-Once',
-  'local-first': 'Local-First',
-  best: 'Best [Topic]',
-};
-
-const patternRoutes: Record<string, string> = {
-  alternative: '/alternatives',
-  comparison: '/compare',
-  'use-case': '/use-cases',
-  problem: '/problems',
-  'no-subscription': '/no-subscription',
-  'privacy-first': '/privacy-first',
-  'offline-tools': '/offline-tools',
-  'buy-once': '/buy-once',
-  'local-first': '/local-first',
-};
-
-const totalIssues = pages.filter(p => pseoIssues(p).length > 0).length;
-const publishedCount = pages.filter(p => !p.data.draft).length;
-function getIntentStyle(intent: string): string {
-  const map: { [key: string]: string } = {
-    informational: 'color:var(--blue)',
-    commercial: 'color:var(--gold)',
-    transactional: 'color:var(--green)',
-    navigational: 'color:var(--sidebar-muted)',
-  };
-  return map[intent] ?? '';
-}
-
 ---
 
-<AdminLayout title="pSEO Manager">
-  <div style="display:flex; flex-direction:column; gap:var(--s5);">
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>pSEO Manager | OwnitApps Admin</title>
+    <style>
+      :root {
+        --sidebar-bg:#2B2B2B; --sidebar-text:#E8DDD0; --sidebar-muted:#9A8F82;
+        --main-bg:#F5F0E8; --card:#fff; --surface:#F0EBE0;
+        --border:rgba(0,0,0,.1); --gold:#C9A84C; --green:#2E8B5A;
+        --red:#C0392B; --blue:#2471A3; --text:#2B2B2B; --muted:#6B6258;
+        --r:10px; --rs:6px;
+        --font-heading:"Syne","Inter","Segoe UI",system-ui,sans-serif;
+        --font-body:"DM Sans","Inter","Segoe UI",system-ui,sans-serif;
+        --font-mono:"DM Mono","SFMono-Regular",Consolas,monospace;
+      }
+      *{box-sizing:border-box}
+      body{margin:0;background:var(--main-bg);color:var(--text);font-family:var(--font-body)}
+      .shell{min-height:100vh;display:grid;grid-template-columns:240px 1fr}
+      aside{background:var(--sidebar-bg);color:var(--sidebar-text);padding:24px 18px}
+      .brand{font-family:var(--font-heading);font-weight:900;font-size:22px;margin-bottom:6px}
+      aside .muted{color:var(--sidebar-muted);font-size:12px;line-height:1.5}
+      nav{display:grid;gap:8px;margin-top:28px}
+      nav a{color:var(--sidebar-text);text-decoration:none;padding:10px 12px;border-radius:var(--rs);font-size:14px}
+      nav a.active,nav a:hover{background:rgba(201,168,76,.14);color:#fff}
+      main{padding:32px;max-width:1500px;width:100%}
+      .topbar{display:flex;justify-content:space-between;gap:18px;margin-bottom:24px}
+      h1{font-family:var(--font-heading);font-size:clamp(34px,4vw,56px);line-height:1;margin:0 0 8px;letter-spacing:-.055em}
+      .subtitle{color:var(--muted);max-width:850px;line-height:1.6;margin:0}
+      .grid{display:grid;grid-template-columns:minmax(340px,480px) 1fr;gap:20px;align-items:start}
+      .card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 18px 50px rgba(43,43,43,.06)}
+      .card-body{padding:18px}
+      h2{font-family:var(--font-heading);font-size:22px;letter-spacing:-.03em;margin:0 0 10px}
+      label{display:block;font-family:var(--font-mono);font-size:12px;color:var(--muted);margin:13px 0 6px}
+      input,textarea,select{width:100%;border:1px solid var(--border);border-radius:var(--rs);padding:10px 12px;background:#fff;color:var(--text);font:inherit;min-height:42px}
+      textarea{min-height:105px;resize:vertical;line-height:1.55}
+      .content{min-height:220px;font-family:var(--font-mono);font-size:13px}
+      .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+      .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+      button{border:0;border-radius:var(--rs);padding:10px 14px;min-height:42px;cursor:pointer;font-weight:800}
+      .primary{background:var(--gold);color:#1f1f1f}
+      .secondary{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+      .danger{background:rgba(192,57,43,.1);color:var(--red);border:1px solid rgba(192,57,43,.22)}
+      .info{background:rgba(36,113,163,.1);color:var(--blue);border:1px solid rgba(36,113,163,.2)}
+      .toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+      .search{max-width:340px}
+      .list{display:grid;gap:10px}
+      .item{display:grid;grid-template-columns:1fr auto;gap:12px;padding:14px;border:1px solid var(--border);border-radius:var(--r);background:#fff}
+      .title{font-weight:900;margin-bottom:5px}
+      .meta{display:flex;gap:8px;flex-wrap:wrap;color:#9A8F82;font-family:var(--font-mono);font-size:12px}
+      .badge{display:inline-flex;padding:3px 8px;border-radius:999px;background:var(--surface);border:1px solid var(--border)}
+      .badge.published{color:var(--green);background:rgba(46,139,90,.1);border-color:rgba(46,139,90,.2)}
+      .small{font-size:12px;color:#9A8F82;line-height:1.5}
+      .empty{padding:28px;text-align:center;color:#9A8F82;border:1px dashed var(--border);border-radius:var(--r)}
+      .toast{position:fixed;right:18px;bottom:18px;background:var(--sidebar-bg);color:var(--sidebar-text);padding:12px 14px;border-radius:var(--r);display:none;z-index:999;box-shadow:0 18px 60px rgba(0,0,0,.22)}
+      .toast.show{display:block}
+      @media(max-width:980px){.shell{grid-template-columns:1fr}.grid,.row{grid-template-columns:1fr}main{padding:20px;padding-bottom:100px}nav{grid-template-columns:repeat(2,1fr)}.topbar{display:block}}
+    </style>
+  </head>
 
-    <!-- Header -->
-    <div>
-      <h1 style="font-size:1.5rem; font-weight:800; font-family:var(--font-heading); margin:0 0 var(--s1);">pSEO Manager</h1>
-      <p style="color:var(--sidebar-muted); font-size:0.875rem; margin:0;">
-        {pages.length} programmatic SEO pages · {publishedCount} published · {totalIssues} with issues · {Object.keys(byPattern).length} patterns active
-      </p>
-    </div>
+  <body>
+    <div class="shell">
+      <aside>
+        <div class="brand">OwnitApps</div>
+        <p class="muted">D1 programmatic SEO manager for long-tail pages.</p>
+        <nav>
+          <a href="/admin/">Dashboard</a>
+          <a href="/admin/posts">Posts</a>
+          <a href="/admin/products">Products</a>
+          <a href="/admin/media">Media</a>
+          <a class="active" href="/admin/pseo">pSEO</a>
+          <a href="/admin/seo">SEO</a>
+          <a href="/admin/settings">Settings</a>
+          <a href="/">View Site</a>
+        </nav>
+      </aside>
 
-    <!-- Pattern Summary -->
-    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:var(--s3);">
-      {Object.entries(byPattern).map(([pattern, patternPages]) => {
-        const withIssues = patternPages.filter(p => pseoIssues(p).length > 0).length;
-        return (
-          <div style="background:rgba(255,255,255,0.04); border:1px solid var(--sidebar-border); border-radius:var(--r); padding:var(--s4);">
-            <div style="font-size:0.7rem; color:var(--gold); text-transform:uppercase; letter-spacing:0.08em; font-family:var(--font-mono); margin-bottom:var(--s2);">{patternLabels[pattern] || pattern}</div>
-            <div style="font-size:1.75rem; font-weight:800; font-family:var(--font-mono); color:var(--sidebar-text); margin-bottom:var(--s1);">{patternPages.length}</div>
-            {withIssues > 0 && (
-              <div style="font-size:0.7rem; color:var(--amber);">⚠ {withIssues} with issues</div>
-            )}
+      <main>
+        <div class="topbar">
+          <div>
+            <h1>pSEO Manager</h1>
+            <p class="subtitle">Create long-tail D1 pages for use-cases, alternatives, comparisons, local-first tools, no-subscription tools, and privacy-first software pages.</p>
           </div>
-        );
-      })}
-    </div>
+          <button class="secondary" id="refreshBtn">Refresh</button>
+        </div>
 
-    <!-- pSEO Table -->
-    <div style="background:rgba(255,255,255,0.04); border:1px solid var(--sidebar-border); border-radius:var(--r); overflow:hidden;">
-      <div style="padding:var(--s3) var(--s5); border-bottom:1px solid var(--sidebar-border);">
-        <h2 style="font-size:0.8rem; font-weight:700; color:var(--sidebar-muted); margin:0; text-transform:uppercase; letter-spacing:0.08em;">All pSEO Pages</h2>
-      </div>
-      <div style="overflow-x:auto;">
-        <table style="width:100%; border-collapse:collapse; font-size:0.78rem;">
-          <thead>
-            <tr style="border-bottom:1px solid var(--sidebar-border);">
-              <th style="text-align:left; padding:var(--s3) var(--s5); color:var(--sidebar-muted); font-weight:600;">Title</th>
-              <th style="text-align:left; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Pattern</th>
-              <th style="text-align:left; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Keyword</th>
-              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Intent</th>
-              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">FAQs</th>
-              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">AI</th>
-              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Products</th>
-              <th style="text-align:center; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Status</th>
-              <th style="text-align:left; padding:var(--s3) var(--s4); color:var(--sidebar-muted); font-weight:600;">Issues</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pages.map(page => {
-              const _issues = pseoIssues(page);
-              const _hasFaqs = !!(page.data.faqs && page.data.faqs.length > 0);
-              const _hasAI = !!(page.data.aiSummary && page.data.aiCitationText);
-              const _hasProducts = !!(page.data.relatedProducts && page.data.relatedProducts.length > 0);
-              const _route = patternRoutes[page.data.pattern] || `/${page.data.pattern}`;
-              const _intentStyle = getIntentStyle(page.data.searchIntent ?? '');
-              return (
-                <tr style={`border-bottom:1px solid rgba(58,58,58,0.5); ${_issues.length > 3 ? 'background:rgba(192,57,43,0.04);' : ''}`}>
-                  <td style="padding:var(--s3) var(--s5); max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                    <a href={`${_route}/${page.slug}`} target="_blank"
-                       style="color:var(--sidebar-text); text-decoration:none; font-weight:500;">{page.data.title}</a>
-                  </td>
-                  <td style="padding:var(--s3) var(--s4);">
-                    <span style="font-size:0.7rem; color:var(--gold); font-family:var(--font-mono);">{page.data.pattern}</span>
-                  </td>
-                  <td style="padding:var(--s3) var(--s4); max-width:150px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                    <span style="font-size:0.75rem; color:var(--sidebar-muted);">{page.data.targetKeyword}</span>
-                  </td>
-                  <td style="padding:var(--s3) var(--s4); text-align:center;">
-                    <span style={`font-size:0.7rem; ${_intentStyle}`}>{page.data.searchIntent?.slice(0,4)}</span>
-                  </td>
-                  <td style="padding:var(--s3) var(--s4); text-align:center;">
-                    {_hasFaqs ? `✅ ${page.data.faqs!.length}` : '❌'}
-                  </td>
-                  <td style="padding:var(--s3) var(--s4); text-align:center;">{_hasAI ? '✅' : '⚠️'}</td>
-                  <td style="padding:var(--s3) var(--s4); text-align:center;">{_hasProducts ? `✅ ${page.data.relatedProducts!.length}` : '❌'}</td>
-                  <td style="padding:var(--s3) var(--s4); text-align:center;">
-                    <span style={`font-size:0.7rem; padding:2px 6px; border-radius:8px; ${page.data.draft ? 'background:rgba(154,143,130,0.2); color:var(--sidebar-muted)' : 'background:rgba(46,139,90,0.15); color:#6fcf97'}`}>
-                      {page.data.draft ? 'Draft' : 'Live'}
-                    </span>
-                  </td>
-                  <td style="padding:var(--s3) var(--s4);">
-                    {_issues.length === 0 ? (
-                      <span style="font-size:0.7rem; color:var(--green);">All good</span>
-                    ) : (
-                      <div style="display:flex; gap:4px; flex-wrap:wrap;">
-                        {_issues.slice(0, 2).map((iss: string) => (
-                          <span style="background:rgba(201,168,76,0.12); color:var(--amber); font-size:0.65rem; padding:1px 5px; border-radius:6px;">{iss}</span>
-                        ))}
-                        {_issues.length > 2 && <span style="font-size:0.65rem; color:var(--sidebar-muted);">+{_issues.length - 2}</span>}
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
+        <div class="grid">
+          <section class="card">
+            <div class="card-body">
+              <h2 id="formTitle">Create pSEO Page</h2>
+              <p class="small" id="editingLabel">New draft</p>
 
-    <!-- pSEO Gap Finder -->
-    <div style="background:rgba(255,255,255,0.04); border:1px solid var(--sidebar-border); border-radius:var(--r); padding:var(--s5);">
-      <h2 style="font-size:0.875rem; font-weight:700; color:var(--sidebar-text); margin:0 0 var(--s4); text-transform:uppercase; letter-spacing:0.06em;">Pattern Coverage Gap Analysis</h2>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:var(--s3);">
-        {Object.entries(patternLabels).map(([pattern, label]) => {
-          const count = (byPattern[pattern] || []).length;
-          const target = 5;
-          const pct = Math.min((count / target) * 100, 100);
-          return (
-            <div style="display:flex; flex-direction:column; gap:var(--s2);">
-              <div style="display:flex; justify-content:space-between; font-size:0.75rem;">
-                <span style="color:var(--sidebar-text);">{label}</span>
-                <span style={`font-family:var(--font-mono); color:${count >= target ? 'var(--green)' : 'var(--amber)'};`}>{count}/{target}</span>
+              <input type="hidden" id="pageId" />
+
+              <label for="title">Title</label>
+              <input id="title" placeholder="Offline Budget Planner for Freelancers" />
+
+              <label for="slug">Slug</label>
+              <input id="slug" placeholder="offline-budget-planner-for-freelancers" />
+
+              <div class="row">
+                <div>
+                  <label for="status">Status</label>
+                  <select id="status">
+                    <option value="draft">Draft</option>
+                    <option value="review">Review</option>
+                    <option value="published">Published</option>
+                    <option value="archived">Archived</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="pattern">Pattern</label>
+                  <select id="pattern">
+                    <option value="use-case">Use Case</option>
+                    <option value="problem">Problem</option>
+                    <option value="solution">Solution</option>
+                    <option value="alternative">Alternative</option>
+                    <option value="comparison">Comparison</option>
+                    <option value="no-subscription">No Subscription</option>
+                    <option value="privacy-first">Privacy First</option>
+                    <option value="offline-tools">Offline Tools</option>
+                    <option value="buy-once">Buy Once</option>
+                    <option value="local-first">Local First</option>
+                    <option value="best">Best</option>
+                  </select>
+                </div>
               </div>
-              <div style="background:var(--sidebar-border); border-radius:4px; height:6px; overflow:hidden;">
-                <div style={`height:100%; border-radius:4px; background:${count >= target ? 'var(--green)' : 'var(--amber)'}; width:${pct}%;`}></div>
+
+              <div class="row">
+                <div>
+                  <label for="targetKeyword">Target Keyword</label>
+                  <input id="targetKeyword" placeholder="offline budget planner" />
+                </div>
+                <div>
+                  <label for="searchIntent">Search Intent</label>
+                  <select id="searchIntent">
+                    <option value="informational">Informational</option>
+                    <option value="commercial">Commercial</option>
+                    <option value="transactional">Transactional</option>
+                    <option value="navigational">Navigational</option>
+                  </select>
+                </div>
+              </div>
+
+              <label for="intro">Intro</label>
+              <textarea id="intro" placeholder="Short intro for the page."></textarea>
+
+              <label for="ogImage">OG Image Public URL</label>
+              <input id="ogImage" placeholder="https://ownitapps.com/media/uploads/..." />
+
+              <label for="seoTitle">SEO Title</label>
+              <input id="seoTitle" maxlength="60" placeholder="Under 60 characters" />
+
+              <label for="seoDescription">Meta Description</label>
+              <textarea id="seoDescription" maxlength="160" placeholder="Under 160 characters"></textarea>
+
+              <label for="relatedProducts">Related Products</label>
+              <textarea id="relatedProducts" placeholder="One product slug per line"></textarea>
+
+              <label for="faqs">FAQs</label>
+              <textarea id="faqs" placeholder="Question? | Answer. One FAQ per line."></textarea>
+
+              <label for="aiSummary">AI Summary</label>
+              <textarea id="aiSummary" placeholder="Short answer-style summary for LLM discovery."></textarea>
+
+              <label for="aiCitationText">AI Citation Text</label>
+              <textarea id="aiCitationText" placeholder="Citation-friendly description of this page."></textarea>
+
+              <label for="content">Markdown Content</label>
+              <textarea id="content" class="content" placeholder="# Page content..."></textarea>
+
+              <div class="actions">
+                <button class="primary" id="saveBtn">Save Page</button>
+                <button class="secondary" id="newBtn">New</button>
+                <button class="secondary" id="previewBtn" disabled>Preview</button>
+                <button class="secondary" id="liveBtn" disabled>Live</button>
+                <button class="danger" id="deleteBtn" disabled>Delete</button>
               </div>
             </div>
-          );
-        })}
-      </div>
+          </section>
+
+          <section class="card">
+            <div class="card-body">
+              <div class="toolbar">
+                <div>
+                  <h2>All pSEO Pages</h2>
+                  <p class="small"><span id="count">0</span> page(s) in D1</p>
+                </div>
+                <input class="search" id="search" placeholder="Search pSEO pages..." />
+              </div>
+              <div id="pages" class="list">
+                <div class="empty">Loading pSEO pages...</div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
     </div>
 
-  </div>
-</AdminLayout>
+    <div class="toast" id="toast"></div>
+
+    <script>
+      const API = "/api/admin/pseo";
+
+      const els = {
+        pageId: document.getElementById("pageId"),
+        title: document.getElementById("title"),
+        slug: document.getElementById("slug"),
+        status: document.getElementById("status"),
+        pattern: document.getElementById("pattern"),
+        targetKeyword: document.getElementById("targetKeyword"),
+        searchIntent: document.getElementById("searchIntent"),
+        intro: document.getElementById("intro"),
+        ogImage: document.getElementById("ogImage"),
+        seoTitle: document.getElementById("seoTitle"),
+        seoDescription: document.getElementById("seoDescription"),
+        relatedProducts: document.getElementById("relatedProducts"),
+        faqs: document.getElementById("faqs"),
+        aiSummary: document.getElementById("aiSummary"),
+        aiCitationText: document.getElementById("aiCitationText"),
+        content: document.getElementById("content"),
+        saveBtn: document.getElementById("saveBtn"),
+        newBtn: document.getElementById("newBtn"),
+        previewBtn: document.getElementById("previewBtn"),
+        liveBtn: document.getElementById("liveBtn"),
+        deleteBtn: document.getElementById("deleteBtn"),
+        refreshBtn: document.getElementById("refreshBtn"),
+        pages: document.getElementById("pages"),
+        count: document.getElementById("count"),
+        search: document.getElementById("search"),
+        formTitle: document.getElementById("formTitle"),
+        editingLabel: document.getElementById("editingLabel"),
+        toast: document.getElementById("toast"),
+      };
+
+      let allPages = [];
+
+      function toast(message) {
+        els.toast.textContent = message;
+        els.toast.classList.add("show");
+        setTimeout(() => els.toast.classList.remove("show"), 2600);
+      }
+
+      function slugify(value) {
+        return String(value || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 120);
+      }
+
+      function lines(value) {
+        return String(value || "").split("\\n").map(x => x.trim()).filter(Boolean);
+      }
+
+      function parseFaqs(value) {
+        return lines(value).map(line => {
+          const parts = line.split("|");
+          return {
+            question: (parts[0] || "").trim(),
+            answer: parts.slice(1).join("|").trim()
+          };
+        }).filter(f => f.question && f.answer);
+      }
+
+      function safeJsonArray(value) {
+        if (!value) return [];
+        try {
+          const parsed = JSON.parse(value);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch {
+          return [];
+        }
+      }
+
+      function faqsToText(value) {
+        return safeJsonArray(value).map(f => `${f.question || ""} | ${f.answer || ""}`).join("\\n");
+      }
+
+      function resetForm() {
+        els.pageId.value = "";
+        els.title.value = "";
+        els.slug.value = "";
+        els.status.value = "draft";
+        els.pattern.value = "use-case";
+        els.targetKeyword.value = "";
+        els.searchIntent.value = "informational";
+        els.intro.value = "";
+        els.ogImage.value = "";
+        els.seoTitle.value = "";
+        els.seoDescription.value = "";
+        els.relatedProducts.value = "";
+        els.faqs.value = "";
+        els.aiSummary.value = "";
+        els.aiCitationText.value = "";
+        els.content.value = "";
+        els.previewBtn.disabled = true;
+        els.liveBtn.disabled = true;
+        els.deleteBtn.disabled = true;
+        els.formTitle.textContent = "Create pSEO Page";
+        els.editingLabel.textContent = "New draft";
+      }
+
+      function fillForm(page) {
+        els.pageId.value = page.id || "";
+        els.title.value = page.title || "";
+        els.slug.value = page.slug || "";
+        els.status.value = page.status || "draft";
+        els.pattern.value = page.pattern || "use-case";
+        els.targetKeyword.value = page.target_keyword || "";
+        els.searchIntent.value = page.search_intent || "informational";
+        els.intro.value = page.intro || "";
+        els.ogImage.value = page.og_image || "";
+        els.seoTitle.value = page.seo_title || "";
+        els.seoDescription.value = page.seo_description || "";
+        els.relatedProducts.value = safeJsonArray(page.related_products_json).join("\\n");
+        els.faqs.value = faqsToText(page.faqs_json);
+        els.aiSummary.value = page.ai_summary || "";
+        els.aiCitationText.value = page.ai_citation_text || "";
+        els.content.value = page.content_markdown || "";
+        els.previewBtn.disabled = false;
+        els.liveBtn.disabled = false;
+        els.deleteBtn.disabled = false;
+        els.formTitle.textContent = "Edit pSEO Page";
+        els.editingLabel.textContent = page.slug ? "/" + page.slug : page.id;
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function payload() {
+        return {
+          title: els.title.value.trim(),
+          slug: slugify(els.slug.value || els.title.value),
+          status: els.status.value,
+          pattern: els.pattern.value,
+          target_keyword: els.targetKeyword.value.trim() || null,
+          search_intent: els.searchIntent.value,
+          intro: els.intro.value.trim() || null,
+          og_image: els.ogImage.value.trim() || null,
+          seo_title: els.seoTitle.value.trim() || null,
+          seo_description: els.seoDescription.value.trim() || null,
+          related_products: lines(els.relatedProducts.value),
+          faqs: parseFaqs(els.faqs.value),
+          ai_summary: els.aiSummary.value.trim() || null,
+          ai_citation_text: els.aiCitationText.value.trim() || null,
+          content_markdown: els.content.value.trim() || null,
+        };
+      }
+
+      async function api(path, options = {}) {
+        const res = await fetch(path, {
+          ...options,
+          headers: { "content-type": "application/json", ...(options.headers || {}) }
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.ok === false) throw new Error(data.error || "Request failed.");
+        return data;
+      }
+
+      async function loadPages() {
+        els.pages.innerHTML = '<div class="empty">Loading pSEO pages...</div>';
+        try {
+          const data = await api(API);
+          allPages = data.pages || [];
+          renderPages();
+        } catch (err) {
+          els.pages.innerHTML = `<div class="empty">${escapeHtml(err.message)}</div>`;
+          toast(err.message);
+        }
+      }
+
+      async function loadFullPage(id) {
+        try {
+          const data = await api(API + "/" + encodeURIComponent(id));
+          fillForm(data.page);
+        } catch (err) {
+          toast(err.message);
+        }
+      }
+
+      function renderPages() {
+        const q = els.search.value.trim().toLowerCase();
+        const filtered = allPages.filter(page => [page.title, page.slug, page.status, page.pattern, page.target_keyword, page.search_intent].join(" ").toLowerCase().includes(q));
+        els.count.textContent = String(filtered.length);
+
+        if (!filtered.length) {
+          els.pages.innerHTML = '<div class="empty">No pSEO pages found. Create your first long-tail page.</div>';
+          return;
+        }
+
+        els.pages.innerHTML = filtered.map(page => `
+          <article class="item">
+            <div>
+              <div class="title">${escapeHtml(page.title || "Untitled")}</div>
+              <div class="meta">
+                <span class="badge ${page.status === "published" ? "published" : ""}">${escapeHtml(page.status || "draft")}</span>
+                <span class="badge">${escapeHtml(page.pattern || "")}</span>
+                <span>${escapeHtml(page.slug || "")}</span>
+                <span>${escapeHtml(page.target_keyword || "No keyword")}</span>
+              </div>
+            </div>
+            <button class="info" data-edit="${escapeHtml(page.id)}">Edit</button>
+          </article>
+        `).join("");
+
+        document.querySelectorAll("[data-edit]").forEach(btn => {
+          btn.addEventListener("click", () => loadFullPage(btn.dataset.edit));
+        });
+      }
+
+      function escapeHtml(value) {
+        return String(value || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+      }
+
+      async function savePage() {
+        const data = payload();
+        if (!data.title) return toast("Title is required.");
+        if (!data.pattern) return toast("Pattern is required.");
+
+        try {
+          const id = els.pageId.value;
+          const result = id
+            ? await api(API + "/" + encodeURIComponent(id), { method: "PUT", body: JSON.stringify(data) })
+            : await api(API, { method: "POST", body: JSON.stringify(data) });
+
+          toast(id ? "pSEO page updated." : "pSEO page created.");
+          fillForm(result.page);
+          await loadPages();
+        } catch (err) {
+          toast(err.message);
+        }
+      }
+
+      async function deletePage() {
+        const id = els.pageId.value;
+        if (!id) return;
+        if (!confirm("Delete this pSEO page permanently?")) return;
+
+        try {
+          await api(API + "/" + encodeURIComponent(id), { method: "DELETE" });
+          toast("pSEO page deleted.");
+          resetForm();
+          await loadPages();
+        } catch (err) {
+          toast(err.message);
+        }
+      }
+
+      function previewPage() {
+        const slug = slugify(els.slug.value || els.title.value);
+        if (!slug) return toast("Save with a valid slug first.");
+        window.open(`/preview/pseo-d1/${encodeURIComponent(slug)}`, "_blank", "noopener");
+      }
+
+      function livePage() {
+        const slug = slugify(els.slug.value || els.title.value);
+        if (!slug) return toast("Save with a valid slug first.");
+        window.open(`/pseo-live/${encodeURIComponent(slug)}`, "_blank", "noopener");
+      }
+
+      els.title.addEventListener("input", () => {
+        if (!els.pageId.value && !els.slug.value) els.slug.value = slugify(els.title.value);
+      });
+
+      els.search.addEventListener("input", renderPages);
+      els.saveBtn.addEventListener("click", savePage);
+      els.newBtn.addEventListener("click", resetForm);
+      els.previewBtn.addEventListener("click", previewPage);
+      els.liveBtn.addEventListener("click", livePage);
+      els.deleteBtn.addEventListener("click", deletePage);
+      els.refreshBtn.addEventListener("click", loadPages);
+
+      async function init() {
+        await loadPages();
+        const editId = new URLSearchParams(window.location.search).get("edit");
+        if (editId) await loadFullPage(editId);
+      }
+
+      init();
+    </script>
+  </body>
+</html>
