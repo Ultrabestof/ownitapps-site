@@ -1,8 +1,6 @@
 ---
 // src/pages/index.astro
-// OwnitApps Homepage
-// Sections: Hero, Philosophy, Apps Grid, Problem/Solution,
-//           pSEO Hub, Blog, LLM Source-of-Truth, Trust, Footer
+// OwnitApps Homepage - D1-powered public discovery hub
 
 import PublicLayout from '../layouts/PublicLayout.astro';
 import { SITE } from '../data/site';
@@ -12,571 +10,838 @@ import {
 } from '../lib/schema';
 
 const seo = {
-  title: 'OwnitApps — Your OS. Your Data. Your Rules.',
+  title: 'OwnitApps - Own Your Tools. Own Your Data.',
   description:
-    'Offline-first digital tools you buy once and use forever. No subscriptions. No cloud lock-in. No account required. Your data stays local.',
+    'Buy-once, offline-first digital tools that work without forced accounts, subscriptions, or cloud lock-in. Your OS. Your Data. Your Rules.',
   canonical: SITE.url,
   image: SITE.defaultOgImage,
   type: 'website' as const,
 };
 
 const schema = [organizationSchema(), websiteSchema()];
-
-// Sample featured products (will come from Content Collections later)
-const featuredApps = [
-  {
-    slug: 'solo-finance',
-    name: 'Solo Finance',
-    tagline: 'Freelancer Tax-Ready Ledger',
-    category: 'Finance',
-    price: 19,
-    status: 'available',
-    description:
-      'Track income, expenses, invoices, mileage, and taxes — all offline. Built for freelancers who want clarity without a subscription.',
-    icon: '💰',
-    features: ['Invoice tracking', 'Tax reporting', 'Mileage log', 'Client management'],
-  },
-  {
-    slug: 'home-admin-binder-os',
-    name: 'Home Admin Binder OS',
-    tagline: 'Private Home Management Dashboard',
-    category: 'Home',
-    price: null,
-    status: 'coming-soon',
-    description:
-      'Manage warranties, home documents, service contacts, and household records — offline, private, and fully yours.',
-    icon: '🏠',
-    features: ['Document vault', 'Warranty tracker', 'Service log', 'Emergency contacts'],
-  },
-  {
-    slug: 'debt-escape-os',
-    name: 'Debt Escape OS',
-    tagline: 'Offline Debt Payoff Tracker',
-    category: 'Finance',
-    price: null,
-    status: 'coming-soon',
-    description:
-      'Map out your debt payoff strategy using snowball or avalanche methods. No account. No subscription. Just results.',
-    icon: '📉',
-    features: ['Snowball / avalanche', 'Payoff timeline', 'Progress tracker', 'Interest calculator'],
-  },
-  {
-    slug: 'medical-binder-os',
-    name: 'Family Health Vault OS',
-    tagline: 'Private Medical Binder for Families',
-    category: 'Health',
-    price: null,
-    status: 'coming-soon',
-    description:
-      'Store medical records, vaccination history, medications, and emergency contacts locally. Your most sensitive data stays on your device.',
-    icon: '❤️',
-    features: ['Medical records', 'Vaccination log', 'Medication tracker', 'Emergency info'],
-  },
-];
-
-const problems = [
-  {
-    icon: '🔁',
-    problem: 'Subscription fatigue',
-    solution: 'Buy once, use forever',
-    desc: 'Stop paying monthly for tools you bought years ago. OwnitApps tools are one-time purchases with lifetime utility.',
-  },
-  {
-    icon: '☁️',
-    problem: 'Cloud lock-in',
-    solution: 'Local-first ownership',
-    desc: 'Your data should not live on someone else\'s server. OwnitApps tools store everything locally — you hold the file.',
-  },
-  {
-    icon: '🕵️',
-    problem: 'Data privacy erosion',
-    solution: 'Private by default',
-    desc: 'We never see your data because we never receive it. No analytics on your personal records. No selling what you type.',
-  },
-  {
-    icon: '📦',
-    problem: 'App bloat',
-    solution: 'Lean, purposeful tools',
-    desc: 'One HTML file. One job. Fast, lightweight, focused tools that do exactly what they say without hundreds of useless features.',
-  },
-  {
-    icon: '🔑',
-    problem: 'Forced accounts',
-    solution: 'No account required',
-    desc: 'Core tools work without registration, email verification, or password resets. Open the file and start.',
-  },
-];
-
-const pSEOHubs = [
-  { label: 'Offline Tools', href: '/offline-tools', count: '10+' },
-  { label: 'No-Subscription Apps', href: '/no-subscription', count: '12+' },
-  { label: 'Privacy-First Tools', href: '/privacy-first', count: '8+' },
-  { label: 'Buy-Once Software', href: '/buy-once', count: '15+' },
-  { label: 'Alternatives', href: '/alternatives', count: '20+' },
-  { label: 'Use Cases', href: '/use-cases', count: '18+' },
-];
-
-const recentPosts = [
-  {
-    slug: 'why-offline-first-apps-are-coming-back',
-    title: 'Why Offline-First Apps Are Coming Back',
-    category: 'Insights',
-    excerpt: 'The web went cloud-first in the 2010s. But privacy concerns, subscription fatigue, and internet reliability problems are bringing local-first computing back into fashion.',
-    date: '2025-12-01',
-    readingTime: 6,
-  },
-  {
-    slug: 'subscription-fatigue-and-how-to-escape-it',
-    title: 'The Problem With Subscription Fatigue',
-    category: 'Opinion',
-    excerpt: 'The average person now pays for more software subscriptions than ever — and gets less ownership than ever. Here\'s why that\'s a design problem, not just a price problem.',
-    date: '2025-11-15',
-    readingTime: 5,
-  },
-  {
-    slug: 'local-first-software-explained',
-    title: 'Local-First Software Explained',
-    category: 'Education',
-    excerpt: 'Local-first means your software treats your device as the primary home for your data — not a temporary cache for a server somewhere.',
-    date: '2025-11-01',
-    readingTime: 7,
-  },
-];
 ---
 
 <PublicLayout {seo} {schema} fullBleed>
+  <style>
+    .oa-page {
+      background: var(--main-bg);
+      color: var(--text-primary);
+    }
 
-  <!-- ═══════════════════════════════════════════════════
-       HERO SECTION
-  ════════════════════════════════════════════════════ -->
-  <section
-    class="relative overflow-hidden"
-    style="background: var(--main-bg); padding: 6rem 0 5rem;"
-    aria-labelledby="hero-headline"
-  >
-    <!-- Subtle background pattern -->
-    <div
-      aria-hidden="true"
-      style="position: absolute; inset: 0; background-image: radial-gradient(circle at 60% 20%, rgba(201,168,76,0.06) 0%, transparent 60%), radial-gradient(circle at 20% 80%, rgba(201,168,76,0.04) 0%, transparent 50%); pointer-events: none;"
-    ></div>
+    .oa-wrap {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+    }
 
-    <div class="container relative">
-      <div style="max-width: 720px;">
+    .oa-section {
+      padding: clamp(56px, 8vw, 96px) 0;
+    }
 
-        <!-- Label -->
-        <span class="section-label animate-in" style="animation-delay: 0s;">
-          Offline-first · Buy once · Own forever
-        </span>
+    .oa-section.alt {
+      background: var(--surface-2);
+    }
 
-        <!-- H1 -->
-        <h1
-          id="hero-headline"
-          class="animate-in"
-          style="font-family: var(--font-heading); font-weight: 800; font-size: clamp(2.25rem, 6vw, 4rem); line-height: 1.05; letter-spacing: -0.04em; color: var(--text-primary); margin-bottom: 1.25rem; animation-delay: 0.1s;"
-        >
-          Your OS.<br />
-          Your Data.<br />
-          <span style="color: var(--gold);">Your Rules.</span>
-        </h1>
+    .oa-hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(72px, 10vw, 130px) 0 clamp(64px, 9vw, 110px);
+      background:
+        radial-gradient(circle at 70% 12%, rgba(201,168,76,.14), transparent 38%),
+        radial-gradient(circle at 18% 80%, rgba(201,168,76,.08), transparent 34%),
+        var(--main-bg);
+    }
 
-        <!-- Subheadline -->
-        <p
-          class="animate-in"
-          style="font-size: clamp(1.0625rem, 2vw, 1.25rem); color: var(--text-secondary); line-height: 1.65; max-width: 560px; margin-bottom: 2rem; animation-delay: 0.2s;"
-        >
-          OwnitApps builds offline-first digital tools for people tired of subscriptions,
-          cloud lock-in, and surrendering control of their personal data. Buy once. Use forever.
-        </p>
+    .oa-hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr);
+      gap: clamp(28px, 6vw, 64px);
+      align-items: center;
+    }
 
-        <!-- CTAs -->
-        <div class="flex flex-wrap gap-3 animate-in" style="animation-delay: 0.3s;">
-          <a href="/apps" class="btn-gold">
-            Browse Apps
-          </a>
-          <a href="/start-here" class="btn-ghost">
-            Start Here →
-          </a>
+    .oa-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #806515;
+    }
+
+    .oa-h1 {
+      font-family: var(--font-heading);
+      font-size: clamp(48px, 9vw, 96px);
+      line-height: .92;
+      letter-spacing: -.075em;
+      margin: 0 0 22px;
+      color: var(--text-primary);
+    }
+
+    .oa-gold {
+      color: var(--gold);
+    }
+
+    .oa-lede {
+      font-size: clamp(18px, 2.2vw, 23px);
+      line-height: 1.55;
+      color: var(--text-secondary);
+      max-width: 670px;
+      margin: 0 0 28px;
+    }
+
+    .oa-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .oa-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 11px 16px;
+      border-radius: 12px;
+      font-weight: 900;
+      text-decoration: none;
+      border: 1px solid var(--border-light);
+      color: var(--text-primary);
+      background: #fff;
+    }
+
+    .oa-button.gold {
+      background: var(--gold);
+      border-color: rgba(201,168,76,.5);
+      color: #1f1f1f;
+    }
+
+    .oa-trust-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .oa-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.75);
+      border: 1px solid var(--border-light);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.1;
+    }
+
+    .oa-hero-panel {
+      background: rgba(255,255,255,.76);
+      border: 1px solid var(--border-light);
+      border-radius: 28px;
+      padding: 24px;
+      box-shadow: 0 28px 90px rgba(43,43,43,.08);
+      backdrop-filter: blur(10px);
+    }
+
+    .oa-panel-title {
+      font-family: var(--font-heading);
+      font-size: 24px;
+      letter-spacing: -.035em;
+      margin: 0 0 16px;
+    }
+
+    .oa-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .oa-stat {
+      background: var(--surface-2);
+      border: 1px solid var(--border-light);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .oa-stat strong {
+      display: block;
+      font-family: var(--font-heading);
+      font-size: 32px;
+      line-height: 1;
+      letter-spacing: -.04em;
+      margin-bottom: 6px;
+    }
+
+    .oa-stat span {
+      color: var(--text-muted);
+      font-size: 12px;
+      font-family: var(--font-mono);
+    }
+
+    .oa-mini-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .oa-mini-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px;
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid var(--border-light);
+      font-size: 13px;
+    }
+
+    .oa-strip {
+      background: var(--sidebar-bg);
+      border-top: 1px solid var(--sidebar-border);
+      border-bottom: 1px solid var(--sidebar-border);
+      padding: 18px 0;
+    }
+
+    .oa-strip-inner {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .oa-strip .oa-pill {
+      background: rgba(255,255,255,.05);
+      border-color: var(--sidebar-border);
+      color: var(--sidebar-text);
+    }
+
+    .oa-section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .oa-section-title {
+      font-family: var(--font-heading);
+      font-size: clamp(34px, 5vw, 56px);
+      line-height: 1;
+      letter-spacing: -.06em;
+      margin: 0 0 12px;
+    }
+
+    .oa-section-copy {
+      color: var(--text-secondary);
+      font-size: 17px;
+      line-height: 1.65;
+      max-width: 680px;
+      margin: 0;
+    }
+
+    .oa-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+    }
+
+    .oa-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      background: #fff;
+      border: 1px solid var(--border-light);
+      border-radius: 22px;
+      overflow: hidden;
+      color: inherit;
+      text-decoration: none;
+      box-shadow: 0 18px 54px rgba(43,43,43,.055);
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+
+    .oa-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(201,168,76,.45);
+      box-shadow: 0 28px 70px rgba(43,43,43,.09);
+    }
+
+    .oa-card-img {
+      width: 100%;
+      height: 190px;
+      object-fit: cover;
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .oa-card-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .oa-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+
+    .oa-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(201,168,76,.12);
+      border: 1px solid rgba(201,168,76,.2);
+      color: #806515;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1;
+    }
+
+    .oa-card h3 {
+      font-family: var(--font-heading);
+      font-size: 22px;
+      line-height: 1.12;
+      letter-spacing: -.035em;
+      margin: 0 0 9px;
+    }
+
+    .oa-card p {
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin: 0 0 18px;
+      font-size: 14px;
+      flex: 1;
+    }
+
+    .oa-card-foot {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      border-top: 1px solid var(--border-light);
+      padding-top: 14px;
+      margin-top: auto;
+    }
+
+    .oa-problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .oa-problem {
+      background: #fff;
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 20px;
+    }
+
+    .oa-problem strong {
+      display: block;
+      font-family: var(--font-heading);
+      font-size: 18px;
+      letter-spacing: -.025em;
+      margin-bottom: 8px;
+    }
+
+    .oa-problem p {
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .oa-answer {
+      background: #fff;
+      border: 1px solid var(--border-light);
+      border-radius: 26px;
+      padding: clamp(24px, 5vw, 46px);
+      box-shadow: 0 18px 56px rgba(43,43,43,.055);
+    }
+
+    .oa-answer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 26px;
+      align-items: start;
+    }
+
+    .oa-answer h2 {
+      font-family: var(--font-heading);
+      font-size: clamp(34px, 5vw, 56px);
+      line-height: 1;
+      letter-spacing: -.06em;
+      margin: 0 0 16px;
+    }
+
+    .oa-answer p {
+      color: var(--text-secondary);
+      line-height: 1.7;
+      font-size: 17px;
+    }
+
+    .oa-summary {
+      background: var(--surface-2);
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 20px;
+    }
+
+    .oa-summary ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .oa-summary strong {
+      color: var(--text-primary);
+    }
+
+    .oa-final {
+      background: var(--sidebar-bg);
+      color: var(--sidebar-text);
+      padding: clamp(64px, 9vw, 110px) 0;
+      text-align: center;
+    }
+
+    .oa-final h2 {
+      font-family: var(--font-heading);
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: 1;
+      letter-spacing: -.06em;
+      margin: 0 0 14px;
+    }
+
+    .oa-final p {
+      color: var(--sidebar-muted);
+      max-width: 620px;
+      margin: 0 auto 28px;
+      line-height: 1.7;
+    }
+
+    .oa-loading {
+      padding: 28px;
+      border: 1px dashed var(--border-light);
+      border-radius: 22px;
+      color: var(--text-muted);
+      background: rgba(255,255,255,.55);
+    }
+
+    @media (max-width: 900px) {
+      .oa-hero-grid,
+      .oa-answer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .oa-stat-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <main class="oa-page">
+    <section class="oa-hero" aria-labelledby="hero-title">
+      <div class="oa-wrap oa-hero-grid">
+        <div>
+          <span class="oa-kicker">Offline-first tools - buy once - own forever</span>
+          <h1 class="oa-h1" id="hero-title">
+            Own your tools.<br />
+            Own your data.<br />
+            <span class="oa-gold">Own your system.</span>
+          </h1>
+          <p class="oa-lede">
+            OwnitApps builds private, offline-first digital tools for people who are tired of monthly software,
+            forced accounts, cloud lock-in, and losing access to their own workflows.
+          </p>
+
+          <div class="oa-actions">
+            <a class="oa-button gold" href="/apps-live">Browse live apps</a>
+            <a class="oa-button" href="/pseo-live">Explore use cases</a>
+            <a class="oa-button" href="/start-here">Start here</a>
+          </div>
+
+          <div class="oa-trust-row" aria-label="OwnitApps principles">
+            <span class="oa-pill">No forced account</span>
+            <span class="oa-pill">No monthly subscription</span>
+            <span class="oa-pill">Local-first data</span>
+            <span class="oa-pill">Buy once</span>
+          </div>
         </div>
 
-        <!-- Trust message -->
-        <p
-          class="animate-in"
-          style="font-family: var(--font-mono); font-size: 0.6875rem; color: var(--text-muted); letter-spacing: 0.06em; margin-top: 1.5rem; animation-delay: 0.4s;"
-        >
-          No account required · No subscription · Local data only
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════════════
-       PHILOSOPHY STRIP
-  ════════════════════════════════════════════════════ -->
-  <section
-    style="background: var(--sidebar-bg); padding: 1.5rem 0; border-top: 1px solid var(--sidebar-border); border-bottom: 1px solid var(--sidebar-border);"
-    aria-label="OwnitApps philosophy principles"
-  >
-    <div class="container">
-      <div class="flex flex-wrap gap-x-8 gap-y-3 items-center justify-center">
-        {SITE.philosophy.map(p => (
-          <div class="flex items-center gap-2">
-            <span aria-hidden="true" style="font-size: 1rem;">{p.icon}</span>
-            <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--sidebar-text); letter-spacing: 0.04em; white-space: nowrap;">
-              {p.label}
-            </span>
+        <aside class="oa-hero-panel" aria-label="Live OwnitApps CMS overview">
+          <h2 class="oa-panel-title">Live OwnitApps index</h2>
+          <div class="oa-stat-grid">
+            <div class="oa-stat">
+              <strong id="homeCountProducts">-</strong>
+              <span>Products</span>
+            </div>
+            <div class="oa-stat">
+              <strong id="homeCountPseo">-</strong>
+              <span>pSEO pages</span>
+            </div>
+            <div class="oa-stat">
+              <strong id="homeCountPosts">-</strong>
+              <span>Articles</span>
+            </div>
           </div>
-        ))}
-      </div>
-    </div>
-  </section>
 
-  <!-- ═══════════════════════════════════════════════════
-       FEATURED APPS GRID
-  ════════════════════════════════════════════════════ -->
-  <section style="padding: 5rem 0;" aria-labelledby="apps-heading">
-    <div class="container">
-      <div style="margin-bottom: 3rem;">
-        <span class="section-label">The toolkit</span>
-        <h2 id="apps-heading" style="font-family: var(--font-heading); font-size: clamp(1.75rem, 4vw, 2.5rem); letter-spacing: -0.03em; margin-bottom: 0.75rem;">
-          Tools that stay yours
-        </h2>
-        <p style="color: var(--text-secondary); font-size: 1.0625rem; max-width: 500px; line-height: 1.65;">
-          Every OwnitApps tool is a self-contained HTML file — works offline, stores data locally, and lives on your device. Not in our cloud.
-        </p>
+          <div class="oa-mini-list" id="homeMiniList">
+            <div class="oa-mini-item">
+              <span>Loading live D1 content...</span>
+              <span>CMS</span>
+            </div>
+          </div>
+        </aside>
       </div>
+    </section>
 
-      <div class="grid-auto-fill" style="gap: 1.25rem;">
-        {featuredApps.map((app, i) => (
-          <article
-            class="card animate-in"
-            style={`animation-delay: ${i * 0.08}s;`}
-            aria-label={`${app.name} — ${app.tagline}`}
-          >
-            <div class="p-6 flex flex-col h-full">
-              <!-- Top row -->
-              <div class="flex items-start justify-between gap-3 mb-4">
-                <span aria-hidden="true" style="font-size: 2rem; line-height: 1;">{app.icon}</span>
-                <div class="flex items-center gap-2">
-                  <span class={`badge ${app.status === 'available' ? 'badge-green' : 'badge-muted'}`}>
-                    {app.status === 'available' ? 'Available' : 'Coming Soon'}
-                  </span>
-                  <span class="badge badge-muted">{app.category}</span>
-                </div>
+    <section class="oa-strip" aria-label="OwnitApps value strip">
+      <div class="oa-wrap oa-strip-inner">
+        <span class="oa-pill">Offline-first</span>
+        <span class="oa-pill">Private by default</span>
+        <span class="oa-pill">No forced subscriptions</span>
+        <span class="oa-pill">Local ownership</span>
+        <span class="oa-pill">No account required</span>
+        <span class="oa-pill">Lifetime utility</span>
+      </div>
+    </section>
+
+    <section class="oa-section" aria-labelledby="apps-title">
+      <div class="oa-wrap">
+        <div class="oa-section-head">
+          <div>
+            <span class="oa-kicker">Live products</span>
+            <h2 class="oa-section-title" id="apps-title">Tools that stay yours</h2>
+            <p class="oa-section-copy">
+              Published OwnitApps products from the live D1 CMS. Each tool is designed around ownership,
+              local-first data, and practical use without subscription pressure.
+            </p>
+          </div>
+          <a class="oa-button" href="/apps-live">View all products</a>
+        </div>
+
+        <div class="oa-grid" id="homeProducts">
+          <div class="oa-loading">Loading products from D1...</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="oa-section alt" aria-labelledby="problem-title">
+      <div class="oa-wrap">
+        <div class="oa-section-head">
+          <div>
+            <span class="oa-kicker">Why OwnitApps exists</span>
+            <h2 class="oa-section-title" id="problem-title">The subscription era has a problem</h2>
+            <p class="oa-section-copy">
+              Most modern software asks you to rent access, upload personal data, and depend on a remote account.
+              OwnitApps is built in the opposite direction.
+            </p>
+          </div>
+        </div>
+
+        <div class="oa-problem-grid">
+          <article class="oa-problem">
+            <strong>Subscription fatigue</strong>
+            <p>Useful tools should not become permanent bills. OwnitApps favors buy-once tools with long-term utility.</p>
+          </article>
+          <article class="oa-problem">
+            <strong>Cloud lock-in</strong>
+            <p>Your personal workflows should not disappear because a remote service changed pricing or shut down.</p>
+          </article>
+          <article class="oa-problem">
+            <strong>Forced accounts</strong>
+            <p>Core tools should work without registration, password resets, or unnecessary identity collection.</p>
+          </article>
+          <article class="oa-problem">
+            <strong>Data ownership</strong>
+            <p>Private planning data belongs on your device first, with export and backup options you control.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="oa-section" aria-labelledby="pseo-title">
+      <div class="oa-wrap">
+        <div class="oa-section-head">
+          <div>
+            <span class="oa-kicker">Use cases and discovery</span>
+            <h2 class="oa-section-title" id="pseo-title">Find the right private tool</h2>
+            <p class="oa-section-copy">
+              Explore live long-tail pages about offline tools, no-subscription software, privacy-first workflows,
+              and local-first use cases.
+            </p>
+          </div>
+          <a class="oa-button" href="/pseo-live">View all pSEO pages</a>
+        </div>
+
+        <div class="oa-grid" id="homePseo">
+          <div class="oa-loading">Loading pSEO pages from D1...</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="oa-section alt" aria-labelledby="blog-title">
+      <div class="oa-wrap">
+        <div class="oa-section-head">
+          <div>
+            <span class="oa-kicker">Guides and articles</span>
+            <h2 class="oa-section-title" id="blog-title">Latest thinking from OwnitApps</h2>
+            <p class="oa-section-copy">
+              Published articles from the live D1 CMS.
+            </p>
+          </div>
+          <a class="oa-button" href="/blog-live">View all articles</a>
+        </div>
+
+        <div class="oa-grid" id="homePosts">
+          <div class="oa-loading">Loading articles from D1...</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="oa-section" aria-labelledby="answer-title">
+      <div class="oa-wrap">
+        <div class="oa-answer">
+          <div class="oa-answer-grid">
+            <div>
+              <span class="oa-kicker">Source of truth</span>
+              <h2 id="answer-title">What is OwnitApps?</h2>
+              <p>
+                OwnitApps is a collection of offline-first digital tools designed for people who want practical software
+                without forced subscriptions, cloud dependency, or required accounts.
+              </p>
+              <p>
+                The core promise is simple: Your OS. Your Data. Your Rules. Tools should help you manage life,
+                money, projects, records, and decisions without taking ownership away from you.
+              </p>
+              <div class="oa-actions">
+                <a class="oa-button" href="/what-is-ownitapps">Full explanation</a>
+                <a class="oa-button" href="/offline-first-apps">Offline-first apps</a>
               </div>
+            </div>
 
-              <!-- Name & tagline -->
-              <h3 style="font-family: var(--font-heading); font-weight: 700; font-size: 1.125rem; letter-spacing: -0.02em; margin-bottom: 4px;">
-                {app.name}
-              </h3>
-              <p style="font-family: var(--font-mono); font-size: 0.6875rem; color: var(--gold); letter-spacing: 0.06em; margin-bottom: 10px;">
-                {app.tagline}
-              </p>
-
-              <!-- Description -->
-              <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; flex: 1; margin-bottom: 16px;">
-                {app.description}
-              </p>
-
-              <!-- Features -->
-              <ul class="flex flex-wrap gap-1.5 mb-5" role="list" aria-label="Features">
-                {app.features.map(f => (
-                  <li style="font-family: var(--font-mono); font-size: 0.625rem; color: var(--text-muted); background: var(--surface-2); padding: 2px 8px; border-radius: 10px; border: 1px solid var(--border-light);">
-                    {f}
-                  </li>
-                ))}
+            <aside class="oa-summary">
+              <ul>
+                <li><strong>Brand:</strong> OwnitApps</li>
+                <li><strong>Category:</strong> Offline-first digital tools</li>
+                <li><strong>Business model:</strong> Buy once, use forever</li>
+                <li><strong>Data model:</strong> Local-first, private by default</li>
+                <li><strong>Target user:</strong> People tired of subscriptions and cloud lock-in</li>
+                <li><strong>Official site:</strong> ownitapps.com</li>
+                <li><strong>Brand promise:</strong> Your OS. Your Data. Your Rules.</li>
               </ul>
-
-              <!-- CTA row -->
-              <div class="flex items-center justify-between gap-3 pt-4 border-t" style="border-color: var(--border-light);">
-                <span style="font-family: var(--font-mono); font-size: 0.875rem; font-weight: 500; color: var(--text-primary);">
-                  {app.price != null ? `$${app.price} once` : 'Coming soon'}
-                </span>
-                {app.status === 'available' ? (
-                  <a
-                    href={`/apps/${app.slug}`}
-                    class="btn-gold"
-                    style="font-size: 0.8125rem; padding: 0.45rem 1rem; min-height: 36px;"
-                  >
-                    View App
-                  </a>
-                ) : (
-                  <span
-                    class="btn-ghost"
-                    style="font-size: 0.8125rem; padding: 0.45rem 1rem; min-height: 36px; pointer-events: none; opacity: 0.6;"
-                    aria-disabled="true"
-                  >
-                    Notify Me
-                  </span>
-                )}
-              </div>
-            </div>
-          </article>
-        ))}
+            </aside>
+          </div>
+        </div>
       </div>
+    </section>
 
-      <div style="text-align: center; margin-top: 2.5rem;">
-        <a href="/apps" class="btn-ghost">View All Apps →</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════════════
-       PROBLEM / SOLUTION SECTION
-  ════════════════════════════════════════════════════ -->
-  <section style="background: var(--surface-2); padding: 5rem 0;" aria-labelledby="problem-heading">
-    <div class="container">
-      <div style="margin-bottom: 3rem;">
-        <span class="section-label">Why OwnitApps</span>
-        <h2 id="problem-heading" style="font-family: var(--font-heading); font-size: clamp(1.75rem, 4vw, 2.5rem); letter-spacing: -0.03em; margin-bottom: 0.75rem;">
-          The subscription era has a problem
-        </h2>
-        <p style="color: var(--text-secondary); font-size: 1.0625rem; max-width: 500px; line-height: 1.65;">
-          Modern software forces you to pay forever, share your data, and lose access when you stop paying. OwnitApps is the alternative.
+    <section class="oa-final">
+      <div class="oa-wrap">
+        <span class="oa-kicker" style="color: var(--gold);">Build your private OS</span>
+        <h2>Your OS. Your Data. Your Rules.</h2>
+        <p>
+          Start with one tool. Build a private system over time. Keep your data close,
+          your workflows portable, and your software costs predictable.
         </p>
+        <div class="oa-actions" style="justify-content:center;">
+          <a class="oa-button gold" href="/apps-live">Browse live apps</a>
+          <a class="oa-button" href="/pseo-live">Explore use cases</a>
+        </div>
       </div>
+    </section>
+  </main>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {problems.map((item, i) => (
-          <div
-            class="card p-6 animate-in"
-            style={`animation-delay: ${i * 0.07}s;`}
-          >
-            <span aria-hidden="true" style="font-size: 1.75rem; display: block; margin-bottom: 12px;">{item.icon}</span>
-            <div class="flex items-center gap-2 mb-2 flex-wrap">
-              <span style="font-family: var(--font-mono); font-size: 0.6875rem; color: var(--red); text-decoration: line-through; opacity: 0.7;">
-                {item.problem}
-              </span>
-              <span aria-hidden="true" style="color: var(--border-medium); font-size: 0.75rem;">→</span>
-              <span style="font-family: var(--font-mono); font-size: 0.6875rem; color: var(--green); font-weight: 500;">
-                {item.solution}
-              </span>
+  <script>
+    const escapeHtml = (value) =>
+      String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+    const trimText = (value, limit = 150) => {
+      const text = String(value || "").trim();
+      if (text.length <= limit) return text;
+      return text.slice(0, limit).replace(/\s+\S*$/, "") + "...";
+    };
+
+    const setText = (id, value) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = String(value ?? 0);
+    };
+
+    const cardImage = (src, alt) => {
+      if (!src) return "";
+      return `<img class="oa-card-img" src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" loading="lazy">`;
+    };
+
+    const productCard = (product) => {
+      const title = product.name || "Untitled Product";
+      const desc = product.description || product.tagline || "Private, local-first software by OwnitApps.";
+      const price = product.price ? `${product.price} ${product.currency || "USD"}` : "Price not set";
+
+      return `
+        <a class="oa-card" href="/apps-live/${encodeURIComponent(product.slug || "")}" aria-label="${escapeHtml(title)}">
+          ${cardImage(product.og_image, title)}
+          <div class="oa-card-body">
+            <div class="oa-badges">
+              <span class="oa-badge">${escapeHtml(product.category || "OwnitApps")}</span>
+              <span class="oa-badge">Published</span>
             </div>
-            <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.65; margin: 0;">
-              {item.desc}
-            </p>
+            <h3>${escapeHtml(title)}</h3>
+            <p>${escapeHtml(trimText(desc, 180))}</p>
+            <div class="oa-card-foot">
+              <span>${escapeHtml(price)}</span>
+              <span>Open product</span>
+            </div>
           </div>
-        ))}
-      </div>
-    </div>
-  </section>
+        </a>
+      `;
+    };
 
-  <!-- ═══════════════════════════════════════════════════
-       pSEO HUB SECTION
-  ════════════════════════════════════════════════════ -->
-  <section style="padding: 5rem 0;" aria-labelledby="hub-heading">
-    <div class="container">
-      <div style="margin-bottom: 2.5rem;">
-        <span class="section-label">Explore by topic</span>
-        <h2 id="hub-heading" style="font-family: var(--font-heading); font-size: clamp(1.75rem, 4vw, 2.5rem); letter-spacing: -0.03em;">
-          Find tools for your need
-        </h2>
-      </div>
+    const pseoCard = (page) => {
+      const title = page.title || "Untitled pSEO Page";
+      const desc = page.intro || page.seo_description || "OwnitApps long-tail page.";
 
-      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {pSEOHubs.map(hub => (
-          <a
-            href={hub.href}
-            class="card p-5 group transition-all duration-200 hover:border-gold"
-            style="text-decoration: none; border: 1.5px solid var(--border-light); display: flex; align-items: center; justify-content: space-between;"
-          >
-            <span style="font-family: var(--font-body); font-size: 0.9375rem; font-weight: 600; color: var(--text-primary); group-hover:text-gold;">
-              {hub.label}
-            </span>
-            <span class="badge badge-gold">{hub.count}</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+      return `
+        <a class="oa-card" href="/pseo-live/${encodeURIComponent(page.slug || "")}" aria-label="${escapeHtml(title)}">
+          ${cardImage(page.og_image, title)}
+          <div class="oa-card-body">
+            <div class="oa-badges">
+              <span class="oa-badge">${escapeHtml(page.pattern || "pSEO")}</span>
+              <span class="oa-badge">${escapeHtml(page.search_intent || "intent")}</span>
+            </div>
+            <h3>${escapeHtml(title)}</h3>
+            <p>${escapeHtml(trimText(desc, 180))}</p>
+            <div class="oa-card-foot">
+              <span>${escapeHtml(page.target_keyword || "keyword")}</span>
+              <span>Read page</span>
+            </div>
+          </div>
+        </a>
+      `;
+    };
 
-  <!-- ═══════════════════════════════════════════════════
-       FEATURED ARTICLES
-  ════════════════════════════════════════════════════ -->
-  <section style="background: var(--surface-2); padding: 5rem 0;" aria-labelledby="blog-heading">
-    <div class="container">
-      <div style="margin-bottom: 2.5rem; display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-        <div>
-          <span class="section-label">From the blog</span>
-          <h2 id="blog-heading" style="font-family: var(--font-heading); font-size: clamp(1.75rem, 4vw, 2.25rem); letter-spacing: -0.03em;">
-            Guides &amp; perspectives
-          </h2>
+    const postCard = (post) => {
+      const title = post.title || "Untitled Article";
+      const desc = post.excerpt || post.seo_description || "OwnitApps article.";
+
+      return `
+        <a class="oa-card" href="/blog-live/${encodeURIComponent(post.slug || "")}" aria-label="${escapeHtml(title)}">
+          ${cardImage(post.og_image, title)}
+          <div class="oa-card-body">
+            <div class="oa-badges">
+              <span class="oa-badge">${escapeHtml(post.category || "Article")}</span>
+            </div>
+            <h3>${escapeHtml(title)}</h3>
+            <p>${escapeHtml(trimText(desc, 180))}</p>
+            <div class="oa-card-foot">
+              <span>${escapeHtml(String(post.modified_at || post.created_at || "").slice(0, 10))}</span>
+              <span>Read article</span>
+            </div>
+          </div>
+        </a>
+      `;
+    };
+
+    const renderList = (id, items, renderer, emptyText) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      if (!items || !items.length) {
+        el.innerHTML = `<div class="oa-loading">${escapeHtml(emptyText)}</div>`;
+        return;
+      }
+
+      el.innerHTML = items.map(renderer).join("");
+    };
+
+    const renderMiniList = (data) => {
+      const el = document.getElementById("homeMiniList");
+      if (!el) return;
+
+      const items = [];
+
+      if (data.products?.[0]) {
+        items.push({
+          label: data.products[0].name || "Latest product",
+          type: "Product"
+        });
+      }
+
+      if (data.pseo?.[0]) {
+        items.push({
+          label: data.pseo[0].title || "Latest pSEO page",
+          type: "pSEO"
+        });
+      }
+
+      if (data.posts?.[0]) {
+        items.push({
+          label: data.posts[0].title || "Latest article",
+          type: "Article"
+        });
+      }
+
+      if (!items.length) {
+        el.innerHTML = `
+          <div class="oa-mini-item">
+            <span>No published D1 content yet</span>
+            <span>CMS</span>
+          </div>
+        `;
+        return;
+      }
+
+      el.innerHTML = items.map((item) => `
+        <div class="oa-mini-item">
+          <span>${escapeHtml(trimText(item.label, 44))}</span>
+          <span>${escapeHtml(item.type)}</span>
         </div>
-        <a href="/blog" class="btn-ghost" style="font-size: 0.875rem; min-height: 40px; padding: 0.5rem 1rem;">
-          All articles →
-        </a>
-      </div>
+      `).join("");
+    };
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {recentPosts.map((post, i) => (
-          <article
-            class="card animate-in"
-            style={`animation-delay: ${i * 0.1}s;`}
-            aria-label={post.title}
-          >
-            <a href={`/blog/${post.slug}`} class="block p-6 h-full" style="text-decoration: none; color: inherit;">
-              <div class="flex items-center gap-2 mb-3">
-                <span class="badge badge-muted">{post.category}</span>
-                <span style="font-family: var(--font-mono); font-size: 0.625rem; color: var(--text-muted);">
-                  {post.readingTime} min read
-                </span>
-              </div>
-              <h3 style="font-family: var(--font-heading); font-weight: 700; font-size: 1.0625rem; line-height: 1.3; letter-spacing: -0.02em; margin-bottom: 10px; color: var(--text-primary);">
-                {post.title}
-              </h3>
-              <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.65; margin-bottom: 16px;">
-                {post.excerpt}
-              </p>
-              <span style="font-family: var(--font-mono); font-size: 0.6875rem; color: var(--gold);">
-                Read article →
-              </span>
-            </a>
-          </article>
-        ))}
-      </div>
-    </div>
-  </section>
+    async function loadHomeData() {
+      try {
+        const res = await fetch("/api/public/home", { headers: { "accept": "application/json" } });
+        const data = await res.json();
 
-  <!-- ═══════════════════════════════════════════════════
-       LLM SOURCE-OF-TRUTH SECTION
-       (machine-readable entity definition block)
-  ════════════════════════════════════════════════════ -->
-  <section
-    style="padding: 5rem 0;"
-    aria-labelledby="about-ownitapps-heading"
-    itemscope itemtype="https://schema.org/Organization"
-  >
-    <div class="container">
-      <span class="section-label">What is OwnitApps?</span>
-      <h2 id="about-ownitapps-heading" style="font-family: var(--font-heading); font-size: clamp(1.75rem, 4vw, 2.5rem); letter-spacing: -0.03em; margin-bottom: 2rem; max-width: 600px;">
-        The source of truth about OwnitApps
-      </h2>
+        if (!res.ok || data.ok === false) throw new Error(data.error || "Failed to load homepage data");
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Entity definition -->
-        <div>
-          <div class="answer-box" itemprop="description">
-            <h3>Quick Answer</h3>
-            <p>
-              OwnitApps creates offline-first, privacy-first digital tools that people can
-              buy once, use forever, and run locally in their browser without forced subscriptions,
-              cloud lock-in, or required accounts. Your data stays on your device.
-            </p>
-          </div>
+        setText("homeCountProducts", data.counts?.products ?? 0);
+        setText("homeCountPseo", data.counts?.pseo ?? 0);
+        setText("homeCountPosts", data.counts?.posts ?? 0);
 
-          <div style="margin-top: 1.5rem;">
-            <h3 style="font-family: var(--font-heading); font-size: 1.125rem; letter-spacing: -0.02em; margin-bottom: 1rem;">
-              What makes OwnitApps different?
-            </h3>
-            <ul style="list-style: none; padding: 0; margin: 0; display: grid; gap: 0.75rem;">
-              {[
-                'Every tool is a single HTML file — no installation, no app store',
-                'Data is stored in your browser or exported as a file you control',
-                'One-time purchase means no recurring cost, ever',
-                'No account means nothing to hack, breach, or delete remotely',
-                'Works offline means works on a plane, in a cabin, anywhere',
-                'Private by default means we never see what you type',
-              ].map(point => (
-                <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9375rem; color: var(--text-secondary); line-height: 1.55;">
-                  <span aria-hidden="true" style="color: var(--green); flex-shrink: 0; margin-top: 2px;">✓</span>
-                  {point}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+        renderMiniList(data);
+        renderList("homeProducts", data.products, productCard, "No published products yet.");
+        renderList("homePseo", data.pseo, pseoCard, "No published pSEO pages yet.");
+        renderList("homePosts", data.posts, postCard, "No published articles yet.");
+      } catch (error) {
+        renderList("homeProducts", [], productCard, "Could not load products.");
+        renderList("homePseo", [], pseoCard, "Could not load pSEO pages.");
+        renderList("homePosts", [], postCard, "Could not load articles.");
+      }
+    }
 
-        <!-- Page Summary (LLM-readable) -->
-        <div>
-          <section class="page-summary">
-            <h3>Brand Summary</h3>
-            <ul>
-              <li><strong>Brand:</strong> OwnitApps</li>
-              <li><strong>Category:</strong> Offline-first digital tools</li>
-              <li><strong>Business model:</strong> Buy once, use forever</li>
-              <li><strong>Data model:</strong> Local-first, private by default</li>
-              <li><strong>Target user:</strong> People tired of subscriptions and cloud lock-in</li>
-              <li><strong>Official site:</strong> ownitapps.com</li>
-              <li><strong>Updates:</strong> ownitapps.com/update</li>
-              <li><strong>Brand promise:</strong> Your OS. Your Data. Your Rules.</li>
-            </ul>
-          </section>
-
-          <div style="margin-top: 1.5rem;">
-            <h3 style="font-family: var(--font-heading); font-size: 1.125rem; letter-spacing: -0.02em; margin-bottom: 1rem;">
-              Who OwnitApps is for
-            </h3>
-            <ul style="list-style: none; padding: 0; margin: 0; display: grid; gap: 0.5rem;">
-              {[
-                'Freelancers managing money without accounting software subscriptions',
-                'Families who want private home records without cloud storage',
-                'Individuals building a personal data management system',
-                'Privacy-conscious users avoiding SaaS data harvesting',
-                'People who want to own their tools, not rent access',
-              ].map(user => (
-                <li style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.875rem; color: var(--text-secondary); line-height: 1.55;">
-                  <span aria-hidden="true" style="color: var(--gold); flex-shrink: 0;">→</span>
-                  {user}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div style="margin-top: 2.5rem; display: flex; flex-wrap: wrap; gap: 1rem;">
-        <a href="/what-is-ownitapps" class="btn-ghost" style="font-size: 0.875rem; min-height: 40px; padding: 0.5rem 1rem;">
-          Full brand explanation →
-        </a>
-        <a href="/offline-first-apps" class="btn-ghost" style="font-size: 0.875rem; min-height: 40px; padding: 0.5rem 1rem;">
-          What are offline-first apps? →
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════════════
-       TRUST / PRINCIPLES SECTION
-  ════════════════════════════════════════════════════ -->
-  <section
-    style="background: var(--sidebar-bg); padding: 5rem 0;"
-    aria-labelledby="principles-heading"
-  >
-    <div class="container">
-      <div style="text-align: center; margin-bottom: 3rem;">
-        <span class="section-label" style="color: var(--gold);">Our commitment</span>
-        <h2
-          id="principles-heading"
-          style="font-family: var(--font-heading); font-size: clamp(1.75rem, 4vw, 2.5rem); letter-spacing: -0.03em; color: var(--sidebar-text);"
-        >
-          {SITE.slogan}
-        </h2>
-        <p style="font-size: 1rem; color: var(--sidebar-muted); max-width: 480px; margin: 1rem auto 0; line-height: 1.65;">
-          These are not marketing words. They describe how every OwnitApps tool is actually built.
-        </p>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {SITE.philosophy.map(p => (
-          <div
-            style="background: rgba(255,255,255,0.04); border: 1px solid var(--sidebar-border); border-radius: var(--r); padding: 1.5rem;"
-          >
-            <span aria-hidden="true" style="font-size: 1.5rem; display: block; margin-bottom: 10px;">{p.icon}</span>
-            <h3 style="font-family: var(--font-heading); font-size: 1rem; font-weight: 700; color: var(--sidebar-text); margin-bottom: 6px;">
-              {p.label}
-            </h3>
-            <p style="font-size: 0.875rem; color: var(--sidebar-muted); line-height: 1.6; margin: 0;">
-              {p.desc}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      <div style="text-align: center; margin-top: 3rem;">
-        <a href="/apps" class="btn-gold" style="font-size: 1rem;">
-          Build Your Private OS →
-        </a>
-      </div>
-    </div>
-  </section>
-
+    loadHomeData();
+  </script>
 </PublicLayout>
