@@ -305,6 +305,58 @@
           grid-template-columns: 1fr;
         }
       }
+    
+      /* Premium recent-card polish */
+      .item {
+        transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+      }
+
+      a.item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 18px 44px rgba(43,43,43,.10);
+        border-color: rgba(201,168,76,.35);
+      }
+
+      .item-title {
+        line-height: 1.25;
+        letter-spacing: -0.02em;
+      }
+
+      .item-meta {
+        display: flex !important;
+        gap: 7px !important;
+        flex-wrap: wrap !important;
+        align-items: center;
+        margin-top: 8px;
+      }
+
+      .item-meta span,
+      .item-meta .badge {
+        display: inline-flex !important;
+        align-items: center;
+        width: auto;
+        max-width: 100%;
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: var(--surface-2);
+        border: 1px solid var(--border-light);
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+        font-size: 11px;
+        line-height: 1.1;
+        white-space: nowrap;
+      }
+
+      .item-meta .badge.published,
+      .item-meta span.published {
+        color: var(--green);
+        background: rgba(46,139,90,.10);
+        border-color: rgba(46,139,90,.22);
+      }
+
+      .item-meta span:first-child {
+        font-weight: 800;
+      }
     </style>
   </head>
 
@@ -340,53 +392,53 @@
         <section class="kpis">
           <div class="card kpi">
             <div class="kpi-label">Total Posts</div>
-            <div class="kpi-value" id="postsTotal">ط£آ¢أ¢â€ڑآ¬أ¢â‚¬â€Œ</div>
+            <div class="kpi-value" id="postsTotal">ط·آ£ط¢آ¢ط£آ¢أ¢â‚¬ع‘ط¢آ¬ط£آ¢أ¢â€ڑآ¬أ¢â‚¬إ’</div>
             <div class="kpi-note">All saved posts</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Draft Posts</div>
-            <div class="kpi-value" id="postsDraft">ط£آ¢أ¢â€ڑآ¬أ¢â‚¬â€Œ</div>
+            <div class="kpi-value" id="postsDraft">ط·آ£ط¢آ¢ط£آ¢أ¢â‚¬ع‘ط¢آ¬ط£آ¢أ¢â€ڑآ¬أ¢â‚¬إ’</div>
             <div class="kpi-note">Not published</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Published Posts</div>
-            <div class="kpi-value" id="postsPublished">ط£آ¢أ¢â€ڑآ¬أ¢â‚¬â€Œ</div>
+            <div class="kpi-value" id="postsPublished">ط·آ£ط¢آ¢ط£آ¢أ¢â‚¬ع‘ط¢آ¬ط£آ¢أ¢â€ڑآ¬أ¢â‚¬إ’</div>
             <div class="kpi-note">Live-ready content</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Products</div>
-            <div class="kpi-value" id="productsTotal">ط£آ¢أ¢â€ڑآ¬أ¢â‚¬â€Œ</div>
+            <div class="kpi-value" id="productsTotal">ط·آ£ط¢آ¢ط£آ¢أ¢â‚¬ع‘ط¢آ¬ط£آ¢أ¢â€ڑآ¬أ¢â‚¬إ’</div>
             <div class="kpi-note">All product records</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Product Drafts</div>
-            <div class="kpi-value" id="productsDraft">ط£آ¢أ¢â€ڑآ¬أ¢â‚¬â€Œ</div>
+            <div class="kpi-value" id="productsDraft">ط·آ£ط¢آ¢ط£آ¢أ¢â‚¬ع‘ط¢آ¬ط£آ¢أ¢â€ڑآ¬أ¢â‚¬إ’</div>
             <div class="kpi-note">Needs review</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Published Products</div>
-            <div class="kpi-value" id="productsPublished">ط£آ¢أ¢â€ڑآ¬أ¢â‚¬â€Œ</div>
+            <div class="kpi-value" id="productsPublished">ط·آ£ط¢آ¢ط£آ¢أ¢â‚¬ع‘ط¢آ¬ط£آ¢أ¢â€ڑآ¬أ¢â‚¬إ’</div>
             <div class="kpi-note">Ready to sell</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Media Files</div>
-            <div class="kpi-value" id="mediaTotal">ط£آ¢أ¢â€ڑآ¬أ¢â‚¬â€Œ</div>
+            <div class="kpi-value" id="mediaTotal">ط·آ£ط¢آ¢ط£آ¢أ¢â‚¬ع‘ط¢آ¬ط£آ¢أ¢â€ڑآ¬أ¢â‚¬إ’</div>
             <div class="kpi-note">Stored in R2</div>
           </div>
         
           <div class="card kpi">
             <div class="kpi-label">pSEO Pages</div>
-            <div class="kpi-value" id="pseoTotal">—</div>
+            <div class="kpi-value" id="pseoTotal">â€”</div>
             <div class="kpi-note">Long-tail pages</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">pSEO Drafts</div>
-            <div class="kpi-value" id="pseoDraft">—</div>
+            <div class="kpi-value" id="pseoDraft">â€”</div>
             <div class="kpi-note">Needs review</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Published pSEO</div>
-            <div class="kpi-value" id="pseoPublished">—</div>
+            <div class="kpi-value" id="pseoPublished">â€”</div>
             <div class="kpi-note">Public long-tail pages</div>
           </div></section>
 
