@@ -340,40 +340,55 @@
         <section class="kpis">
           <div class="card kpi">
             <div class="kpi-label">Total Posts</div>
-            <div class="kpi-value" id="postsTotal">أ¢â‚¬â€‌</div>
+            <div class="kpi-value" id="postsTotal">ط£آ¢أ¢â€ڑآ¬أ¢â‚¬â€Œ</div>
             <div class="kpi-note">All saved posts</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Draft Posts</div>
-            <div class="kpi-value" id="postsDraft">أ¢â‚¬â€‌</div>
+            <div class="kpi-value" id="postsDraft">ط£آ¢أ¢â€ڑآ¬أ¢â‚¬â€Œ</div>
             <div class="kpi-note">Not published</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Published Posts</div>
-            <div class="kpi-value" id="postsPublished">أ¢â‚¬â€‌</div>
+            <div class="kpi-value" id="postsPublished">ط£آ¢أ¢â€ڑآ¬أ¢â‚¬â€Œ</div>
             <div class="kpi-note">Live-ready content</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Products</div>
-            <div class="kpi-value" id="productsTotal">أ¢â‚¬â€‌</div>
+            <div class="kpi-value" id="productsTotal">ط£آ¢أ¢â€ڑآ¬أ¢â‚¬â€Œ</div>
             <div class="kpi-note">All product records</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Product Drafts</div>
-            <div class="kpi-value" id="productsDraft">أ¢â‚¬â€‌</div>
+            <div class="kpi-value" id="productsDraft">ط£آ¢أ¢â€ڑآ¬أ¢â‚¬â€Œ</div>
             <div class="kpi-note">Needs review</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Published Products</div>
-            <div class="kpi-value" id="productsPublished">أ¢â‚¬â€‌</div>
+            <div class="kpi-value" id="productsPublished">ط£آ¢أ¢â€ڑآ¬أ¢â‚¬â€Œ</div>
             <div class="kpi-note">Ready to sell</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Media Files</div>
-            <div class="kpi-value" id="mediaTotal">أ¢â‚¬â€‌</div>
+            <div class="kpi-value" id="mediaTotal">ط£آ¢أ¢â€ڑآ¬أ¢â‚¬â€Œ</div>
             <div class="kpi-note">Stored in R2</div>
           </div>
-        </section>
+        
+          <div class="card kpi">
+            <div class="kpi-label">pSEO Pages</div>
+            <div class="kpi-value" id="pseoTotal">—</div>
+            <div class="kpi-note">Long-tail pages</div>
+          </div>
+          <div class="card kpi">
+            <div class="kpi-label">pSEO Drafts</div>
+            <div class="kpi-value" id="pseoDraft">—</div>
+            <div class="kpi-note">Needs review</div>
+          </div>
+          <div class="card kpi">
+            <div class="kpi-label">Published pSEO</div>
+            <div class="kpi-value" id="pseoPublished">—</div>
+            <div class="kpi-note">Public long-tail pages</div>
+          </div></section>
 
         <section class="grid">
           <div class="card">
@@ -463,7 +478,7 @@
       }
 
       function setText(id, value) {
-        els[id].textContent = String(value ?? 0);
+        if (els[id]) els[id].textContent = String(value ?? 0);
       }
 
       function item(title, meta = [], href = "") {
