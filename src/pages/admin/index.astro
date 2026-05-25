@@ -120,7 +120,7 @@
 
       .kpis {
         display: grid;
-        grid-template-columns: repeat(7, minmax(130px, 1fr));
+        grid-template-columns: repeat(5, minmax(130px, 1fr));
         gap: 14px;
         margin-bottom: 20px;
       }
@@ -340,37 +340,37 @@
         <section class="kpis">
           <div class="card kpi">
             <div class="kpi-label">Total Posts</div>
-            <div class="kpi-value" id="postsTotal">—</div>
+            <div class="kpi-value" id="postsTotal">أ¢â‚¬â€‌</div>
             <div class="kpi-note">All saved posts</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Draft Posts</div>
-            <div class="kpi-value" id="postsDraft">—</div>
+            <div class="kpi-value" id="postsDraft">أ¢â‚¬â€‌</div>
             <div class="kpi-note">Not published</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Published Posts</div>
-            <div class="kpi-value" id="postsPublished">—</div>
+            <div class="kpi-value" id="postsPublished">أ¢â‚¬â€‌</div>
             <div class="kpi-note">Live-ready content</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Products</div>
-            <div class="kpi-value" id="productsTotal">—</div>
+            <div class="kpi-value" id="productsTotal">أ¢â‚¬â€‌</div>
             <div class="kpi-note">All product records</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Product Drafts</div>
-            <div class="kpi-value" id="productsDraft">—</div>
+            <div class="kpi-value" id="productsDraft">أ¢â‚¬â€‌</div>
             <div class="kpi-note">Needs review</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Published Products</div>
-            <div class="kpi-value" id="productsPublished">—</div>
+            <div class="kpi-value" id="productsPublished">أ¢â‚¬â€‌</div>
             <div class="kpi-note">Ready to sell</div>
           </div>
           <div class="card kpi">
             <div class="kpi-label">Media Files</div>
-            <div class="kpi-value" id="mediaTotal">—</div>
+            <div class="kpi-value" id="mediaTotal">أ¢â‚¬â€‌</div>
             <div class="kpi-note">Stored in R2</div>
           </div>
         </section>
@@ -399,6 +399,15 @@
               <h2>Recent Media</h2>
               <div class="list" id="recentMedia">
                 <div class="empty">Loading media...</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <h2>Recent pSEO</h2>
+              <div class="list" id="recentPseo">
+                <div class="empty">Loading pSEO pages...</div>
               </div>
             </div>
           </div>
@@ -434,9 +443,13 @@
         productsDraft: document.getElementById("productsDraft"),
         productsPublished: document.getElementById("productsPublished"),
         mediaTotal: document.getElementById("mediaTotal"),
+        pseoTotal: document.getElementById("pseoTotal"),
+        pseoDraft: document.getElementById("pseoDraft"),
+        pseoPublished: document.getElementById("pseoPublished"),
         recentPosts: document.getElementById("recentPosts"),
         recentProducts: document.getElementById("recentProducts"),
         recentMedia: document.getElementById("recentMedia"),
+        recentPseo: document.getElementById("recentPseo"),
         refreshBtn: document.getElementById("refreshBtn"),
       };
 
@@ -493,6 +506,9 @@
           setText("productsDraft", counts.products?.draft);
           setText("productsPublished", counts.products?.published);
           setText("mediaTotal", counts.media?.total);
+          setText("pseoTotal", counts.pseo?.total);
+          setText("pseoDraft", counts.pseo?.draft);
+          setText("pseoPublished", counts.pseo?.published);
 
           const recent = data.recent || {};
 
@@ -510,13 +526,20 @@
 
           els.recentMedia.innerHTML = (recent.media || []).length
             ? recent.media.map((media) =>
-                item(media.filename || "Untitled media", [media.mime_type || "", media.created_at || ""], `/admin/media`)
+                item(media.filename || "Untitled media", [media.mime_type || "", media.created_at || ""], "/admin/media")
               ).join("")
             : '<div class="empty">No media yet.</div>';
+
+          els.recentPseo.innerHTML = (recent.pseo || []).length
+            ? recent.pseo.map((page) =>
+                item(page.title || "Untitled pSEO page", [page.status || "draft", page.pattern || "", page.slug || ""], `/admin/pseo?edit=${encodeURIComponent(page.id)}`)
+              ).join("")
+            : '<div class="empty">No pSEO pages yet.</div>';
         } catch (error) {
           els.recentPosts.innerHTML = `<div class="empty">${escapeHtml(error.message)}</div>`;
           els.recentProducts.innerHTML = `<div class="empty">${escapeHtml(error.message)}</div>`;
           els.recentMedia.innerHTML = `<div class="empty">${escapeHtml(error.message)}</div>`;
+          els.recentPseo.innerHTML = `<div class="empty">${escapeHtml(error.message)}</div>`;
         }
       }
 

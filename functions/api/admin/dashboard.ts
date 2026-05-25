@@ -25,7 +25,10 @@ export const onRequestGet = async ({ env }: PagesContext) => {
       totalProducts,
       draftProducts,
       publishedProducts,
-      totalMedia
+      totalMedia,
+      totalPseo,
+      draftPseo,
+      publishedPseo
     ] = await Promise.all([
       count(env, "SELECT COUNT(*) as count FROM posts"),
       count(env, "SELECT COUNT(*) as count FROM posts WHERE status = 'draft'"),
@@ -33,7 +36,10 @@ export const onRequestGet = async ({ env }: PagesContext) => {
       count(env, "SELECT COUNT(*) as count FROM products"),
       count(env, "SELECT COUNT(*) as count FROM products WHERE status = 'draft'"),
       count(env, "SELECT COUNT(*) as count FROM products WHERE status = 'published'"),
-      count(env, "SELECT COUNT(*) as count FROM media")
+      count(env, "SELECT COUNT(*) as count FROM media"),
+      count(env, "SELECT COUNT(*) as count FROM pseo_pages"),
+      count(env, "SELECT COUNT(*) as count FROM pseo_pages WHERE status = 'draft'"),
+      count(env, "SELECT COUNT(*) as count FROM pseo_pages WHERE status = 'published'")
     ]);
 
     const recentPosts = await env.DB.prepare(
@@ -57,6 +63,13 @@ export const onRequestGet = async ({ env }: PagesContext) => {
        LIMIT 5`
     ).all();
 
+    const recentPseo = await env.DB.prepare(
+      `SELECT id, title, slug, status, pattern, target_keyword, modified_at, created_at
+       FROM pseo_pages
+       ORDER BY COALESCE(modified_at, created_at) DESC
+       LIMIT 5`
+    ).all();
+
     return json({
       ok: true,
       counts: {
@@ -72,12 +85,18 @@ export const onRequestGet = async ({ env }: PagesContext) => {
         },
         media: {
           total: totalMedia
+        },
+        pseo: {
+          total: totalPseo,
+          draft: draftPseo,
+          published: publishedPseo
         }
       },
       recent: {
         posts: recentPosts.results || [],
         products: recentProducts.results || [],
-        media: recentMedia.results || []
+        media: recentMedia.results || [],
+        pseo: recentPseo.results || []
       }
     });
   } catch (error: any) {
