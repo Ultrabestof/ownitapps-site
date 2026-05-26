@@ -11,13 +11,56 @@ function json(data: unknown, init: ResponseInit = {}) {
   });
 }
 
+async function tableExists(env: any, table: string) {
+  const row = await env.DB
+    .prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?")
+    .bind(table)
+    .first();
+
+  return Boolean(row?.name);
+}
+
 async function count(env: any, sql: string) {
   const row = await env.DB.prepare(sql).first();
   return Number(row?.count || 0);
 }
 
+function emptyDashboard(mode = "empty-local-db") {
+  return {
+    ok: true,
+    mode,
+    counts: {
+      posts: { total: 0, draft: 0, published: 0 },
+      products: { total: 0, draft: 0, published: 0 },
+      media: { total: 0 },
+      pseo: { total: 0, draft: 0, published: 0 },
+    },
+    recent: {
+      posts: [],
+      products: [],
+      media: [],
+      pseo: [],
+    },
+  };
+}
+
 export const onRequestGet = async ({ env }: PagesContext) => {
   try {
+    if (!env?.DB) {
+      return json(emptyDashboard("no-db"));
+    }
+
+    const [hasPosts, hasProducts, hasMedia, hasPseo] = await Promise.all([
+      tableExists(env, "posts"),
+      tableExists(env, "products"),
+      tableExists(env, "media"),
+      tableExists(env, "pseo_pages"),
+    ]);
+
+    if (!hasPosts || !hasProducts || !hasMedia || !hasPseo) {
+      return json(emptyDashboard("empty-local-db"));
+    }
+
     const [
       totalPosts,
       draftPosts,
@@ -72,6 +115,7 @@ export const onRequestGet = async ({ env }: PagesContext) => {
 
     return json({
       ok: true,
+      mode: "db",
       counts: {
         posts: {
           total: totalPosts,
