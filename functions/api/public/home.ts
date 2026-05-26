@@ -14,8 +14,45 @@ function json(data: unknown, init: ResponseInit = {}) {
   });
 }
 
+async function tableExists(db: any, table: string) {
+  const row = await db
+    .prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?")
+    .bind(table)
+    .first();
+
+  return Boolean(row?.name);
+}
+
 export const onRequestGet = async ({ env }: PagesContext) => {
   try {
+    if (!env?.DB) {
+      return json({
+        ok: true,
+        mode: "no-db",
+        counts: { products: 0, posts: 0, pseo: 0 },
+        products: [],
+        posts: [],
+        pseo: [],
+      });
+    }
+
+    const [hasProducts, hasPosts, hasPseo] = await Promise.all([
+      tableExists(env.DB, "products"),
+      tableExists(env.DB, "posts"),
+      tableExists(env.DB, "pseo_pages"),
+    ]);
+
+    if (!hasProducts || !hasPosts || !hasPseo) {
+      return json({
+        ok: true,
+        mode: "empty-local-db",
+        counts: { products: 0, posts: 0, pseo: 0 },
+        products: [],
+        posts: [],
+        pseo: [],
+      });
+    }
+
     const products = await env.DB.prepare(
       `SELECT id, name, slug, tagline, category, price, currency, description, og_image, modified_at, created_at
        FROM products
@@ -48,6 +85,7 @@ export const onRequestGet = async ({ env }: PagesContext) => {
 
     return json({
       ok: true,
+      mode: "db",
       counts: {
         products: Number(counts[0]?.count || 0),
         posts: Number(counts[1]?.count || 0),
