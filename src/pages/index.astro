@@ -685,35 +685,108 @@ const schema = [organizationSchema(), websiteSchema()];
           </div>
         </div>
 
-        <div class="oa-grid">
-          <article class="oa-card">
-            <div class="oa-card-body">
-              <div class="oa-badges"><span class="oa-badge">SaaS tools</span></div>
-              <h3>Monthly fees</h3>
-              <p>You keep paying to access the same workflow, even when the tool barely changes.</p>
+        <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; align-items:start;">
+          <div class="oa-card" style="padding:0; overflow:hidden;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; border-bottom:1px solid rgba(43,43,43,.10);">
+            <div style="padding:18px 22px; background:rgba(43,43,43,.05);">
+              <span class="oa-badge">Typical SaaS</span>
+              <h3 style="margin:10px 0 0; font-size:1.15rem;">Rented access</h3>
             </div>
-          </article>
-          <article class="oa-card">
-            <div class="oa-card-body">
-              <div class="oa-badges"><span class="oa-badge">OwnitApps</span></div>
-              <h3>Buy once</h3>
-              <p>Start with one tool and keep it without turning every workflow into a subscription.</p>
+            <div style="padding:18px 22px; background:rgba(207,174,63,.14);">
+              <span class="oa-badge">OwnitApps</span>
+              <h3 style="margin:10px 0 0; font-size:1.15rem;">Owned workflow</h3>
             </div>
-          </article>
-          <article class="oa-card">
-            <div class="oa-card-body">
-              <div class="oa-badges"><span class="oa-badge">SaaS tools</span></div>
-              <h3>Account dependency</h3>
-              <p>Your access can depend on logins, servers, policies, pricing changes, and cloud availability.</p>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr;">
+            <div style="padding:18px 22px; border-right:1px solid rgba(43,43,43,.10);">
+              <strong>Monthly fees</strong>
+              <p style="margin:.4rem 0 0; color:var(--text-secondary);">You keep paying to access the same workflow.</p>
             </div>
-          </article>
-          <article class="oa-card">
-            <div class="oa-card-body">
-              <div class="oa-badges"><span class="oa-badge">OwnitApps</span></div>
-              <h3>Local-first control</h3>
-              <p>Core tools are designed to keep your workflows close, private, and easier to back up.</p>
+            <div style="padding:18px 22px;">
+              <strong>Buy once</strong>
+              <p style="margin:.4rem 0 0; color:var(--text-secondary);">Start with one tool and keep using it without subscription pressure.</p>
             </div>
-          </article>
+
+            <div style="padding:18px 22px; border-top:1px solid rgba(43,43,43,.10); border-right:1px solid rgba(43,43,43,.10);">
+              <strong>Account dependency</strong>
+              <p style="margin:.4rem 0 0; color:var(--text-secondary);">Access depends on logins, servers, policies, and cloud availability.</p>
+            </div>
+            <div style="padding:18px 22px; border-top:1px solid rgba(43,43,43,.10);">
+              <strong>No account pressure</strong>
+              <p style="margin:.4rem 0 0; color:var(--text-secondary);">Core tools are designed around simpler, private ownership.</p>
+            </div>
+
+            <div style="padding:18px 22px; border-top:1px solid rgba(43,43,43,.10); border-right:1px solid rgba(43,43,43,.10);">
+              <strong>Cloud lock-in</strong>
+              <p style="margin:.4rem 0 0; color:var(--text-secondary);">Your data often lives inside someone else’s system.</p>
+            </div>
+            <div style="padding:18px 22px; border-top:1px solid rgba(43,43,43,.10);">
+              <strong>Local-first control</strong>
+              <p style="margin:.4rem 0 0; color:var(--text-secondary);">Keep workflows close, portable, and easier to back up.</p>
+            </div>
+
+            <div style="padding:18px 22px; border-top:1px solid rgba(43,43,43,.10); border-right:1px solid rgba(43,43,43,.10);">
+              <strong>Access can change</strong>
+              <p style="margin:.4rem 0 0; color:var(--text-secondary);">Pricing, plans, or product direction can change without your control.</p>
+            </div>
+            <div style="padding:18px 22px; border-top:1px solid rgba(43,43,43,.10);">
+              <strong>Files stay yours</strong>
+              <p style="margin:.4rem 0 0; color:var(--text-secondary);">The goal is durable software you can keep, export, and own.</p>
+            </div>
+          </div>
+          </div>
+
+          <div class="oa-card" style="padding:0; overflow:hidden;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; border-bottom:1px solid rgba(43,43,43,.10);">
+              <div style="padding:18px 22px; background:rgba(43,43,43,.05);">
+                <span class="oa-badge">Cloud data</span>
+                <h3 style="margin:10px 0 0; font-size:1.15rem;">Stored elsewhere</h3>
+              </div>
+              <div style="padding:18px 22px; background:rgba(207,174,63,.14);">
+                <span class="oa-badge">Local data</span>
+                <h3 style="margin:10px 0 0; font-size:1.15rem;">Closer to you</h3>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr;">
+              <div style="padding:18px 22px; border-right:1px solid rgba(43,43,43,.10);">
+                <strong>Remote storage</strong>
+                <p style="margin:.4rem 0 0; color:var(--text-secondary);">Your records often live inside a provider-controlled cloud system.</p>
+              </div>
+              <div style="padding:18px 22px;">
+                <strong>Private browser storage</strong>
+                <p style="margin:.4rem 0 0; color:var(--text-secondary);">Core app data is designed to stay closer to your own device and browser.</p>
+              </div>
+
+              <div style="padding:18px 22px; border-top:1px solid rgba(43,43,43,.10); border-right:1px solid rgba(43,43,43,.10);">
+                <strong>Account recovery risk</strong>
+                <p style="margin:.4rem 0 0; color:var(--text-secondary);">If access is blocked, your workflow can pause with the account.</p>
+              </div>
+              <div style="padding:18px 22px; border-top:1px solid rgba(43,43,43,.10);">
+                <strong>Exportable records</strong>
+                <p style="margin:.4rem 0 0; color:var(--text-secondary);">OwnitApps tools prioritize backup, export, and user-controlled copies.</p>
+              </div>
+
+              <div style="padding:18px 22px; border-top:1px solid rgba(43,43,43,.10); border-right:1px solid rgba(43,43,43,.10);">
+                <strong>Hidden sync logic</strong>
+                <p style="margin:.4rem 0 0; color:var(--text-secondary);">Cloud tools may sync, store, or process data in ways users rarely inspect.</p>
+              </div>
+              <div style="padding:18px 22px; border-top:1px solid rgba(43,43,43,.10);">
+                <strong>Transparent files</strong>
+                <p style="margin:.4rem 0 0; color:var(--text-secondary);">The product promise is simple: tools you can understand, save, and back up.</p>
+              </div>
+
+              <div style="padding:18px 22px; border-top:1px solid rgba(43,43,43,.10); border-right:1px solid rgba(43,43,43,.10);">
+                <strong>Server dependency</strong>
+                <p style="margin:.4rem 0 0; color:var(--text-secondary);">Outages, shutdowns, or policy changes can interrupt the system.</p>
+              </div>
+              <div style="padding:18px 22px; border-top:1px solid rgba(43,43,43,.10);">
+                <strong>Offline resilience</strong>
+                <p style="margin:.4rem 0 0; color:var(--text-secondary);">Where possible, OwnitApps tools are built to keep useful workflows available.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
