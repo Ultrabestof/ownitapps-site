@@ -536,7 +536,7 @@ const schema = [organizationSchema(), websiteSchema()];
         </div>
 
         <aside class="oa-hero-panel" aria-label="Live OwnitApps CMS overview">
-          <h2 class="oa-panel-title">Live OwnitApps index</h2>
+          <h2 class="oa-panel-title">Private software library</h2>
           <div class="oa-stat-grid">
             <div class="oa-stat">
               <strong id="homeCountProducts">-</strong>
@@ -544,7 +544,7 @@ const schema = [organizationSchema(), websiteSchema()];
             </div>
             <div class="oa-stat">
               <strong id="homeCountPseo">-</strong>
-              <span>pSEO pages</span>
+              <span>Use cases</span>
             </div>
             <div class="oa-stat">
               <strong id="homeCountPosts">-</strong>
@@ -573,6 +573,51 @@ const schema = [organizationSchema(), websiteSchema()];
       </div>
     </section>
 
+    <section class="oa-section" aria-labelledby="how-it-works-title">
+      <div class="oa-wrap">
+        <div class="oa-section-head">
+          <div>
+            <span class="oa-kicker">How it works</span>
+            <h2 class="oa-section-title" id="how-it-works-title">Download once. Own your workflow.</h2>
+            <p class="oa-section-copy">
+              OwnitApps tools are designed to feel simple: buy once, open in your browser,
+              keep your data close, and export when you need to.
+            </p>
+          </div>
+        </div>
+
+        <div class="oa-grid">
+          <article class="oa-card">
+            <div class="oa-card-body">
+              <div class="oa-badges"><span class="oa-badge">Step 1</span></div>
+              <h3>Buy once</h3>
+              <p>No forced monthly subscription just to keep using your own digital tools.</p>
+            </div>
+          </article>
+          <article class="oa-card">
+            <div class="oa-card-body">
+              <div class="oa-badges"><span class="oa-badge">Step 2</span></div>
+              <h3>Download the app</h3>
+              <p>Use a private HTML-based tool that is built for practical, everyday workflows.</p>
+            </div>
+          </article>
+          <article class="oa-card">
+            <div class="oa-card-body">
+              <div class="oa-badges"><span class="oa-badge">Step 3</span></div>
+              <h3>Use it locally</h3>
+              <p>Core workflows are designed around local-first ownership and fewer accounts.</p>
+            </div>
+          </article>
+          <article class="oa-card">
+            <div class="oa-card-body">
+              <div class="oa-badges"><span class="oa-badge">Step 4</span></div>
+              <h3>Export anytime</h3>
+              <p>Keep backups, move your records, and avoid losing access to your own data.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
     <section class="oa-section" aria-labelledby="apps-title">
       <div class="oa-wrap">
         <div class="oa-section-head">
@@ -627,6 +672,51 @@ const schema = [organizationSchema(), websiteSchema()];
       </div>
     </section>
 
+    <section class="oa-section" aria-labelledby="compare-title">
+      <div class="oa-wrap">
+        <div class="oa-section-head">
+          <div>
+            <span class="oa-kicker">OwnitApps vs SaaS</span>
+            <h2 class="oa-section-title" id="compare-title">Built for ownership, not dependency</h2>
+            <p class="oa-section-copy">
+              Most software asks you to rent access. OwnitApps is built for people who want
+              private, portable tools they can keep using.
+            </p>
+          </div>
+        </div>
+
+        <div class="oa-grid">
+          <article class="oa-card">
+            <div class="oa-card-body">
+              <div class="oa-badges"><span class="oa-badge">SaaS tools</span></div>
+              <h3>Monthly fees</h3>
+              <p>You keep paying to access the same workflow, even when the tool barely changes.</p>
+            </div>
+          </article>
+          <article class="oa-card">
+            <div class="oa-card-body">
+              <div class="oa-badges"><span class="oa-badge">OwnitApps</span></div>
+              <h3>Buy once</h3>
+              <p>Start with one tool and keep it without turning every workflow into a subscription.</p>
+            </div>
+          </article>
+          <article class="oa-card">
+            <div class="oa-card-body">
+              <div class="oa-badges"><span class="oa-badge">SaaS tools</span></div>
+              <h3>Account dependency</h3>
+              <p>Your access can depend on logins, servers, policies, pricing changes, and cloud availability.</p>
+            </div>
+          </article>
+          <article class="oa-card">
+            <div class="oa-card-body">
+              <div class="oa-badges"><span class="oa-badge">OwnitApps</span></div>
+              <h3>Local-first control</h3>
+              <p>Core tools are designed to keep your workflows close, private, and easier to back up.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
     <section class="oa-section" aria-labelledby="pseo-title">
       <div class="oa-wrap">
         <div class="oa-section-head">
@@ -638,11 +728,11 @@ const schema = [organizationSchema(), websiteSchema()];
               and local-first use cases.
             </p>
           </div>
-          <a class="oa-button" href="/pseo-live">View all pSEO pages</a>
+          <a class="oa-button" href="/pseo-live">View all use cases</a>
         </div>
 
         <div class="oa-grid" id="homePseo">
-          <div class="oa-loading">Loading pSEO pages from D1...</div>
+          <div class="oa-loading">Loading use cases from D1...</div>
         </div>
       </div>
     </section>
@@ -769,15 +859,15 @@ const schema = [organizationSchema(), websiteSchema()];
     };
 
     const pseoCard = (page) => {
-      const title = page.title || "Untitled pSEO Page";
-      const desc = page.intro || page.seo_description || "OwnitApps long-tail page.";
+      const title = page.title || "Untitled use case";
+      const desc = page.intro || page.seo_description || "OwnitApps private tool use case.";
 
       return `
         <a class="oa-card" href="/pseo-live/${encodeURIComponent(page.slug || "")}" aria-label="${escapeHtml(title)}">
           ${cardImage(page.og_image, title)}
           <div class="oa-card-body">
             <div class="oa-badges">
-              <span class="oa-badge">${escapeHtml(page.pattern || "pSEO")}</span>
+              <span class="oa-badge">${escapeHtml(page.pattern || "Use case")}</span>
               <span class="oa-badge">${escapeHtml(page.search_intent || "intent")}</span>
             </div>
             <h3>${escapeHtml(title)}</h3>
@@ -874,8 +964,8 @@ const schema = [organizationSchema(), websiteSchema()];
 
       if (data.pseo?.[0]) {
         items.push({
-          label: data.pseo[0].title || "Latest pSEO page",
-          type: "pSEO"
+          label: data.pseo[0].title || "Latest use case",
+          type: "Use case"
         });
       }
 
@@ -917,11 +1007,11 @@ const schema = [organizationSchema(), websiteSchema()];
 
         renderMiniList(data);
         renderList("homeProducts", data.products, productCard, "No published products yet.");
-        renderList("homePseo", data.pseo, pseoCard, "No published pSEO pages yet.");
+        renderList("homePseo", data.pseo, pseoCard, "No published use cases yet.");
         renderList("homePosts", data.posts, postCard, "No published articles yet.");
       } catch (error) {
         renderList("homeProducts", [], productCard, "Could not load products.");
-        renderList("homePseo", [], pseoCard, "Could not load pSEO pages.");
+        renderList("homePseo", [], pseoCard, "Could not load use cases.");
         renderList("homePosts", [], postCard, "Could not load articles.");
       }
     }
