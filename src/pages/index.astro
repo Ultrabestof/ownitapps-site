@@ -813,12 +813,46 @@ const schema = [organizationSchema(), websiteSchema()];
       `;
     };
 
+    const fallbackCard = (title, desc, badge, href = "/start-here") => `
+      <a class="oa-card" href="${href}" aria-label="${escapeHtml(title)}">
+        <div class="oa-card-body">
+          <div class="oa-badges">
+            <span class="oa-badge">${escapeHtml(badge)}</span>
+            <span class="oa-badge">Offline-first</span>
+          </div>
+          <h3>${escapeHtml(title)}</h3>
+          <p>${escapeHtml(desc)}</p>
+          <span class="oa-card-link">Explore OwnitApps →</span>
+        </div>
+      </a>
+    `;
+
+    const fallbackSets = {
+      homeProducts: [
+        fallbackCard("Budget by Paycheck OS", "A private, buy-once planner for paycheck budgeting, bills, savings, and monthly control.", "Finance tool", "/apps"),
+        fallbackCard("Home Admin Binder OS", "Keep household records, renewals, documents, and emergency details organized without another subscription.", "Home system", "/apps"),
+        fallbackCard("Medical Binder OS", "A local-first family health vault for medications, appointments, records, and printable emergency notes.", "Health vault", "/apps")
+      ],
+      homePseo: [
+        fallbackCard("Offline Budget Planner for Freelancers", "Explore how local-first budget tools help freelancers plan irregular income without cloud lock-in.", "Use case", "/pseo-live"),
+        fallbackCard("Private Family Document Organizer", "A practical guide to owning important household records instead of scattering them across cloud apps.", "Privacy-first", "/pseo-live"),
+        fallbackCard("No-Subscription Personal Dashboard", "Compare buy-once tools with recurring SaaS dashboards for daily life, money, and home systems.", "No subscription", "/pseo-live")
+      ],
+      homePosts: [
+        fallbackCard("Why Offline-First Apps Are Coming Back", "A clear explanation of why people want tools that still work when accounts, servers, or subscriptions fail.", "Article", "/blog"),
+        fallbackCard("Subscription Fatigue and How to Escape It", "Understand the hidden cost of permanent software bills and how buy-once tools change the equation.", "Guide", "/blog"),
+        fallbackCard("Local-First Software Explained", "A simple breakdown of local data ownership, browser storage, exports, and private workflows.", "Explainer", "/blog")
+      ]
+    };
+
     const renderList = (id, items, renderer, emptyText) => {
       const el = document.getElementById(id);
       if (!el) return;
 
       if (!items || !items.length) {
-        el.innerHTML = `<div class="oa-loading">${escapeHtml(emptyText)}</div>`;
+        el.innerHTML = (fallbackSets[id] || [
+          fallbackCard("OwnitApps is ready", emptyText, "Local preview", "/start-here")
+        ]).join("");
         return;
       }
 
