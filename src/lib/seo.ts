@@ -97,8 +97,10 @@ export function validateSEO(props: SEOProps): string[] {
   else if (props.description.length < SEO_LIMITS.descriptionMin)
     warnings.push(`Description too short (${props.description.length}/${SEO_LIMITS.descriptionMin})`);
 
-  if (!props.canonical) warnings.push('Missing canonical URL');
-  if (!props.image) warnings.push('Missing OG image');
+  // Canonical and OG image are resolved with safe defaults in buildSEO().
+  // Do not warn when pages rely on those defaults.
+  if (props.canonical === '') warnings.push('Empty canonical URL');
+  if (props.image === '') warnings.push('Empty OG image');
 
   return warnings;
 }
