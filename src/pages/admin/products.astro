@@ -816,7 +816,7 @@
           allProducts = data.products || [];
           renderProducts();
         } catch (error) {
-          els.products.innerHTML = '<div class="empty">Could not load products.</div>';
+          els.products.innerHTML = `<div class="empty">Could not load products: ${escapeHtml(error.message)}</div>`;
           toast(error.message);
         }
       }

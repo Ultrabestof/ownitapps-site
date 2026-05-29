@@ -795,7 +795,7 @@
           allPosts = data.posts || [];
           renderPosts();
         } catch (error) {
-          els.posts.innerHTML = '<div class="empty">Could not load posts.</div>';
+          els.posts.innerHTML = `<div class="empty">Could not load posts: ${escapeHtml(error.message)}</div>`;
           toast(error.message);
         }
       }
