@@ -1,4 +1,4 @@
----
+﻿---
 // src/pages/index.astro
 // OwnitApps Homepage - D1-powered public discovery hub
 
@@ -551,8 +551,8 @@ const schema = [organizationSchema(), websiteSchema()];
           </p>
 
           <div class="oa-actions">
-            <a class="oa-button gold" href="/apps-live">Browse live apps</a>
-            <a class="oa-button" href="/pseo-live">Explore use cases</a>
+            <a class="oa-button gold" href="/apps">Browse live apps</a>
+            <a class="oa-button" href="/use-cases">Explore use cases</a>
             <a class="oa-button" href="/start-here">Start here</a>
           </div>
 
@@ -658,7 +658,7 @@ const schema = [organizationSchema(), websiteSchema()];
               local-first data, and practical use without subscription pressure.
             </p>
           </div>
-          <a class="oa-button" href="/apps-live">View all products</a>
+          <a class="oa-button" href="/apps">View all products</a>
         </div>
 
         <div class="oa-grid" id="homeProducts">
@@ -747,7 +747,7 @@ const schema = [organizationSchema(), websiteSchema()];
 
             <div style="padding:18px 22px; border-top:1px solid rgba(43,43,43,.10); border-right:1px solid rgba(43,43,43,.10);">
               <strong>Cloud lock-in</strong>
-              <p style="margin:.4rem 0 0; color:var(--text-secondary);">Your data often lives inside someone else’s system.</p>
+              <p style="margin:.4rem 0 0; color:var(--text-secondary);">Your data often lives inside someone elseâ€™s system.</p>
             </div>
             <div style="padding:18px 22px; border-top:1px solid rgba(43,43,43,.10);">
               <strong>Local-first control</strong>
@@ -783,7 +783,7 @@ const schema = [organizationSchema(), websiteSchema()];
 
             <div style="padding:18px 22px; border-top:1px solid rgba(43,43,43,.10); border-right:1px solid rgba(43,43,43,.10);">
               <strong>Privacy by policy</strong>
-              <p style="margin:.4rem 0 0; color:var(--text-secondary);">You depend on the platform’s rules, tracking choices, and future business model.</p>
+              <p style="margin:.4rem 0 0; color:var(--text-secondary);">You depend on the platformâ€™s rules, tracking choices, and future business model.</p>
             </div>
             <div style="padding:18px 22px; border-top:1px solid rgba(43,43,43,.10);">
               <strong>Privacy by design</strong>
@@ -792,7 +792,7 @@ const schema = [organizationSchema(), websiteSchema()];
 
             <div style="padding:18px 22px; border-top:1px solid rgba(43,43,43,.10); border-right:1px solid rgba(43,43,43,.10);">
               <strong>Hard to move</strong>
-              <p style="margin:.4rem 0 0; color:var(--text-secondary);">Your workflow may become trapped inside one platform’s interface and pricing.</p>
+              <p style="margin:.4rem 0 0; color:var(--text-secondary);">Your workflow may become trapped inside one platformâ€™s interface and pricing.</p>
             </div>
             <div style="padding:18px 22px; border-top:1px solid rgba(43,43,43,.10);">
               <strong>Portable workflow</strong>
@@ -813,7 +813,7 @@ const schema = [organizationSchema(), websiteSchema()];
               and local-first use cases.
             </p>
           </div>
-          <a class="oa-button" href="/pseo-live">View all use cases</a>
+          <a class="oa-button" href="/use-cases">View all use cases</a>
         </div>
 
         <div class="oa-grid" id="homePseo">
@@ -832,7 +832,7 @@ const schema = [organizationSchema(), websiteSchema()];
               Published articles from the live D1 CMS.
             </p>
           </div>
-          <a class="oa-button" href="/blog-live">View all articles</a>
+          <a class="oa-button" href="/blog">View all articles</a>
         </div>
 
         <div class="oa-grid" id="homePosts">
@@ -887,8 +887,8 @@ const schema = [organizationSchema(), websiteSchema()];
           your workflows portable, and your software costs predictable.
         </p>
         <div class="oa-actions" style="justify-content:center;">
-          <a class="oa-button gold" href="/apps-live">Browse live apps</a>
-          <a class="oa-button" href="/pseo-live">Explore use cases</a>
+          <a class="oa-button gold" href="/apps">Browse live apps</a>
+          <a class="oa-button" href="/use-cases">Explore use cases</a>
         </div>
       </div>
     </section>
@@ -925,7 +925,7 @@ const schema = [organizationSchema(), websiteSchema()];
       const price = product.price ? `${product.price} ${product.currency || "USD"}` : "Price not set";
 
       return `
-        <a class="oa-card" href="/apps-live/${encodeURIComponent(product.slug || "")}" aria-label="${escapeHtml(title)}">
+        <a class="oa-card" href="/apps/${encodeURIComponent(product.slug || "")}" aria-label="${escapeHtml(title)}">
           ${cardImage(product.og_image, title)}
           <div class="oa-card-body">
             <div class="oa-badges">
@@ -948,7 +948,7 @@ const schema = [organizationSchema(), websiteSchema()];
       const desc = page.intro || page.seo_description || "OwnitApps private tool use case.";
 
       return `
-        <a class="oa-card" href="/pseo-live/${encodeURIComponent(page.slug || "")}" aria-label="${escapeHtml(title)}">
+        <a class="oa-card" href="/use-cases/${encodeURIComponent(page.slug || "")}" aria-label="${escapeHtml(title)}">
           ${cardImage(page.og_image, title)}
           <div class="oa-card-body">
             <div class="oa-badges">
@@ -971,7 +971,7 @@ const schema = [organizationSchema(), websiteSchema()];
       const desc = post.excerpt || post.seo_description || "OwnitApps article.";
 
       return `
-        <a class="oa-card" href="/blog-live/${encodeURIComponent(post.slug || "")}" aria-label="${escapeHtml(title)}">
+        <a class="oa-card" href="/blog/${encodeURIComponent(post.slug || "")}" aria-label="${escapeHtml(title)}">
           ${cardImage(post.og_image, title)}
           <div class="oa-card-body">
             <div class="oa-badges">
@@ -997,7 +997,7 @@ const schema = [organizationSchema(), websiteSchema()];
           </div>
           <h3>${escapeHtml(title)}</h3>
           <p>${escapeHtml(desc)}</p>
-          <span class="oa-card-link">Explore OwnitApps →</span>
+          <span class="oa-card-link">Explore OwnitApps â†’</span>
         </div>
       </a>
     `;
@@ -1009,9 +1009,9 @@ const schema = [organizationSchema(), websiteSchema()];
         fallbackCard("Medical Binder OS", "A local-first family health vault for medications, appointments, records, and printable emergency notes.", "Health vault", "/apps")
       ],
       homePseo: [
-        fallbackCard("Offline Budget Planner for Freelancers", "Explore how local-first budget tools help freelancers plan irregular income without cloud lock-in.", "Use case", "/pseo-live"),
-        fallbackCard("Private Family Document Organizer", "A practical guide to owning important household records instead of scattering them across cloud apps.", "Privacy-first", "/pseo-live"),
-        fallbackCard("No-Subscription Personal Dashboard", "Compare buy-once tools with recurring SaaS dashboards for daily life, money, and home systems.", "No subscription", "/pseo-live")
+        fallbackCard("Offline Budget Planner for Freelancers", "Explore how local-first budget tools help freelancers plan irregular income without cloud lock-in.", "Use case", "/use-cases"),
+        fallbackCard("Private Family Document Organizer", "A practical guide to owning important household records instead of scattering them across cloud apps.", "Privacy-first", "/use-cases"),
+        fallbackCard("No-Subscription Personal Dashboard", "Compare buy-once tools with recurring SaaS dashboards for daily life, money, and home systems.", "No subscription", "/use-cases")
       ],
       homePosts: [
         fallbackCard("Why Offline-First Apps Are Coming Back", "A clear explanation of why people want tools that still work when accounts, servers, or subscriptions fail.", "Article", "/blog"),
