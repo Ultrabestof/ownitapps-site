@@ -13,7 +13,7 @@ export function organizationSchema() {
     url: SITE.url,
     logo: {
       '@type': 'ImageObject',
-      url: `${SITE.url}/logo.svg`,
+      url: `${SITE.url}/assets/logo/ownitapps-logo.svg`,
       width: 200,
       height: 60,
     },
