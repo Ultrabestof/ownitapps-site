@@ -1,0 +1,324 @@
+﻿---
+import PublicLayout from '@layouts/PublicLayout.astro';
+import { buildSEO } from '@lib/seo';
+
+const seo = buildSEO({
+  title: 'Emergency Planning Tools | OwnitApps',
+  description: 'Private offline tools for family emergency binders, emergency contacts, medical notes, insurance info, caregiver instructions, and household readiness.',
+  canonical: '/categories/emergency-planning-tools',
+});
+---
+
+<PublicLayout seo={seo}>
+  <main class="category-hub">
+    <section class="hero">
+      <p class="eyebrow">Emergency Planning Tools</p>
+      <h1>Private Emergency Planning Tools for Families and Households</h1>
+      <p class="lede">
+        Emergency planning is not only about disasters. It is about making sure the right people can find the right household information quickly when life gets stressful, urgent, or unexpected.
+        OwnitApps emergency planning tools help families organize contacts, medical notes, insurance details, routines, documents, and print-ready instructions without depending on another cloud subscription.
+      </p>
+
+      <div class="hero-actions">
+        <a href="/apps/home-admin-binder-os" class="btn primary">View Home Admin Binder OS</a>
+        <a href="/blog/family-emergency-binder-checklist" class="btn secondary">Open emergency checklist</a>
+      </div>
+    </section>
+
+    <section class="featured card">
+      <div>
+        <p class="eyebrow">Featured Tool</p>
+        <h2>Home Admin Binder OS</h2>
+        <p>
+          A private offline household command center for emergency contacts, home documents, medical notes, insurance information, caregiver instructions, family routines, and print-ready emergency summaries.
+        </p>
+
+        <ul class="checklist">
+          <li>Prepare emergency contacts before they are needed</li>
+          <li>Organize medical notes, allergies, and caregiver instructions</li>
+          <li>Track insurance, home documents, and provider contacts</li>
+          <li>Create print-ready emergency summaries</li>
+          <li>Keep household information private and local-first</li>
+        </ul>
+
+        <a href="/apps/home-admin-binder-os" class="text-link">Build your private emergency binder →</a>
+      </div>
+
+      <aside class="mini-panel">
+        <strong>Best for</strong>
+        <span>Busy parents</span>
+        <span>Caregivers</span>
+        <span>Homeowners</span>
+        <span>Families preparing handoff instructions</span>
+      </aside>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <p class="eyebrow">Emergency Use Cases</p>
+        <h2>Prepare the information people may need quickly</h2>
+      </div>
+
+      <div class="grid">
+        <a class="card link-card" href="/use-cases/family-emergency-binder-app">
+          <h3>Family Emergency Binder App</h3>
+          <p>Organize emergency contacts, medical notes, insurance details, routines, and printable household instructions.</p>
+        </a>
+
+        <a class="card link-card" href="/use-cases/home-admin-binder-for-families">
+          <h3>Home Admin Binder for Families</h3>
+          <p>Give your household one calm place for important documents, contacts, routines, and emergency information.</p>
+        </a>
+
+        <a class="card link-card" href="/use-cases/private-home-document-organizer">
+          <h3>Private Home Document Organizer</h3>
+          <p>Track important household records, warranties, insurance notes, provider contacts, and document locations.</p>
+        </a>
+
+        <a class="card link-card" href="/use-cases/digital-household-binder">
+          <h3>Digital Household Binder</h3>
+          <p>Use a searchable, editable, printable household binder instead of relying only on paper or scattered folders.</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <p class="eyebrow">Checklists and Guides</p>
+        <h2>Practical emergency planning resources</h2>
+      </div>
+
+      <div class="grid">
+        <a class="card link-card" href="/blog/family-emergency-binder-checklist">
+          <h3>Family Emergency Binder Checklist</h3>
+          <p>A practical checklist for contacts, medical notes, insurance details, documents, routines, and print-ready instructions.</p>
+        </a>
+
+        <a class="card link-card" href="/blog/what-belongs-in-a-home-admin-binder">
+          <h3>What Belongs in a Home Admin Binder?</h3>
+          <p>Learn which household documents, contacts, routines, and emergency information are worth organizing first.</p>
+        </a>
+
+        <a class="card link-card" href="/compare/digital-home-binder-vs-paper-binder">
+          <h3>Digital Home Binder vs Paper Binder</h3>
+          <p>Compare searchable digital systems with printable paper binders for emergency readiness and household handoffs.</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <p class="eyebrow">Comparisons</p>
+        <h2>Choose the right emergency planning system</h2>
+      </div>
+
+      <div class="grid">
+        <a class="card link-card" href="/compare/home-admin-binder-os-vs-notion">
+          <h3>Home Admin Binder OS vs Notion</h3>
+          <p>Compare a ready-made private household system with building your own cloud workspace.</p>
+        </a>
+
+        <a class="card link-card" href="/compare/home-document-organizer-vs-google-drive">
+          <h3>Home Document Organizer vs Google Drive</h3>
+          <p>See why emergency planning needs more structure than cloud folders alone.</p>
+        </a>
+
+        <a class="card link-card" href="/categories/home-organization-tools">
+          <h3>Home Organization Tools</h3>
+          <p>Explore the broader home organization cluster connected to emergency planning and household admin.</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="section card final-cta">
+      <p class="eyebrow">OwnitApps</p>
+      <h2>Create a private emergency-ready household system</h2>
+      <p>
+        Home Admin Binder OS helps families prepare emergency contacts, home documents, medical notes, insurance information, routines, and caregiver instructions in one private local-first tool.
+      </p>
+      <a href="/apps/home-admin-binder-os" class="btn primary">View Home Admin Binder OS</a>
+    </section>
+  </main>
+
+  <style>
+    .category-hub {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 56px 20px 80px;
+    }
+
+    .hero {
+      padding: 56px 0 34px;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--gold, #C9A84C);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: 12px;
+    }
+
+    h1 {
+      max-width: 920px;
+      margin: 0;
+      font-size: clamp(38px, 6vw, 72px);
+      line-height: .95;
+      letter-spacing: -0.06em;
+    }
+
+    .lede {
+      max-width: 840px;
+      margin: 22px 0 0;
+      color: var(--text-secondary, #6B6258);
+      font-size: 18px;
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 26px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .btn.primary {
+      background: var(--gold, #C9A84C);
+      color: #1f1808;
+    }
+
+    .btn.secondary {
+      background: #fff;
+      color: var(--text-primary, #2B2B2B);
+      border: 1px solid rgba(0,0,0,.08);
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: 18px;
+      box-shadow: 0 18px 60px rgba(43,43,43,.06);
+    }
+
+    .featured {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 28px;
+      padding: 28px;
+      margin: 28px 0 52px;
+    }
+
+    .featured h2,
+    .section h2 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+
+    .featured p,
+    .section p {
+      color: var(--text-secondary, #6B6258);
+      line-height: 1.65;
+    }
+
+    .checklist {
+      display: grid;
+      gap: 10px;
+      padding-left: 20px;
+      color: var(--text-primary, #2B2B2B);
+    }
+
+    .mini-panel {
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      padding: 18px;
+      border-radius: 14px;
+      background: #F5F0E8;
+      border: 1px solid rgba(0,0,0,.08);
+    }
+
+    .mini-panel span {
+      display: inline-flex;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--text-secondary, #6B6258);
+      font-size: 13px;
+    }
+
+    .section {
+      margin-top: 52px;
+    }
+
+    .section-head {
+      margin-bottom: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .link-card {
+      display: block;
+      padding: 20px;
+      color: inherit;
+      text-decoration: none;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    .link-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 70px rgba(43,43,43,.09);
+    }
+
+    .link-card h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      letter-spacing: -0.03em;
+    }
+
+    .link-card p {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .text-link {
+      display: inline-flex;
+      margin-top: 12px;
+      color: #806515;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .final-cta {
+      padding: 28px;
+    }
+
+    @media (max-width: 850px) {
+      .featured,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 42px;
+      }
+    }
+  </style>
+</PublicLayout>
